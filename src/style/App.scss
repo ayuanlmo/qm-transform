@@ -1,0 +1,501 @@
+@import "theme";
+
+.animated {
+  animation-duration: .2s !important;
+}
+
+.main-app {
+  display: flex;
+
+  .main-menu-collapse {
+    width: 6.25rem !important;
+
+    .main-menu-content-item {
+      width: 3.75rem !important;
+
+      .main-menu-content-item-name {
+        display: none !important;
+      }
+    }
+
+    .main-menu-app-logo {
+      img {
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+      }
+    }
+
+    .main-menu-app-name {
+      display: none !important;
+    }
+
+    .system-setting {
+      width: 3.75rem;
+
+      span {
+        display: none;
+      }
+    }
+
+
+  }
+
+  .main-content {
+    width: 100%;
+    height: calc(100vh - 2.25rem);
+
+    .router-view {
+      height: 100%;
+      overflow: hidden;
+    }
+  }
+
+  .task-list {
+    padding: 0 1.5rem;
+    height: calc(100vh - 12.25rem);
+    overflow-y: scroll;
+    margin-top: 1.69rem;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .task-item {
+      width: 100%;
+      height: 10rem;
+      margin-bottom: 1.25rem;
+
+      .fui-Spinner {
+        height: 100%;
+      }
+
+      .fui-Card {
+        height: 100%;
+        padding: 0;
+        border-radius: 0.75rem;
+      }
+
+      .task-item-content {
+        height: 10rem;
+
+        .task-item-content-cover {
+          width: 15.1875rem;
+          overflow: hidden;
+
+          img {
+            width: 100%;
+          }
+        }
+
+        .task-item-media-info {
+          width: calc(100% - 15.1875rem);
+
+          .task-item-media-info-remove {
+            right: 1rem;
+            top: .62rem;
+
+            svg {
+              &:hover {
+                path {
+                  fill: $theme-color;
+                }
+              }
+            }
+          }
+
+          .task-item-media-info-name {
+            margin-left: 1.08rem;
+            margin-top: 1.06rem;
+
+            .task-item-media-info-text {
+              margin-left: .38rem;
+            }
+          }
+
+          .task-item-media-info-sub {
+            margin-left: 1.06rem;
+            margin-top: .63rem;
+            color: #999;
+          }
+
+          .task-item-media-info-options {
+            margin-left: 1.06rem;
+            margin-top: 2rem;
+          }
+
+          .task-item-media-info-sub-item {
+            margin-right: 1.88rem;
+          }
+
+          .task-item-media-info-progress-bar {
+            bottom: 0;
+            width: 100%;
+          }
+        }
+
+        .task-item-option {
+          height: 3rem;
+          right: 1.88rem;
+          margin-top: 3.5rem;
+
+          button {
+            height: 100%;
+          }
+
+          svg {
+            position: relative;
+            margin-top: .75rem;
+          }
+
+          .task-item-option-setting {
+            margin-right: 1.25rem;
+
+            path {
+              &:hover {
+                fill: $theme-color;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .main-menu {
+    width: 16.25rem;
+    height: 100vh;
+    flex-shrink: 0;
+    transition: all .2s;
+
+    .main-menu-app-logo {
+      display: flex;
+      justify-content: center;
+      padding-top: 2.62rem;
+      padding-bottom: 1.04rem;
+
+      img {
+        width: 3.4375rem;
+        height: 3.4375rem;
+        flex-shrink: 0;
+        transition: all .2s
+      }
+    }
+
+    .main-menu-app-name {
+      display: flex;
+      justify-content: center;
+    }
+
+    .main-menu-content {
+      margin-top: 2.5rem;
+
+      .main-menu-content-item-active {
+        box-shadow: 1px 1px 1px 0 rgba(209, 215, 226, 0.30);
+        transition: all .2s;
+
+        &:before {
+          content: '';
+          position: absolute;
+          width: 0.1875rem;
+          height: 1.5rem;
+          flex-shrink: 0;
+          border-radius: 0.5rem;
+          background: #0688E5;
+          top: .75rem;
+          animation: h .2s;
+
+          @keyframes h {
+            1% {
+              height: 0;
+            }
+            100% {
+              height: 1.5rem;
+            }
+          }
+        }
+      }
+
+      .main-menu-content-item {
+        width: 13.75rem;
+        height: 3rem;
+        flex-shrink: 0;
+        margin-left: 1.25rem;
+        margin-bottom: .75rem;
+
+        .main-menu-content-item-ico {
+          margin-top: 0.94rem;
+          margin-left: 1.25rem;
+
+
+          img {
+            width: 1.25rem;
+            height: 1.125rem;
+            flex-shrink: 0;
+          }
+        }
+
+        .main-menu-content-item-name {
+          line-height: 3rem;
+          margin-left: .75rem;
+          font-size: 1rem;
+          font-style: normal;
+          font-weight: 300;
+        }
+
+        &:hover {
+          transform: scale(1.02);
+          @extend .main-menu-content-item-active;
+        }
+
+        border-radius: 0.5rem;
+      }
+    }
+  }
+
+  .app-content-max {
+    width: calc(100vw - 6.25rem);
+  }
+
+  .app-content {
+    width: calc(100vw - 16.25rem);
+
+    .main-content {
+      width: 100%;
+      height: calc(100vh - 2.25rem);
+    }
+
+    .router-view {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+    }
+  }
+
+  .system-setting {
+    bottom: 1.88rem;
+    width: 13.75rem;
+    height: 3rem;
+    margin-top: 1rem;
+    margin-left: 1.38rem;
+
+    .system-setting-content {
+      width: 100%;
+      height: 100%;
+      border-radius: 0.5rem;
+
+      flex-shrink: 0;
+      display: flex;
+      justify-content: left;
+      align-items: center;
+      transition: all .2s;
+
+      &:hover {
+        background: #fff;
+      }
+
+      svg {
+        margin-left: 1.38rem;
+      }
+
+      span {
+        margin-left: .63rem;
+      }
+    }
+  }
+
+  .header-controller {
+    height: 2.25rem;
+    width: 100%;
+    display: flex;
+    justify-content: end;
+
+    .header-controller-drag {
+      -webkit-app-region: drag;
+      width: 88%;
+    }
+
+    .header-controller-item {
+      width: 3.125rem;
+      height: 2.25rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .header-controller-close {
+      &:hover {
+        background: #C42B1C;
+
+        svg {
+          fill: #fff;
+        }
+      }
+    }
+  }
+
+  .main-app-drop-file {
+    width: 100%;
+    height: calc(100% - (2.5rem + 2.69rem));
+
+    .main-app-drop-file-content {
+      width: 32.5rem;
+      height: 18.75rem;
+      flex-shrink: 0;
+      border-radius: 1.25rem;
+      left: calc((100% - 32.5rem) / 2);
+      top: calc((100% - 21.8rem) / 2);
+      transition: all .2s;
+      text-align: center;
+
+      .main-app-drop-file-content-icon {
+        width: 3.75rem;
+        height: 3.75rem;
+        flex-shrink: 0;
+        margin: 5.25rem auto auto;
+      }
+
+      .main-app-drop-file-content-message {
+        font-size: 1rem;
+        font-style: normal;
+        font-weight: 300;
+        line-height: normal;
+        margin-top: 1.25rem;
+      }
+
+      .main-app-drop-file-content-desc {
+        margin-top: .62rem;
+        font-size: 0.875rem;
+        font-style: normal;
+        font-weight: 300;
+        line-height: normal;
+      }
+
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  .add-media-files {
+    margin-top: .69rem;
+    padding: 0 1.25rem;
+    height: 2.5rem;
+    justify-content: space-between;
+  }
+
+}
+
+.system-setting-tab {
+  margin-bottom: .5rem;
+  overflow: auto;
+}
+
+.fui-Card {
+  margin-bottom: 1rem !important;
+}
+
+.system-setting-item {
+  margin-bottom: .5rem;
+
+  label {
+    svg {
+      width: 1rem;
+      height: 1rem;
+      position: relative;
+      top: .2rem;
+      margin-right: .5rem;
+    }
+  }
+
+  .fui-InteractionTagPrimary {
+    margin-right: .5rem;
+
+    span {
+      margin-top: 0;
+    }
+  }
+
+  span {
+    margin-top: .5rem;
+  }
+
+  .fui-Input {
+    width: 100%;
+  }
+
+  .system-setting-item-content {
+    margin-top: .2rem;
+  }
+
+  .system-setting-item-content-divider {
+    margin-top: .5rem;
+  }
+}
+
+.app-about {
+  text-align: center;
+
+  .icon {
+    width: 6.25rem;
+    height: 6.25rem;
+    margin: auto;
+
+    img {
+      width: 100%;
+      display: block;
+    }
+  }
+
+  .app-about-name {
+    color: $theme-color;
+    margin-top: 1.25rem;
+    font-size: 1.8rem;
+    font-weight: bold;
+  }
+
+  .app-about-version {
+    font-size: 0.875rem;
+    margin: 1.25rem 0;
+  }
+
+  .app-about-update {
+    display: flex;
+    justify-content: center;
+    margin: 1.25rem 0;
+  }
+
+  .app-about-license {
+    @extend .app-about-update;
+  }
+
+  .app-about-repository {
+    p {
+      margin: 0.5rem 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+  }
+}
+
+.license-item {
+  margin-bottom: .5rem;
+  line-height: 1.5rem;
+
+  .fui-Divider {
+    margin-top: .5rem;
+  }
+}
+
+.task-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 16.5rem);
+  justify-content: space-between;
+  margin: 1rem 0;
+
+  .task-options-item{
+    padding-bottom: .8rem;
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "cancel": "キャンセル",
+  "confirm": "確認",
+  "close": "閉じる",
+  "image": "画像",
+  "audio": "音声",
+  "video": "動画",
+  "add": "追加",
+  "use": "使用",
+  "return": "戻る",
+  "continue": "続ける",
+  "delete": "削除",
+  "deleteFile": "ファイルを削除",
+  "edit": "編集",
+  "save": "保存",
+  "search": "検索",
+  "clear": "クリア",
+  "upload": "アップロード",
+  "download": "ダウンロード",
+  "input": "入力",
+  "select": "選択",
+  "play": "再生",
+  "pause": "一時停止",
+  "noData": "データがありません",
+  "pleaseSelect": "選択してください",
+  "tips": "ヒント",
+  "systemMessage": "システムメッセージ",
+  "systemSetting": "設定",
+  "menu": {
+    "videoTransform": "動画形式変換",
+    "audioTransform": "音声形式変換",
+    "videoConcat": "動画結合",
+    "videoCompress": "動画圧縮"
+  },
+  "outputSetting": {
+    "label": "出力設定",
+    "optPath": "出力パス",
+    "parallelTasks": "並列タスク数",
+    "parallelTasksDesc": "コンピュータの性能に応じて適切に調整してください",
+    "codec": "コーデック",
+    "softwareDecoding": "ソフトウェアデコード",
+    "hardwareDecoding": "ハードウェアデコード",
+    "hardwareDecodingDesc": "ハードウェアデコードはGPUを使用して処理を高速化し、CPUの負担を軽減します。",
+    "gpuDecoderMethod": "GPUデコーダー方式",
+    "gpuDecoderMethodDesc": "ハードウェアおよびドライバが正常に動作していることを確認してください。エラーが発生した場合は、デコーダーとしてCPUを選択してください。"
+  },
+  "otherSetting": {
+    "label": "その他の設定",
+    "tmpFile": "一時ファイル",
+    "preventLowPowerMode": "低電力モードを防止",
+    "preventLowPowerModeDesc": "{{os}}がスリープや一時停止状態に入らないようにします。このセッションのみ有効です。"
+  },
+  "playerSetting": {
+    "label": "プレイヤー設定",
+    "mediaPlayer": "メディアプレイヤー",
+    "customMediaPlayer": "カスタムメディアプレイヤー",
+    "mediaPlayerPath": "プレイヤーパス",
+    "mediaPlayerDesc": "上記のプレイヤー起動方法はすべて「直接呼び出し」方式です。"
+  },
+  "about": {
+    "label": "情報",
+    "viewOnGithub": "GitHubでこのプロジェクトを見る",
+    "checkForUpdate": "更新を確認する",
+    "designer": "デザイナー",
+    "licenseAndOpenSourceNotices": "ライセンスおよびオープンソースに関する通知",
+    "appOpenSourceNotice": "<appName>{{name}}</appName> は Apache 2.0 ライセンスに基づいて公開されているオープンソースプロジェクトです。<github>Github</github> でソースコードを閲覧し、このプロジェクトに貢献することが可能です。"
+  },
+  "update": {
+    "checking": "アップデートを確認しています...",
+    "noAvailable": "現在利用可能なアップデートはありません。",
+    "downloaded": "アップデートのダウンロードが完了しました。アプリケーションを再起動して適用しますか？",
+    "error": "アップデートのダウンロードに失敗しました。ネットワーク接続を確認してください。"
+  },
+  "mediaFile": {
+    "options": {
+      "add": "ファイル追加",
+      "openNetworkStreaming": "ネットワークストリームを開く",
+      "remove": "削除",
+      "clearAll": "すべてクリア",
+      "clearAllConfirmMessage": "現在のすべてのメディアファイルを削除してもよろしいですか？",
+      "clickImportAndDrop": "クリックしてインポートするか、ここにファイルをドラッグ＆ドロップしてください",
+      "clickImportAndDropDesc": "mp4、mov、mkv、avi、mp3、flac形式をサポートしています",
+      "startConversionAll": "すべて変換",
+      "startProcessing": "処理開始",
+      "inProgress": "進行中",
+      "getMediaFileInformation": "メディアファイル情報を取得中...",
+      "startConcat": "結合開始",
+      "conversionSuccessMessage": "[{{name}}] 変換に成功しました",
+      "conversionFailed": "変換に失敗しました",
+      "showInExplorer": "エクスプローラーで表示",
+      "showInFinder": "Finderで表示",
+      "addTitle": "タイトルを追加",
+      "addCredits": "クレジットを追加",
+      "videoFps": "動画フレームレート",
+      "type": "タイプ",
+      "openInMediaPlayer": "メディアプレイヤーで開く"
+    },
+    "format": "フォーマット",
+    "resolution": "解像度",
+    "outPutFormat": "出力フォーマット",
+    "audioCode": "音声コーデック",
+    "bitRate": "ビットレート",
+    "samplingRate": "サンプリングレート",
+    "videoCode": "動画コーデック",
+    "size": "サイズ",
+    "duration": "再生時間",
+    "noAudio": "音声なし",
+    "noVideo": "動画なし",
+    "audio": "音声",
+    "video": "動画",
+    "volume": "音量",
+    "mute": "ミュート"
+  },
+  "themeSetting": {
+    "label": "テーマ設定",
+    "theme": "テーマ",
+    "light": "ライト",
+    "dark": "ダーク",
+    "auto": "自動",
+    "lang": "言語",
+    "appearance": "外観",
+    "navigation": "ナビゲーション",
+    "zoomFactor": "확대/축소 비율",
+    "navigationSetting": {
+      "default": "展開",
+      "collapse": "折りたたみ"
+    }
+  },
+  "window": {
+    "mini": "元に戻す",
+    "max": "最大化",
+    "hide": "最小化",
+    "closeMessage": "本当に閉じますか？"
+  },
+  "errMessage": {
+    "label": "エラーメッセージ",
+    "media-info-error": "メディアファイル [{{mediaFile}}] の基本情報を取得中にエラーが発生しました。詳細: {{message}}",
+    "media-first-frame-error": "メディアファイル [{{mediaFile}}] の最初のフレーム画像を取得中にエラーが発生しました。詳細: {{message}}",
+    "media-audio-av-error": "オーディオファイル [{{mediaFile}}] の波形を取得中にエラーが発生しました。詳細: {{message}}",
+    "output-directory-not-exist": "出力ディレクトリ [{{path}}] が存在しません。再度選択してください。",
+    "conversionFailedMessage": "[{{name}}] 変換に失敗しました。詳細: {{message}}。"
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "cancel": "취소",
+  "confirm": "확인",
+  "close": "닫기",
+  "image": "이미지",
+  "audio": "오디오",
+  "video": "비디오",
+  "add": "추가",
+  "use": "사용",
+  "return": "돌아가기",
+  "continue": "계속",
+  "delete": "삭제",
+  "deleteFile": "파일 삭제",
+  "edit": "편집",
+  "save": "저장",
+  "search": "검색",
+  "clear": "초기화",
+  "upload": "업로드",
+  "download": "다운로드",
+  "input": "입력",
+  "select": "선택",
+  "play": "재생",
+  "pause": "일시정지",
+  "noData": "데이터 없음",
+  "pleaseSelect": "선택해 주세요",
+  "tips": "팁",
+  "systemMessage": "시스템 메시지",
+  "systemSetting": "설정",
+  "menu": {
+    "videoTransform": "비디오 형식 변환",
+    "audioTransform": "오디오 형식 변환",
+    "videoConcat": "비디오 병합",
+    "videoCompress": "비디오 압축"
+  },
+  "outputSetting": {
+    "label": "출력 설정",
+    "optPath": "출력 경로",
+    "parallelTasks": "병렬 작업 수",
+    "parallelTasksDesc": "컴퓨터 성능에 따라 적절히 조정하세요",
+    "codec": "코덱",
+    "softwareDecoding": "소프트웨어 디코딩",
+    "hardwareDecoding": "하드웨어 디코딩",
+    "hardwareDecodingDesc": "하드웨어 디코딩은 GPU를 사용하여 프로세스를 가속화하고 CPU 부담을 줄입니다.",
+    "gpuDecoderMethod": "GPU 디코더 방법",
+    "gpuDecoderMethodDesc": "하드웨어 및 드라이버가 정상적으로 작동하는지 확인하세요. 오류 발생 시 CPU를 디코더로 선택하십시오."
+  },
+  "otherSetting": {
+    "label": "기타 설정",
+    "tmpFile": "임시 파일",
+    "preventLowPowerMode": "저전력 모드 방지",
+    "preventLowPowerModeDesc": "{{os}} 가 대기 또는 일시 중지 상태로 전환되지 않도록 합니다. 현재 세션에만 적용됩니다."
+  },
+  "playerSetting": {
+    "label": "플레이어 설정",
+    "mediaPlayer": "미디어 플레이어",
+    "customMediaPlayer": "사용자 지정 플레이어",
+    "mediaPlayerPath": "플레이어 경로",
+    "mediaPlayerDesc": "위의 플레이어 실행 방식은 모두 '직접 호출' 방식입니다."
+  },
+  "about": {
+    "label": "정보",
+    "viewOnGithub": "Github 에서 이 프로젝트 보기",
+    "checkForUpdate": "업데이트 확인",
+    "designer": "디자이너",
+    "licenseAndOpenSourceNotices": "라이선스 및 오픈소스 알림",
+    "appOpenSourceNotice": "<appName>{{name}}</appName> 은(는) Apache 2.0 라이선스에 따라 배포된 오픈소스 프로젝트입니다. <github>Github</github> 에서 소스 코드를 확인하고 이 프로젝트에 기여할 수 있습니다."
+  },
+  "update": {
+    "checking": "업데이트 확인 중...",
+    "noAvailable": "현재 사용 가능한 업데이트가 없습니다.",
+    "downloaded": "업데이트 다운로드가 완료되었습니다. 애플리케이션을 즉시 재시작하여 업데이트하시겠습니까?",
+    "error": "업데이트 다운로드에 실패했습니다. 네트워크 연결을 확인해 주세요."
+  },
+  "mediaFile": {
+    "options": {
+      "add": "파일 추가",
+      "openNetworkStreaming": "네트워크 스트리밍 열기",
+      "remove": "제거",
+      "clearAll": "전체 삭제",
+      "clearAllConfirmMessage": "현재 모든 미디어 파일을 삭제하시겠습니까?",
+      "clickImportAndDrop": "클릭하여 파일을 가져오거나 여기에 드래그 앤 드롭하세요",
+      "clickImportAndDropDesc": "mp4, mov, mkv, avi, mp3, flac 형식 지원",
+      "startConversionAll": "모두 변환",
+      "startProcessing": "처리 시작",
+      "inProgress": "진행 중",
+      "getMediaFileInformation": "미디어 파일 정보를 가져오는 중...",
+      "startConcat": "병합 시작",
+      "conversionSuccessMessage": "[{{name}}] 변환이 성공적으로 완료됨",
+      "conversionFailed": "변환 실패",
+      "showInExplorer": "탐색기에서 표시",
+      "showInFinder": "파인더에서 표시",
+      "addTitle": "타이틀 추가",
+      "addCredits": "크레딧 추가",
+      "videoFps": "비디오 프레임 속도(FPS)",
+      "type": "유형",
+      "openInMediaPlayer": "미디어 플레이어로 열기"
+    },
+    "format": "포맷",
+    "resolution": "해상도",
+    "outPutFormat": "출력 포맷",
+    "audioCode": "오디오 코덱",
+    "bitRate": "비트레이트",
+    "samplingRate": "샘플링 레이트",
+    "videoCode": "비디오 코덱",
+    "size": "크기",
+    "duration": "길이",
+    "noAudio": "오디오 없음",
+    "noVideo": "비디오 없음",
+    "audio": "오디오",
+    "video": "비디오",
+    "volume": "볼륨",
+    "mute": "음소거"
+  },
+  "themeSetting": {
+    "label": "테마 설정",
+    "theme": "테마",
+    "light": "밝음",
+    "dark": "어두움",
+    "auto": "자동",
+    "lang": "언어",
+    "appearance": "외형",
+    "navigation": "네비게이션",
+    "zoomFactor": "확대/축소 비율",
+    "navigationSetting": {
+      "default": "확장",
+      "collapse": "접기"
+    }
+  },
+  "window": {
+    "mini": "복원",
+    "max": "최대화",
+    "hide": "최소화",
+    "closeMessage": "정말 닫으시겠습니까?"
+  },
+  "errMessage": {
+    "label": "오류 메시지",
+    "media-info-error": "미디어 파일 [{{mediaFile}}]의 기본 정보를 가져오는 중 오류가 발생했습니다. 상세 내용: {{message}}",
+    "media-first-frame-error": "미디어 파일 [{{mediaFile}}]의 첫 번째 프레임 이미지를 가져오는 중 오류가 발생했습니다. 상세 내용: {{message}}",
+    "media-audio-av-error": "오디오 파일 [{{mediaFile}}]의 파형을 가져오는 중 오류가 발생했습니다. 상세 내용: {{message}}",
+    "output-directory-not-exist": "출력 디렉터리 [{{path}}]가 존재하지 않습니다. 다시 선택해 주세요.",
+    "conversionFailedMessage": "[{{name}}] 변환이 실패했습니다. 상세 내용: {{message}}."
+  }
+}
