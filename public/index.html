@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="theme-color" content="#000000"/>
+    <meta
+            name="description"
+            content="Web site created using create-react-app"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/icon.png"/>
+    <title>lmo-Transform</title>
+</head>
+<body>
+<noscript>You need to enable JavaScript to run this app.</noscript>
+<div id="__lmo_app__"></div>
+</body>
+<script>
+    function onLoad() {
+        console.log('\n你离开了南京，从此没有人和我说话\n\n');
+        console.log('Hi, there👋');
+        console.log('\n' + ' %c lmo-Transform' + ' %c by ayuanlmo' + '\n', 'color: #fff; background: #229EED;font-size:14px;border-radius:4px;padding:6px;', 'color:#229EED;' + 'padding:4px 0;background: #F9F3E3;border-radius:4px;margin-left:4px;');
+        console.log('\n' + ' %c GitHub' + ' %c https://github.com/ayuanlmo/lmo-transform' + '\n', 'color: #fff; background: purple;font-size:14px;border-radius:4px;padding:6px;', 'color:#fff;' + 'padding:4px 0;background: #F9F3E3;border-radius:4px;margin-left:4px;');
+        removeEventListener('load', onLoad);
+    }
+
+    addEventListener('load', onLoad);
+</script>
+</html>

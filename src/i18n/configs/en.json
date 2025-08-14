@@ -1,0 +1,143 @@
+{
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "close": "Close",
+  "image": "Image",
+  "audio": "Audio",
+  "video": "Video",
+  "add": "Add",
+  "use": "Use",
+  "return": "Return",
+  "continue": "Continue",
+  "delete": "Delete",
+  "deleteFile": "Delete File",
+  "edit": "Edit",
+  "save": "Save",
+  "search": "Search",
+  "clear": "Clear",
+  "upload": "Upload",
+  "download": "Download",
+  "input": "Input",
+  "select": "Select",
+  "play": "Play",
+  "pause": "Pause",
+  "noData": "No data available",
+  "pleaseSelect": "Please select",
+  "tips": "Tips",
+  "systemMessage": "System Message",
+  "systemSetting": "Settings",
+  "menu": {
+    "videoTransform": "Convert Video Format",
+    "audioTransform": "Convert Audio Format",
+    "videoConcat": "Merge Videos",
+    "videoCompress": "Compress Video"
+  },
+  "outputSetting": {
+    "label": "Output Settings",
+    "optPath": "Output Path",
+    "parallelTasks": "Number of Parallel Tasks",
+    "parallelTasksDesc": "Adjust according to your computer's performance",
+    "codec": "Codec",
+    "softwareDecoding": "Software Decoding",
+    "hardwareDecoding": "Hardware Decoding",
+    "hardwareDecodingDesc": "Hardware decoding uses the GPU to accelerate the process and reduce CPU utilization.",
+    "gpuDecoderMethod": "GPU Decoder Method",
+    "gpuDecoderMethodDesc": "Ensure that your hardware and drivers are working properly. If errors occur, choose CPU as the decoder."
+  },
+  "otherSetting": {
+    "label": "Other Settings",
+    "tmpFile": "Temporary Files",
+    "preventLowPowerMode": "Prevent Low Power Mode",
+    "preventLowPowerModeDesc": "Prevents Windows from entering standby or suspended states, effective only for this session"
+  },
+  "playerSetting": {
+    "label": "Player Settings",
+    "mediaPlayer": "Media Player",
+    "customMediaPlayer": "Custom Media Player",
+    "mediaPlayerPath": "Player Path",
+    "mediaPlayerDesc": "All playback methods above use the 'Direct Call' method"
+  },
+  "about": {
+    "label": "About",
+    "viewOnGithub": "View this project on GitHub",
+    "checkForUpdate": "Check for Updates",
+    "designer": "Designer",
+    "licenseAndOpenSourceNotices": "License and Open Source Notices",
+    "appOpenSourceNotice": "<appName>{{name}}</appName> is an open source project published under the Apache 2.0 License. You can view the source code and contribute to this project on <github>Github</github>"
+  },
+  "update": {
+    "checking": "Checking for updates...",
+    "noAvailable": "No available updates at this time.",
+    "downloaded": "Update downloaded successfully. Do you want to restart the application now to apply the update?",
+    "error": "Update download failed. Please check your network connection."
+  },
+  "mediaFile": {
+    "options": {
+      "add": "Add File",
+      "openNetworkStreaming": "Open Network Stream",
+      "remove": "Remove",
+      "clearAll": "Clear All",
+      "clearAllConfirmMessage": "Are you sure you want to clear all media files?",
+      "clickImportAndDrop": "Click to import a file, or drag and drop it here",
+      "clickImportAndDropDesc": "Supports importing mp4, mov, mkv, avi, mp3, flac formats",
+      "startConversionAll": "Convert All",
+      "startProcessing": "Start Processing",
+      "inProgress": "In Progress",
+      "getMediaFileInformation": "Retrieving media file information...",
+      "startConcat": "Start Merging",
+      "conversionSuccessMessage": "[{{name}}] converted successfully",
+      "conversionFailed": "Conversion failed",
+      "showInExplorer": "Show in Explorer",
+      "showInFinder": "Show in Finder",
+      "addTitle": "Add Title",
+      "addCredits": "Add Credits",
+      "videoFps": "Video FPS",
+      "type": "Type",
+      "openInMediaPlayer": "Open with Media Player"
+    },
+    "format": "Format",
+    "resolution": "Resolution",
+    "outPutFormat": "Output Format",
+    "audioCode": "Audio Codec",
+    "bitRate": "Bit Rate",
+    "samplingRate": "Sampling Rate",
+    "videoCode": "Video Codec",
+    "size": "Size",
+    "duration": "Duration",
+    "noAudio": "No Audio",
+    "noVideo": "No Video",
+    "audio": "Audio",
+    "video": "Video",
+    "volume": "Volume",
+    "mute": "Mute"
+  },
+  "themeSetting": {
+    "label": "Appearance Settings",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "auto": "Auto",
+    "lang": "Language",
+    "appearance": "Appearance",
+    "navigation": "Navigation",
+    "zoomFactor": "Zoom Factor",
+    "navigationSetting": {
+      "default": "Expand",
+      "collapse": "Collapse"
+    }
+  },
+  "window": {
+    "mini": "Restore",
+    "max": "Maximize",
+    "hide": "Minimize",
+    "closeMessage": "Are you sure you want to close?"
+  },
+  "errMessage": {
+    "label": "Error Message",
+    "media-info-error": "An error occurred while retrieving basic information for media file [{{mediaFile}}], details: {{message}}",
+    "media-first-frame-error": "An error occurred while retrieving the first frame image of media file [{{mediaFile}}], details: {{message}}",
+    "media-audio-av-error": "An error occurred while retrieving waveform of audio file [{{mediaFile}}], details: {{message}}",
+    "output-directory-not-exist": "Output directory [{{path}}] does not exist. Please select another.",
+    "conversionFailedMessage": "[{{name}}] conversion failed, details: {{message}}."
+  }
+}

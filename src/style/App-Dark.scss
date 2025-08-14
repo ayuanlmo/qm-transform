@@ -1,0 +1,54 @@
+@import "theme";
+
+.dark-mode {
+  .main-menu {
+    background: #383838;
+
+    .main-menu-content-item {
+      box-shadow: none !important;
+
+      &:hover {
+        background: #444;
+      }
+
+      .main-menu-content-item-name {
+        color: #FFFFFF;
+      }
+    }
+
+    .main-menu-content-item-active {
+      background: #444;
+    }
+  }
+
+  .system-setting {
+    .system-setting-content {
+      &:hover {
+        background: #444 !important;
+      }
+    }
+
+    svg {
+      path {
+        fill: #fff;
+      }
+    }
+  }
+
+  .main-app-drop-file {
+    .main-app-drop-file-content {
+      border: 1px dashed #818181;
+      background: #444;
+
+      .main-app-drop-file-content-icon {
+        svg {
+          fill: $color-white;
+        }
+      }
+
+      .main-app-drop-file-content-message{
+        color: $color-white;
+      }
+    }
+  }
+}
