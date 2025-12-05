@@ -14,6 +14,7 @@ import TaskFormats from "../Task/TaskFormats";
 
 export interface IVTOptionsProps {
     mediaInfo: IMediaInfo;
+    onUpdate?: (changes: Partial<IMediaInfo>) => void;
 }
 
 export interface IVTOptionsRef {
@@ -21,7 +22,7 @@ export interface IVTOptionsRef {
 }
 
 const VTOptions: ForwardRefExoticComponent<IVTOptionsProps & React.RefAttributes<IVTOptionsRef>> = forwardRef<IVTOptionsRef, IVTOptionsProps>((props: IVTOptionsProps, ref: ForwardedRef<IVTOptionsRef>) => {
-    const {mediaInfo} = props;
+    const {mediaInfo, onUpdate} = props;
     const {t} = useTranslation();
     const [visible, setVisible] = useState(false);
 
@@ -29,8 +30,8 @@ const VTOptions: ForwardRefExoticComponent<IVTOptionsProps & React.RefAttributes
         setVisible(!visible);
     };
 
-    const changeEvent = (data: object) => {
-        console.log(data, mediaInfo);
+    const changeEvent = (data: Partial<IMediaInfo>): void => {
+        onUpdate?.(data);
     };
 
     useImperativeHandle(ref, (): IVTOptionsRef => ({
@@ -50,8 +51,12 @@ const VTOptions: ForwardRefExoticComponent<IVTOptionsProps & React.RefAttributes
                             <Label>{t('mediaFile.format')}</Label>
                             <TaskFormats
                                 type={'video'}
-                                onChange={(value) => {
-                                    changeEvent({format: value});
+                                value={mediaInfo.optFormat}
+                                codec={mediaInfo.videoParams.codec}
+                                onChange={(format) => {
+                                    changeEvent({
+                                        optFormat: format.name
+                                    });
                                 }}
                             />
                         </div>
@@ -60,8 +65,12 @@ const VTOptions: ForwardRefExoticComponent<IVTOptionsProps & React.RefAttributes
                                 {t('mediaFile.quality.label')}
                             </Label>
                             <Select
-                                defaultValue={mediaInfo.quality}
                                 value={mediaInfo.quality}
+                                onChange={(_, data): void => {
+                                    changeEvent({
+                                        quality: data.value as MediaQuality
+                                    });
+                                }}
                             >
                                 {
                                     qualityOptions.map((i): React.JSX.Element => {
@@ -75,8 +84,15 @@ const VTOptions: ForwardRefExoticComponent<IVTOptionsProps & React.RefAttributes
                         <div className={'task-options-item'}>
                             <Label>{t('mediaFile.codec')}</Label>
                             <Select
-                                defaultValue={mediaInfo.videoParams.codec}
                                 value={mediaInfo.videoParams.codec}
+                                onChange={(_, data): void => {
+                                    changeEvent({
+                                        videoParams: {
+                                            ...mediaInfo.videoParams,
+                                            codec: data.value
+                                        }
+                                    });
+                                }}
                             >
                                 {
                                     codecOptions.map((i): React.JSX.Element => {
@@ -94,7 +110,15 @@ const VTOptions: ForwardRefExoticComponent<IVTOptionsProps & React.RefAttributes
                                 {t('mediaFile.preset.label')}
                             </InfoLabel>
                             <Select
-
+                                value={mediaInfo.videoParams.preset}
+                                onChange={(_, data): void => {
+                                    changeEvent({
+                                        videoParams: {
+                                            ...mediaInfo.videoParams,
+                                            preset: data.value
+                                        }
+                                    });
+                                }}
                             >
                                 {
                                     presetOptions.map((i): React.JSX.Element => {
@@ -108,8 +132,15 @@ const VTOptions: ForwardRefExoticComponent<IVTOptionsProps & React.RefAttributes
                         <div className={'task-options-item'}>
                             <Label>{t('mediaFile.pixelFormat.label')}</Label>
                             <Select
-                                defaultValue={mediaInfo.videoParams.pixFmt}
                                 value={mediaInfo.videoParams.pixFmt}
+                                onChange={(_, data): void => {
+                                    changeEvent({
+                                        videoParams: {
+                                            ...mediaInfo.videoParams,
+                                            pixFmt: data.value
+                                        }
+                                    });
+                                }}
                             >
                                 {
                                     pixelFormatOptions.map((i): React.JSX.Element => {
@@ -123,8 +154,15 @@ const VTOptions: ForwardRefExoticComponent<IVTOptionsProps & React.RefAttributes
                         <div className={'task-options-item'}>
                             <Label>{t('mediaFile.videoBitrate.label')}</Label>
                             <Select
-                                defaultValue={mediaInfo.videoParams.bitrate}
                                 value={mediaInfo.videoParams.bitrate}
+                                onChange={(_, data): void => {
+                                    changeEvent({
+                                        videoParams: {
+                                            ...mediaInfo.videoParams,
+                                            bitrate: data.value
+                                        }
+                                    });
+                                }}
                             >
                                 {
                                     videoBitrateOptions.map((i): React.JSX.Element => {
@@ -138,8 +176,15 @@ const VTOptions: ForwardRefExoticComponent<IVTOptionsProps & React.RefAttributes
                         <div className={'task-options-item'}>
                             <Label>FPS</Label>
                             <Select
-                                defaultValue={Number(mediaInfo.videoParams.fps).toFixed().toString()}
                                 value={Number(mediaInfo.videoParams.fps).toFixed().toString()}
+                                onChange={(_, data): void => {
+                                    changeEvent({
+                                        videoParams: {
+                                            ...mediaInfo.videoParams,
+                                            fps: Number(data.value)
+                                        }
+                                    });
+                                }}
                             >
                                 <option label="24 fps" value="24"/>
                                 <option label="25 fps" value="25"/>
@@ -153,8 +198,16 @@ const VTOptions: ForwardRefExoticComponent<IVTOptionsProps & React.RefAttributes
                         <div className={'task-options-item'}>
                             <Label>{t('mediaFile.audioCode')}</Label>
                             <Select
-                                defaultValue={mediaInfo.audioParams.codec}
+                                disabled={mediaInfo.noAudio}
                                 value={mediaInfo.audioParams.codec}
+                                onChange={(_, data): void => {
+                                    changeEvent({
+                                        audioParams: {
+                                            ...mediaInfo.audioParams,
+                                            codec: data.value
+                                        }
+                                    });
+                                }}
                             >
                                 <option label="AAC" value="aac"/>
                                 <option label="MP3" value="mp3"/>
@@ -163,8 +216,16 @@ const VTOptions: ForwardRefExoticComponent<IVTOptionsProps & React.RefAttributes
                         <div className={'task-options-item'}>
                             <Label>{t('mediaFile.bitRate')}</Label>
                             <Select
-                                defaultValue={mediaInfo.audioParams.bitrate}
+                                disabled={mediaInfo.noAudio}
                                 value={mediaInfo.audioParams.bitrate}
+                                onChange={(_, data): void => {
+                                    changeEvent({
+                                        audioParams: {
+                                            ...mediaInfo.audioParams,
+                                            bitrate: data.value
+                                        }
+                                    });
+                                }}
                             >
                                 <option label="96 kbps" value="96k"/>
                                 <option label="128 kbps" value="128k"/>
@@ -175,8 +236,16 @@ const VTOptions: ForwardRefExoticComponent<IVTOptionsProps & React.RefAttributes
                         <div className={'task-options-item'}>
                             <Label>{t('mediaFile.samplingRate')}</Label>
                             <Select
-                                defaultValue={mediaInfo.audioParams.sampleRate}
+                                disabled={mediaInfo.noAudio}
                                 value={mediaInfo.audioParams.sampleRate}
+                                onChange={(_, data): void => {
+                                    changeEvent({
+                                        audioParams: {
+                                            ...mediaInfo.audioParams,
+                                            sampleRate: Number(data.value)
+                                        }
+                                    });
+                                }}
                             >
                                 <option label="44.1 kHz" value="44100"/>
                                 <option label="48 kHz" value="48000"/>

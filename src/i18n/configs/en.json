@@ -71,7 +71,7 @@
     "downloaded": "Update downloaded successfully. Do you want to restart the application now to apply the update?",
     "error": "Update download failed. Please check your network connection."
   },
-  "mediaFile": {
+    "mediaFile": {
     "options": {
       "add": "Add File",
       "openNetworkStreaming": "Open Network Stream",
@@ -109,7 +109,45 @@
     "audio": "Audio",
     "video": "Video",
     "volume": "Volume",
-    "mute": "Mute"
+    "mute": "Mute",
+    "codec": "Codec",
+    "optionsLabel": "Options",
+    "noAudioConfirmTitle": "Enable No Audio?",
+    "noAudioConfirmMessage": "After enabling \"No Audio\", all audio tracks of this media file will be removed during transcoding. This will affect the final output. Do you want to continue?",
+    "quality": {
+      "label": "Quality",
+      "original": "Original (no recompression)",
+      "veryHigh": "Very high",
+      "high": "High",
+      "medium": "Medium (recommended)",
+      "low": "Low",
+      "veryLow": "Very low"
+    },
+    "preset": {
+      "label": "Encoding speed",
+      "ultraFast": "Ultra fast",
+      "superFast": "Super fast",
+      "veryFast": "Very fast",
+      "fast": "Fast",
+      "medium": "Medium (balanced)",
+      "slow": "Slow",
+      "slower": "Slower",
+      "verySlow": "Very slow",
+      "desc": "The faster the encoding speed, the lower the compression ratio (larger files). The slower the encoding speed, the higher the compression ratio (smaller files)."
+    },
+    "pixelFormat": {
+      "label": "Pixel format",
+      "yuv420p": "yuv420p (widely compatible)",
+      "yuv444p": "yuv444p (higher quality)"
+    },
+    "videoBitrate": {
+      "label": "Bitrate",
+      "veryLow": "500 kbps (very low)",
+      "low": "1 Mbps (low)",
+      "medium": "2 Mbps (medium)",
+      "high": "5 Mbps (high)",
+      "veryHigh": "8 Mbps (very high)"
+    }
   },
   "themeSetting": {
     "label": "Appearance Settings",

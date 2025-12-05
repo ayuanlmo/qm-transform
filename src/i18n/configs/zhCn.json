@@ -78,7 +78,7 @@
     "downloaded": "更新下载完成，是否立即重启应用程序完成更新？",
     "error": "更新下载失败，请检查网络连接。"
   },
-  "mediaFile": {
+    "mediaFile": {
     "options": {
       "add": "添加文件",
       "openNetworkStreaming": "打开网络串流",
@@ -116,9 +116,11 @@
     "audio": "音频",
     "video": "视频",
     "volume": "音量",
-    "mute": "静音",
+      "mute": "静音",
     "codec": "编解码器",
     "optionsLabel": "选项",
+      "noAudioConfirmTitle": "开启无音频？",
+      "noAudioConfirmMessage": "开启“无音频”后，将会在转码时删除该媒体文件中的所有音频轨道，此操作会影响导出文件的最终效果。是否继续？",
     "quality": {
       "label": "清晰度",
       "original": "原始（无压缩）",
@@ -138,7 +140,7 @@
       "slow": "慢",
       "slower": "缓慢",
       "verySlow": "极慢",
-      "desc": "编码速度越快，压缩率越低（文件越大）。编码速度越慢，压缩了越高（文件较小）"
+      "desc": "编码速度越快，压缩率越低（文件越大）；编码速度越慢，压缩率越高（文件较小）。"
     },
     "pixelFormat": {
       "label": "像素格式",

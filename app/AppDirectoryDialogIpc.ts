@@ -1,4 +1,4 @@
-import {BrowserWindow, dialog, ipcMain, IpcMainEvent, OpenDialogReturnValue} from "electron";
+import {BrowserWindow, dialog, ipcMain, IpcMainEvent, OpenDialogReturnValue, shell} from "electron";
 import {platform} from "node:os";
 import Logger from "electron-log/main";
 
@@ -31,10 +31,12 @@ class AppDirectoryDialogIpc {
         const selectOutputPath = 'window:on:select-output-path';
         const selectMediaPlayerPath = 'window:on:select-media-player-path';
         const selectMediaFile = 'window:on:select-media-file';
+        const openDirectory = 'window:on:open-directory';
 
         ipcMain.on(selectOutputPath, (event: IpcMainEvent): void => this.showDirectoryDialog(this.window, event, selectOutputPath));
         ipcMain.on(selectMediaPlayerPath, (event: IpcMainEvent): void => this.showDirectoryDialog(this.window, event, selectMediaPlayerPath));
         ipcMain.on(selectMediaFile, (event: IpcMainEvent): void => this.showDirectoryDialog(this.window, event, selectMediaFile));
+        ipcMain.on(openDirectory, (event: IpcMainEvent, path: string): void => this.openDirectory(path));
     }
 
     private showDirectoryDialog(window: BrowserWindow, event: IpcMainEvent, evtName: string): void {
@@ -66,6 +68,10 @@ class AppDirectoryDialogIpc {
         }).catch((e) => {
             Logger.error('OpenDialogError:', e);
         });
+    }
+
+    private openDirectory(path: string): void {
+        shell.showItemInFolder(path);
     }
 }
 

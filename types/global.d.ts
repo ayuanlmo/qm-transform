@@ -49,8 +49,9 @@ declare global {
         format: string; // 格式
         optFormat: string; // 格式
         libs?: string; // 库
+        noAudio?: boolean; // 是否无音频
         status: 'ready' | 'processing' | 'complete' | 'error'; // 状态
-        progress: 0; // 进度
+        progress: number; // 进度（0-100）
         quality: MediaQuality;
         videoParams: VideoEncodingParams;
         audioParams: AudioEncodingParams;

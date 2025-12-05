@@ -1,12 +1,17 @@
 import * as React from "react";
 import {useRef} from "react";
 import {LauncherSettings24Regular} from "@fluentui/react-icons";
-import {Button, Card, Checkbox, ListItem, ProgressBar, Tag, Text} from "@fluentui/react-components";
+import {Button, Card, Checkbox, ListItem, ProgressBar, Spinner, Tag, Text} from "@fluentui/react-components";
 import YExtendTemplate from "../YExtendTemplate";
 import {sendIpcMessage} from "../../bin/IPC";
 import {useTranslation} from "react-i18next";
 import TaskFormats from "./TaskFormats";
 import VTOptions, {IVTOptionsRef} from "../VT/VTOptions";
+import {useDispatch, useSelector} from "react-redux";
+import {removeCurrentVTTaskItem, updateCurrentVTTaskItem} from "../../store/AppStore";
+import {useMainEventListener} from "../../bin/Hooks";
+import {RootState} from "../../store";
+import Dialog from "../FluentTemplates/Dialog";
 
 export interface TaskItemProps {
     data: IMediaInfo;
@@ -16,10 +21,44 @@ const TaskItem: React.FC<TaskItemProps> = (props: TaskItemProps): React.JSX.Elem
     const {data} = props;
     const {t} = useTranslation();
     const vTOptionsRef = useRef<IVTOptionsRef>(null);
+    const dispatch = useDispatch();
+    const [noAudioDialogOpen, setNoAudioDialogOpen] = React.useState(false);
+
+    // 确保始终拿到 Redux 中该任务的最新数据
+    const latestData = useSelector((state: RootState): IMediaInfo =>
+        state.app.currentVTTask.find(item => item.id === data.id) || data
+    );
+
+    const isProcessing: boolean = latestData.status === 'processing';
+
+    const handleTaskUpdate = (changes: Partial<IMediaInfo>): void => {
+        dispatch(updateCurrentVTTaskItem({
+            id: data.id,
+            changes
+        }));
+    };
 
     const play = () => {
-        sendIpcMessage('main:on:player', data.fullPath);
+        sendIpcMessage('main:on:player', latestData.fullPath);
     };
+
+    useMainEventListener<{ id: string; progress: number }>(
+        'main:on:media-transform-progress',
+        (event): void => {
+            if (event.id !== data.id)
+                return;
+
+            if (event.progress >= 100) {
+                dispatch(removeCurrentVTTaskItem(data.id));
+                return;
+            }
+
+            handleTaskUpdate({
+                progress: event.progress,
+                status: event.progress >= 100 ? 'complete' : 'processing'
+            });
+        }
+    );
 
     return (
         <ListItem className={"task-item"}>
@@ -28,9 +67,19 @@ const TaskItem: React.FC<TaskItemProps> = (props: TaskItemProps): React.JSX.Elem
                     <div className={'task-item-content-cover app_cursor_pointer'}>
                         <img onClick={play} src={data.cover} alt="cover"/>
                     </div>
-                    <VTOptions ref={vTOptionsRef} mediaInfo={data}/>
+                    <VTOptions
+                        ref={vTOptionsRef}
+                        mediaInfo={latestData}
+                        onUpdate={handleTaskUpdate}
+                    />
                     <div className={'task-item-media-info app_position_relative'}>
-                        <div className={'task-item-media-info-remove app_position_absolute'}>
+                        <div
+                            className={'task-item-media-info-remove app_position_absolute'}
+                            onClick={(): void => {
+                                if (isProcessing) return;
+                                dispatch(removeCurrentVTTaskItem(data.id));
+                            }}
+                        >
                             <svg className={'app_cursor_pointer'} xmlns="http://www.w3.org/2000/svg" width="10"
                                  height="10" viewBox="0 0 10 10"
                                  fill="none">
@@ -40,10 +89,10 @@ const TaskItem: React.FC<TaskItemProps> = (props: TaskItemProps): React.JSX.Elem
                             </svg>
                         </div>
                         <div className={'task-item-media-info-name'}>
-                            <YExtendTemplate show={data.isH264}>
+                            <YExtendTemplate show={latestData.isH264}>
                                 <Tag selected size={"extra-small"}>h264</Tag>
                             </YExtendTemplate>
-                            <YExtendTemplate show={data.isH265}>
+                            <YExtendTemplate show={latestData.isH265}>
                                 <Tag selected size={"extra-small"}>h265</Tag>
                             </YExtendTemplate>
                             <Text
@@ -51,7 +100,7 @@ const TaskItem: React.FC<TaskItemProps> = (props: TaskItemProps): React.JSX.Elem
                                 className={'task-item-media-info-text app_position_absolute'}
                                 truncate
                             >
-                                {data.baseName}
+                                {latestData.baseName}
                             </Text>
                         </div>
                         <div className={'task-item-media-info-sub'}>
@@ -61,14 +110,17 @@ const TaskItem: React.FC<TaskItemProps> = (props: TaskItemProps): React.JSX.Elem
                                     className={'task-item-media-info-text task-item-media-info-sub-item'}
                                     truncate
                                 >
-                                    {t('mediaFile.format')}：{data.format}
+                                    {t('mediaFile.format')}：{latestData.format}
                                 </Text>
                                 <Text
                                     size={400}
                                     className={'task-item-media-info-text task-item-media-info-sub-item'}
                                     truncate
                                 >
-                                    {t('mediaFile.resolution')}：2560 * 1440
+                                    {t('mediaFile.resolution')}：
+                                    {latestData.videoParams.width}
+                                    *
+                                    {latestData.videoParams.height}
                                 </Text>
                                 <svg className={'task-item-media-info-sub-item'} xmlns="http://www.w3.org/2000/svg"
                                      width="14" height="10" viewBox="0 0 14 10"
@@ -84,9 +136,14 @@ const TaskItem: React.FC<TaskItemProps> = (props: TaskItemProps): React.JSX.Elem
                                 >
                                     <div style={{display: 'inline-block'}}>
                                         <TaskFormats
-                                            type={data.isVideo ? 'video' : 'audio'}
-                                            isH264={data.isH264}
-                                            isH265={data.isH265}
+                                            type={latestData.isVideo ? 'video' : 'audio'}
+                                            value={latestData.optFormat}
+                                            disabled={isProcessing}
+                                            onChange={(format) => {
+                                                handleTaskUpdate({
+                                                    optFormat: format.name
+                                                });
+                                            }}
                                         />
                                     </div>
                                 </Text>
@@ -95,32 +152,85 @@ const TaskItem: React.FC<TaskItemProps> = (props: TaskItemProps): React.JSX.Elem
                                     className={'task-item-media-info-text task-item-media-info-sub-item'}
                                     truncate
                                 >
-                                    分辨率：2560 * 1440
+                                    {t('mediaFile.resolution')}：
+                                    {latestData.videoParams.width}
+                                    *
+                                    {latestData.videoParams.height}
                                 </Text>
                             </div>
                         </div>
                         <div className={'task-item-media-info-options'}>
-                            <Checkbox label={t('mediaFile.noAudio')}/>
+                            <Checkbox
+                                label={t('mediaFile.noAudio')}
+                                checked={!!latestData.noAudio}
+                                disabled={isProcessing}
+                                onChange={(_, {checked}): void => {
+                                    // 只在从 false -> true 时弹出确认框
+                                    if (checked && !latestData.noAudio)
+                                        return void setNoAudioDialogOpen(true);
+
+                                    handleTaskUpdate({
+                                        noAudio: !!checked
+                                    });
+                                }}
+                            />
                         </div>
                         <div className={'task-item-media-info-progress-bar app_position_absolute'}>
-                            <ProgressBar value={0}/>
+                            <ProgressBar
+                                max={100}
+                                value={Math.min(100, Math.max(0, latestData.progress))}
+                            />
                         </div>
                     </div>
                     <div className={'task-item-option app_position_absolute app_flex_box'}>
                         <div className={'task-item-option-setting'}>
                             <LauncherSettings24Regular
-                                className={'app_cursor_pointer'}
+                                className={`app_cursor_pointer${isProcessing ? ' app_cursor_disabled' : ''}`}
                                 onClick={(): void => {
+                                    if (isProcessing) return;
                                     vTOptionsRef.current?.open();
                                 }}
                             />
                         </div>
                         <div>
-                            <Button appearance="primary">
-                                {t('mediaFile.options.startProcessing')}
+                            <Button
+                                appearance="primary"
+                                disabled={isProcessing}
+                                icon={isProcessing ? <Spinner size="tiny"/> : undefined}
+                                onClick={(): void => {
+                                    if (isProcessing) return;
+                                    sendIpcMessage('main:on:task-create:video-media-transform', latestData);
+                                }}
+                            >
+                                {isProcessing ? t('mediaFile.options.inProgress') : t('mediaFile.options.startProcessing')}
                             </Button>
                         </div>
                     </div>
+                    {/* 无音频确认弹窗 */}
+                    <Dialog
+                        open={noAudioDialogOpen}
+                        title={t('mediaFile.noAudioConfirmTitle')}
+                        surface={
+                            <Text>
+                                {t('mediaFile.noAudioConfirmMessage')}
+                            </Text>
+                        }
+                        footer={
+                            <Button
+                                appearance="primary"
+                                onClick={(): void => {
+                                    handleTaskUpdate({
+                                        noAudio: true
+                                    });
+                                    setNoAudioDialogOpen(false);
+                                }}
+                            >
+                                {t('confirm')}
+                            </Button>
+                        }
+                        footerCloseTriggerLabel={t('cancel')}
+                        onClose={(): void => setNoAudioDialogOpen(false)}
+                    />
                 </div>
             </Card>
         </ListItem>

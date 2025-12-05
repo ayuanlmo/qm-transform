@@ -109,7 +109,45 @@
     "audio": "音声",
     "video": "動画",
     "volume": "音量",
-    "mute": "ミュート"
+    "mute": "ミュート",
+    "codec": "コーデック",
+    "optionsLabel": "オプション",
+    "noAudioConfirmTitle": "音声を削除しますか？",
+    "noAudioConfirmMessage": "「無音声」を有効にすると、このメディアファイルに含まれるすべての音声トラックが変換時に削除されます。出力結果に影響しますが、よろしいですか？",
+    "quality": {
+      "label": "画質",
+      "original": "オリジナル（再圧縮なし）",
+      "veryHigh": "非常に高い",
+      "high": "高い",
+      "medium": "中（推奨）",
+      "low": "低い",
+      "veryLow": "非常に低い"
+    },
+    "preset": {
+      "label": "エンコード速度",
+      "ultraFast": "超高速",
+      "superFast": "とても速い",
+      "veryFast": "非常に速い",
+      "fast": "速い",
+      "medium": "中（バランス）",
+      "slow": "遅い",
+      "slower": "かなり遅い",
+      "verySlow": "非常に遅い",
+      "desc": "エンコード速度が速いほど圧縮率は低くなり（ファイルサイズは大きくなります）。速度が遅いほど圧縮率は高くなり（ファイルサイズは小さくなります）。"
+    },
+    "pixelFormat": {
+      "label": "ピクセルフォーマット",
+      "yuv420p": "yuv420p（高い互換性）",
+      "yuv444p": "yuv444p（より高画質）"
+    },
+    "videoBitrate": {
+      "label": "ビットレート",
+      "veryLow": "500 kbps（非常に低い）",
+      "low": "1 Mbps（低）",
+      "medium": "2 Mbps（中）",
+      "high": "5 Mbps（高）",
+      "veryHigh": "8 Mbps（非常に高い）"
+    }
   },
   "themeSetting": {
     "label": "テーマ設定",

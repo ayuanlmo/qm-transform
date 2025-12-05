@@ -109,7 +109,45 @@
     "audio": "오디오",
     "video": "비디오",
     "volume": "볼륨",
-    "mute": "음소거"
+    "mute": "음소거",
+    "codec": "코덱",
+    "optionsLabel": "옵션",
+    "noAudioConfirmTitle": "무음으로 설정하시겠습니까?",
+    "noAudioConfirmMessage": "「무음」을 활성화하면 이 미디어 파일에 포함된 모든 오디오 트랙이 변환 시 제거됩니다. 출력 결과에 영향을 줄 수 있습니다. 계속하시겠습니까?",
+    "quality": {
+      "label": "화질",
+      "original": "원본 (재압축 없음)",
+      "veryHigh": "매우 높음",
+      "high": "높음",
+      "medium": "중간 (추천)",
+      "low": "낮음",
+      "veryLow": "매우 낮음"
+    },
+    "preset": {
+      "label": "인코딩 속도",
+      "ultraFast": "울트라 빠름",
+      "superFast": "매우 빠름",
+      "veryFast": "아주 빠름",
+      "fast": "빠름",
+      "medium": "중간 (균형)",
+      "slow": "느림",
+      "slower": "매우 느림",
+      "verySlow": "극도로 느림",
+      "desc": "인코딩 속도가 빠를수록 압축률이 낮아져 파일 크기가 커집니다. 속도가 느릴수록 압축률이 높아져 파일 크기가 작아집니다."
+    },
+    "pixelFormat": {
+      "label": "픽셀 포맷",
+      "yuv420p": "yuv420p (호환성 우수)",
+      "yuv444p": "yuv444p (더 높은 화질)"
+    },
+    "videoBitrate": {
+      "label": "비트레이트",
+      "veryLow": "500 kbps (매우 낮음)",
+      "low": "1 Mbps (낮음)",
+      "medium": "2 Mbps (중간)",
+      "high": "5 Mbps (높음)",
+      "veryHigh": "8 Mbps (매우 높음)"
+    }
   },
   "themeSetting": {
     "label": "테마 설정",

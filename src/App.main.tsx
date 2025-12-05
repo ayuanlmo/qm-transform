@@ -8,6 +8,7 @@ import {useSelector} from "react-redux";
 import {RootState} from "./store";
 import ErrorMessageToast from "./components/ErrorMessageToast";
 import TaskPendingToast from "./components/TaskPendingToast";
+import TaskEndToast from "./components/TaskEndToast";
 
 const AppMain = (): React.JSX.Element => {
     const {theme: {navigationAppearance}} = useSelector((state: RootState) => state.app.currentSettingConfig);
@@ -18,6 +19,7 @@ const AppMain = (): React.JSX.Element => {
             <div className={'main-app main-menu-drawer'}>
                 <ErrorMessageToast/>
                 <TaskPendingToast/>
+                <TaskEndToast />
                 <LeftMenu/>
                 <div
                     className={menuCollapse ? 'app-content-max' : 'app-content'}

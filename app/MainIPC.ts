@@ -5,6 +5,7 @@ import WindowStatusIpc from "./WindowStatusIpc";
 import AppDirectoryDialogIpc from "./AppDirectoryDialogIpc";
 import ExternalUrlIpc from "./ExternalUrlIpc";
 import SysIpc from "./SysIpc";
+import TaskIpc from "./TaskIpc";
 
 /**
  * @class MainIpcHandles
@@ -34,6 +35,7 @@ class MainIpcHandles {
         new AppDirectoryDialogIpc(window);
         new ExternalUrlIpc();
         new SysIpc();
+        new TaskIpc();
     }
 
     private initHandles(): void {

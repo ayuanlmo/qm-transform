@@ -76,7 +76,7 @@
       }
 
       .task-item-content {
-        height: 10rem;
+        min-height: 10rem;
 
         .task-item-content-cover {
           width: 15.1875rem;
@@ -136,7 +136,7 @@
         .task-item-option {
           height: 3rem;
           right: 1.88rem;
-          margin-top: 3.5rem;
+          bottom: 1.25rem;
 
           button {
             height: 100%;
