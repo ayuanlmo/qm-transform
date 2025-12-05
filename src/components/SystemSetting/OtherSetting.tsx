@@ -75,8 +75,9 @@ const OtherSetting: React.FC = (): React.JSX.Element => {
                         </Label>
                         <div>
                             <Switch
-                                defaultChecked={pasOpen}
+                                checked={pasOpen}
                                 onChange={(ev, {checked}) => {
+                                    setPasOpen(checked);
                                     sendIpcMessage('window:on:open-pas', checked);
                                 }}
                             />

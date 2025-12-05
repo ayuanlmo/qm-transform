@@ -23,21 +23,27 @@ class PowerManagementIpc {
     }
 
     private pasIsOpen(event: IpcMainEvent): void {
-        event.sender.send('main:on:pas-is-open', this.pasId === null ? false : powerSaveBlocker.isStarted(this.pasId));
+        const isOpen: boolean = this.pasId !== null && powerSaveBlocker.isStarted(this.pasId);
+
+        event.sender.send('main:on:pas-is-open', isOpen);
     }
 
     private openPas(event: IpcMainEvent, open: boolean): void {
         if (open) {
-            if (!this.pasId)
+            if (this.pasId === null || !powerSaveBlocker.isStarted(this.pasId))
                 this.pasId = powerSaveBlocker.start('prevent-app-suspension');
-            if (powerSaveBlocker.isStarted(this.pasId))
+
+            if (this.pasId !== null && powerSaveBlocker.isStarted(this.pasId))
                 event.sender.send('main:on:pas-on');
         } else {
-            if (this.pasId && powerSaveBlocker.isStarted(this.pasId)) {
-                powerSaveBlocker.stop(this.pasId);
-                this.pasId = null; // Reset pasId after stopping the blocker
-                event.sender.send('main:on:pas-off');
+            if (this.pasId !== null) {
+                if (powerSaveBlocker.isStarted(this.pasId))
+                    powerSaveBlocker.stop(this.pasId);
+
+                this.pasId = null;
             }
+
+            event.sender.send('main:on:pas-off');
         }
     }
 }
