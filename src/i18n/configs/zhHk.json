@@ -1,0 +1,183 @@
+{
+  "cancel": "取消",
+  "confirm": "確認",
+  "close": "關閉",
+  "image": "圖片",
+  "audio": "音訊",
+  "video": "影片",
+  "add": "新增",
+  "use": "使用",
+  "return": "返回",
+  "continue": "繼續",
+  "delete": "刪除",
+  "deleteFile": "刪除檔案",
+  "edit": "編輯",
+  "save": "儲存",
+  "search": "搜尋",
+  "clear": "清除",
+  "upload": "上載",
+  "download": "下載",
+  "input": "輸入",
+  "select": "選擇",
+  "play": "播放",
+  "pause": "暫停",
+  "noData": "暫無資料",
+  "pleaseSelect": "請選擇",
+  "tips": "提示",
+  "systemMessage": "系統訊息",
+  "systemSetting": "設定",
+  "menu": {
+    "videoTransform": "影片格式轉換",
+    "audioTransform": "音訊格式轉換",
+    "videoConcat": "影片合併",
+    "videoCompress": "影片壓縮"
+  },
+  "outputSetting": {
+    "label": "輸出設定",
+    "optPath": "輸出路徑",
+    "parallelTasks": "並行任務數量",
+    "parallelTasksDesc": "根據你的電腦性能，酌情調整",
+    "codec": "編解碼方式",
+    "softwareDecoding": "軟件解碼",
+    "hardwareDecoding": "硬件解碼",
+    "hardwareDecodingDesc": "硬件解碼利用 GPU 加速處理，可減少 CPU 使用率。",
+    "gpuDecoderMethod": "GPU 解碼器方法",
+    "gpuDecoderMethodDesc": "請確保你的硬件及驅動程式正常，如遇錯誤，請改用 CPU 作為解碼器"
+  },
+  "otherSetting": {
+    "label": "其他設定",
+    "tmpFile": "臨時檔案",
+    "preventLowPowerMode": "阻止低耗電模式",
+    "preventLowPowerModeDesc": "阻止 {{os}} 進入待機、暫停等狀態，只在本次使用期間生效"
+  },
+  "playerSetting": {
+    "label": "播放器設定",
+    "mediaPlayer": "媒體播放器",
+    "customMediaPlayer": "自訂播放器",
+    "mediaPlayerPath": "播放器路徑",
+    "mediaPlayerDesc": "以上播放器開啟方式均為「直接呼叫方式」"
+  },
+  "about": {
+    "label": "關於",
+    "viewOnGithub": "在 GitHub 檢視此專案",
+    "checkForUpdate": "檢查更新",
+    "designer": "設計師",
+    "licenseAndOpenSourceNotices": "許可證與開源聲明",
+    "appOpenSourceNotice": "<appName>{{name}}</appName> 是根據 Apache 2.0 許可證發佈的開源專案。你可以在 <github>Github</github> 檢視原始碼並為此專案作出貢獻。"
+  },
+  "update": {
+    "checking": "正在檢查更新…",
+    "noAvailable": "目前沒有可用更新。",
+    "downloaded": "更新已下載完成，是否立刻重新啟動應用程式以套用更新？",
+    "error": "下載更新失敗，請檢查網絡連線。"
+  },
+  "mediaFile": {
+    "options": {
+      "add": "新增檔案",
+      "openNetworkStreaming": "開啟網絡串流",
+      "remove": "移除",
+      "clearAll": "清除全部",
+      "clearAllConfirmMessage": "你確定要清除所有媒體檔案嗎？",
+      "clickImportAndDrop": "按一下匯入檔案，或將檔案拖曳到此處",
+      "clickImportAndDropDesc": "支援匯入 mp4、mov、mkv、avi、mp3、flac 等格式",
+      "startConversionAll": "全部轉換",
+      "startProcessing": "開始處理",
+      "inProgress": "處理中",
+      "getMediaFileInformation": "正在取得媒體檔案資訊…",
+      "startConcat": "開始合併",
+      "conversionSuccessMessage": "[{{name}}] 轉換成功",
+      "conversionFailed": "轉換失敗",
+      "showInExplorer": "在資源管理員顯示",
+      "showInFinder": "在 Finder 顯示",
+      "addTitle": "新增片頭",
+      "addCredits": "新增片尾",
+      "videoFps": "影片幀率",
+      "type": "類型",
+      "openInMediaPlayer": "使用媒體播放器開啟"
+    },
+    "format": "格式",
+    "resolution": "解像度",
+    "outPutFormat": "輸出格式",
+    "audioCode": "音訊編碼",
+    "bitRate": "位元率",
+    "samplingRate": "取樣率",
+    "videoCode": "視訊編碼",
+    "size": "大小",
+    "duration": "時長",
+    "noAudio": "無音訊",
+    "noVideo": "無視訊",
+    "audio": "音訊",
+    "video": "視訊",
+    "volume": "音量",
+    "mute": "靜音",
+    "codec": "編解碼器",
+    "optionsLabel": "選項",
+    "noAudioConfirmTitle": "啟用無音訊？",
+    "noAudioConfirmMessage": "啟用「無音訊」後，轉碼時會刪除此媒體檔案內的所有音訊軌道，這將影響輸出結果。確定要繼續嗎？",
+    "quality": {
+      "label": "畫質",
+      "original": "原始（不重新壓縮）",
+      "veryHigh": "非常高",
+      "high": "高",
+      "medium": "中等（建議）",
+      "low": "低",
+      "veryLow": "非常低"
+    },
+    "preset": {
+      "label": "編碼速度",
+      "ultraFast": "極快",
+      "superFast": "超快",
+      "veryFast": "非常快",
+      "fast": "快",
+      "medium": "中等（平衡）",
+      "slow": "慢",
+      "slower": "較慢",
+      "verySlow": "非常慢",
+      "desc": "編碼速度越快，壓縮率越低（檔案較大）；編碼速度越慢，壓縮率越高（檔案較小）。"
+    },
+    "pixelFormat": {
+      "label": "像素格式",
+      "yuv420p": "yuv420p（相容性佳）",
+      "yuv444p": "yuv444p（畫質更高）"
+    },
+    "videoBitrate": {
+      "label": "位元率",
+      "veryLow": "500 kbps（非常低）",
+      "low": "1 Mbps（低）",
+      "medium": "2 Mbps（中）",
+      "high": "5 Mbps（高）",
+      "veryHigh": "8 Mbps（非常高）"
+    }
+  },
+  "themeSetting": {
+    "label": "外觀設定",
+    "theme": "主題",
+    "light": "淺色",
+    "dark": "深色",
+    "auto": "自動",
+    "lang": "語言",
+    "appearance": "外觀",
+    "navigation": "導航",
+    "zoomFactor": "縮放級別",
+    "navigationSetting": {
+      "default": "展開",
+      "collapse": "摺疊"
+    }
+  },
+  "window": {
+    "mini": "還原",
+    "max": "最大化",
+    "hide": "最小化",
+    "closeMessage": "你確定要關閉嗎？"
+  },
+  "errMessage": {
+    "label": "錯誤訊息",
+    "media-info-error": "取得媒體檔案 [{{mediaFile}}] 基本資訊時發生錯誤，詳細內容為：{{message}}",
+    "media-first-frame-error": "取得媒體檔案 [{{mediaFile}}] 第一幀圖片時發生錯誤，詳細內容為：{{message}}",
+    "media-audio-av-error": "取得音訊檔案 [{{mediaFile}}] 波形圖時發生錯誤，詳細內容為：{{message}}",
+    "output-directory-not-exist": "輸出目錄 [{{path}}] 不存在，請重新選擇。",
+    "conversionFailedMessage": "[{{name}}] 轉換失敗，詳細內容：{{message}}。"
+  }
+}
+
+

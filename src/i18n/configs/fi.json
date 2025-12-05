@@ -1,0 +1,183 @@
+{
+  "cancel": "Peruuta",
+  "confirm": "Vahvista",
+  "close": "Sulje",
+  "image": "Kuva",
+  "audio": "Ääni",
+  "video": "Video",
+  "add": "Lisää",
+  "use": "Käytä",
+  "return": "Palaa",
+  "continue": "Jatka",
+  "delete": "Poista",
+  "deleteFile": "Poista tiedosto",
+  "edit": "Muokkaa",
+  "save": "Tallenna",
+  "search": "Etsi",
+  "clear": "Tyhjennä",
+  "upload": "Lähetä",
+  "download": "Lataa",
+  "input": "Syöte",
+  "select": "Valitse",
+  "play": "Toista",
+  "pause": "Tauko",
+  "noData": "Ei tietoja",
+  "pleaseSelect": "Valitse",
+  "tips": "Vinkit",
+  "systemMessage": "Järjestelmäviesti",
+  "systemSetting": "Asetukset",
+  "menu": {
+    "videoTransform": "Videon muuntaminen",
+    "audioTransform": "Äänen muuntaminen",
+    "videoConcat": "Yhdistä videot",
+    "videoCompress": "Pakkaa video"
+  },
+  "outputSetting": {
+    "label": "Tulostusasetukset",
+    "optPath": "Tulostuskansio",
+    "parallelTasks": "Samanaikaisten tehtävien määrä",
+    "parallelTasksDesc": "Säädä tietokoneesi suorituskyvyn mukaan",
+    "codec": "Koodekki",
+    "softwareDecoding": "Ohjelmistopurku",
+    "hardwareDecoding": "Laitteistopurku",
+    "hardwareDecodingDesc": "Laitteistopurku käyttää näytönohjainta prosessin nopeuttamiseen ja vähentää prosessorin kuormitusta.",
+    "gpuDecoderMethod": "GPU-purkutapa",
+    "gpuDecoderMethodDesc": "Varmista, että laitteisto ja ajurit toimivat oikein. Jos virheitä ilmenee, valitse purkajaksi CPU."
+  },
+  "otherSetting": {
+    "label": "Muut asetukset",
+    "tmpFile": "Väliaikaiset tiedostot",
+    "preventLowPowerMode": "Estä virransäästötila",
+    "preventLowPowerModeDesc": "Estää {{os}}-järjestelmää siirtymästä valmius- tai keskeytettyyn tilaan. Voimassa vain tämän istunnon ajan."
+  },
+  "playerSetting": {
+    "label": "Soittimen asetukset",
+    "mediaPlayer": "Media­soitin",
+    "customMediaPlayer": "Mukautettu mediasoitin",
+    "mediaPlayerPath": "Soittimen polku",
+    "mediaPlayerDesc": "Yllä olevat soittotavat käyttävät suoraa kutsua."
+  },
+  "about": {
+    "label": "Tietoja",
+    "viewOnGithub": "Näytä tämä projekti GitHubissa",
+    "checkForUpdate": "Tarkista päivitykset",
+    "designer": "Suunnittelija",
+    "licenseAndOpenSourceNotices": "Lisenssi ja avoimen lähdekoodin ilmoitukset",
+    "appOpenSourceNotice": "<appName>{{name}}</appName> on avoimen lähdekoodin projekti, joka on julkaistu Apache 2.0 -lisenssillä. Voit tarkastella lähdekoodia ja osallistua projektiin <github>Githubissa</github>."
+  },
+  "update": {
+    "checking": "Tarkistetaan päivityksiä...",
+    "noAvailable": "Tällä hetkellä ei ole saatavilla päivityksiä.",
+    "downloaded": "Päivitys on ladattu. Haluatko käynnistää sovelluksen uudelleen nyt, jotta päivitys otetaan käyttöön?",
+    "error": "Päivityksen lataus epäonnistui. Tarkista verkkoyhteytesi."
+  },
+  "mediaFile": {
+    "options": {
+      "add": "Lisää tiedosto",
+      "openNetworkStreaming": "Avaa verkkovirta",
+      "remove": "Poista",
+      "clearAll": "Tyhjennä kaikki",
+      "clearAllConfirmMessage": "Haluatko varmasti tyhjentää kaikki mediatiedostot?",
+      "clickImportAndDrop": "Napsauta tuodaksesi tiedoston tai vedä ja pudota se tähän",
+      "clickImportAndDropDesc": "Tukee muotoja mp4, mov, mkv, avi, mp3, flac jne.",
+      "startConversionAll": "Muunna kaikki",
+      "startProcessing": "Aloita käsittely",
+      "inProgress": "Käynnissä",
+      "getMediaFileInformation": "Haetaan mediatiedoston tietoja...",
+      "startConcat": "Aloita yhdistäminen",
+      "conversionSuccessMessage": "[{{name}}] muunnettiin onnistuneesti",
+      "conversionFailed": "Muunnos epäonnistui",
+      "showInExplorer": "Näytä Resurssienhallinnassa",
+      "showInFinder": "Näytä Finderissa",
+      "addTitle": "Lisää intro",
+      "addCredits": "Lisää lopputekstit",
+      "videoFps": "Videon FPS",
+      "type": "Tyyppi",
+      "openInMediaPlayer": "Avaa mediasoittimella"
+    },
+    "format": "Muoto",
+    "resolution": "Resoluutio",
+    "outPutFormat": "Tulostusmuoto",
+    "audioCode": "Äänikoodekki",
+    "bitRate": "Bittinopeus",
+    "samplingRate": "Näytteenottotaajuus",
+    "videoCode": "Videokoodekki",
+    "size": "Koko",
+    "duration": "Kesto",
+    "noAudio": "Ei ääntä",
+    "noVideo": "Ei videota",
+    "audio": "Ääni",
+    "video": "Video",
+    "volume": "Äänenvoimakkuus",
+    "mute": "Mykistä",
+    "codec": "Koodekki",
+    "optionsLabel": "Valinnat",
+    "noAudioConfirmTitle": "Ota käyttöön \"Ei ääntä\"?",
+    "noAudioConfirmMessage": "Kun \"Ei ääntä\" on käytössä, tämän mediatiedoston kaikki ääniraidat poistetaan muunnoksen aikana. Tämä vaikuttaa lopulliseen tulokseen. Haluatko jatkaa?",
+    "quality": {
+      "label": "Laatu",
+      "original": "Alkuperäinen (ei uudelleenkoodausta)",
+      "veryHigh": "Erittäin korkea",
+      "high": "Korkea",
+      "medium": "Keskitaso (suositeltu)",
+      "low": "Matala",
+      "veryLow": "Erittäin matala"
+    },
+    "preset": {
+      "label": "Koodausnopeus",
+      "ultraFast": "Erittäin nopea",
+      "superFast": "Supernopea",
+      "veryFast": "Hyvin nopea",
+      "fast": "Nopea",
+      "medium": "Keskitaso (tasapainoinen)",
+      "slow": "Hidas",
+      "slower": "Hitaampi",
+      "verySlow": "Erittäin hidas",
+      "desc": "Mitä nopeampi koodausnopeus, sitä pienempi pakkaussuhde (suuremmat tiedostot). Mitä hitaampi koodausnopeus, sitä suurempi pakkaussuhde (pienemmät tiedostot)."
+    },
+    "pixelFormat": {
+      "label": "Pikselimuoto",
+      "yuv420p": "yuv420p (laajalti yhteensopiva)",
+      "yuv444p": "yuv444p (korkeampi laatu)"
+    },
+    "videoBitrate": {
+      "label": "Bittinopeus",
+      "veryLow": "500 kb/s (erittäin matala)",
+      "low": "1 Mb/s (matala)",
+      "medium": "2 Mb/s (keskitaso)",
+      "high": "5 Mb/s (korkea)",
+      "veryHigh": "8 Mb/s (erittäin korkea)"
+    }
+  },
+  "themeSetting": {
+    "label": "Ulkoasun asetukset",
+    "theme": "Teema",
+    "light": "Vaalea",
+    "dark": "Tumma",
+    "auto": "Automaattinen",
+    "lang": "Kieli",
+    "appearance": "Ulkoasu",
+    "navigation": "Navigointi",
+    "zoomFactor": "Zoomaustaso",
+    "navigationSetting": {
+      "default": "Laajenna",
+      "collapse": "Pienennä"
+    }
+  },
+  "window": {
+    "mini": "Palauta",
+    "max": "Suurenna",
+    "hide": "Pienennä",
+    "closeMessage": "Haluatko varmasti sulkea?"
+  },
+  "errMessage": {
+    "label": "Virheilmoitus",
+    "media-info-error": "Virhe ilmeni haettaessa mediatiedoston [{{mediaFile}}] perustietoja. Lisätiedot: {{message}}",
+    "media-first-frame-error": "Virhe ilmeni haettaessa mediatiedoston [{{mediaFile}}] ensimmäistä kuvaa. Lisätiedot: {{message}}",
+    "media-audio-av-error": "Virhe ilmeni haettaessa äänitiedoston [{{mediaFile}}] aaltomuotoa. Lisätiedot: {{message}}",
+    "output-directory-not-exist": "Tulostuskansio [{{path}}] ei ole olemassa. Valitse jokin toinen.",
+    "conversionFailedMessage": "[{{name}}] -muunnos epäonnistui. Lisätiedot: {{message}}."
+  }
+}
+
+
