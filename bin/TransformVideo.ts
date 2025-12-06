@@ -1,13 +1,11 @@
 import ffmpeg, {FfmpegCommand} from 'fluent-ffmpeg';
 import path from 'path';
 import {IpcMainEvent} from "electron";
-import Logger from "../lib/Logger";
-import {existsSync, mkdirSync, readFileSync} from "node:fs";
+import {mkdirSync} from "node:fs";
 import * as os from "node:os";
+import Media from "./Media";
+import {getLocalConfigAsMain} from "./Conf";
 
-const isWin32: boolean = os.platform() === 'win32';
-const appHomePath: string = path.resolve(isWin32 ? path.resolve(os.homedir(), 'AppData', 'Local', 'lmo-Transform') : path.resolve(os.homedir(), '.lmo-Transform'));
-const configFileDir: string = path.resolve(appHomePath, 'config', 'Conf.t.json');
 // 根据清晰度等级映射到具体的编码参数
 const qualitySettings: Record<string, Partial<VideoEncodingParams>> = {
     very_low: {
@@ -38,30 +36,17 @@ const qualitySettings: Record<string, Partial<VideoEncodingParams>> = {
     original: {} // 使用原始设置
 };
 
-export const getLocalConfig = (): IDefaultSettingConfig | null => {
-    if (existsSync(configFileDir)) {
-        try {
-            return JSON.parse(readFileSync(configFileDir, 'utf8'));
-        } catch (error) {
-            Logger.error('Failed to parse config file:', error);
-        }
-    }
-    return null;
-};
-
 class TransformVideo {
     public static transformVideoMedia(media: IMediaInfo, ctx: IpcMainEvent): void {
-        const appConf: IDefaultSettingConfig | null = getLocalConfig();
+        const appConf: IDefaultSettingConfig | null = getLocalConfigAsMain();
         const extName: string = path.extname(media.fullPath);
-        const outputBaseName: string = media.baseName.replace(extName, '');
+        const outputBaseName: string = Media.getOutputMediaFileName(media.fullPath);
         const outputDir: string = appConf?.output?.outputPath ?? '';
 
-        console.log('outputDir', media);
         mkdirSync(outputDir, {recursive: true});
 
         // 根据用户选择的目标格式（optFormat）推断容器后缀
-        const originExt: string = extName.replace('.', '').toLowerCase();
-        let outputExt: string = originExt;
+        let outputExt: string = extName.replace('.', '').toLowerCase();
 
         if (media.optFormat) {
             const lowerOpt: string = media.optFormat.toLowerCase();

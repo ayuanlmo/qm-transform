@@ -1,6 +1,7 @@
 import {FfprobeData, FfprobeStream} from "fluent-ffmpeg";
 import path from "path";
 import {v4} from "uuid";
+import {getLocalConfigAsMain} from "./Conf";
 
 export const audioTrackVideoTypes = ['mjpeg', 'png'];
 export const commonFormats = [
@@ -116,7 +117,7 @@ class Media {
                     return mediaFormatsMap.video.get(codecName) ?? 'unknown';
                 }
             }
-         else if (Media.targetIs(target, 'audio'))
+        else if (Media.targetIs(target, 'audio'))
             for (const stream of target.streams) {
                 if (stream.codec_type === 'audio') {
                     const codecName = (stream.codec_long_name ?? '').toLowerCase();
@@ -156,6 +157,24 @@ class Media {
 
         return res;
     }
+
+    /**
+     * @method getOutputMediaFileName
+     * @param {string} fullPath - 原始路径
+     * @return {string}
+     * @author ayuanlmo
+     * @description 获取输出媒体文件名称（根据用户配置规则）。
+     * **/
+    public static getOutputMediaFileName = (fullPath: string): string => {
+        const appConf: IDefaultSettingConfig | null = getLocalConfigAsMain();
+
+        if (appConf?.output.fileNameSpase === 'custom')
+            return Media.getCustomMediaFileName(fullPath, <string>appConf?.output.customNameRule);
+
+        const extName: string = path.extname(fullPath);
+
+        return path.basename(fullPath, extName).replace(extName, '');
+    };
 }
 
 export default Media;
