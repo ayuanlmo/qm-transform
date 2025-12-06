@@ -178,7 +178,7 @@ const TaskItem: React.FC<TaskItemProps> = (props: TaskItemProps): React.JSX.Elem
                         <div className={'task-item-media-info-progress-bar app_position_absolute'}>
                             <ProgressBar
                                 max={100}
-                                value={Math.min(100, Math.max(0, latestData.progress))}
+                                value={Math.min(100, Math.max(0, latestData.progress ?? 0))}
                             />
                         </div>
                     </div>
