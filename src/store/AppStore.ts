@@ -29,10 +29,20 @@ const AppStore = createSlice({
                 currentVTTask: payload
             };
         },
+        appendCurrentVTTask: (state, {payload}: PayloadAction<IMediaInfo[]>) => {
+            const existedIds: Set<string> = new Set(state.currentVTTask.map(item => item.id));
+
+            const merged: IMediaInfo[] = [
+                ...state.currentVTTask,
+                ...payload.filter(item => !existedIds.has(item.id))
+            ];
+
+            state.currentVTTask = merged;
+        },
         removeCurrentVTTaskItem: (state, {payload}: PayloadAction<string>) => {
             state.currentVTTask = state.currentVTTask.filter(item => item.id !== payload);
         },
-        updateCurrentVTTaskItem: (state, {payload}: PayloadAction<{id: string; changes: Partial<IMediaInfo>}>) => {
+        updateCurrentVTTaskItem: (state, {payload}: PayloadAction<{ id: string; changes: Partial<IMediaInfo> }>) => {
             const {id, changes} = payload;
 
             const targetIndex = state.currentVTTask.findIndex(item => item.id === id);
@@ -73,6 +83,7 @@ const AppStore = createSlice({
 export const {
     setCurrentSettingConfig,
     setCurrentVTTask,
+    appendCurrentVTTask,
     updateCurrentVTTaskItem,
     removeCurrentVTTaskItem,
     clearCurrentVTTask
