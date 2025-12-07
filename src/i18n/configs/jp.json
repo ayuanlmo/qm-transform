@@ -42,7 +42,14 @@
     "hardwareDecoding": "ハードウェアデコード",
     "hardwareDecodingDesc": "ハードウェアデコードはGPUを使用して処理を高速化し、CPUの負担を軽減します。",
     "gpuDecoderMethod": "GPUデコーダー方式",
-    "gpuDecoderMethodDesc": "ハードウェアおよびドライバが正常に動作していることを確認してください。エラーが発生した場合は、デコーダーとしてCPUを選択してください。"
+     "gpuDecoderMethodDesc": "ハードウェアおよびドライバが正常に動作していることを確認してください。エラーが発生した場合は、デコーダーとしてCPUを選択してください。",
+    "customFileName": {
+      "label": "ファイル名",
+      "origin": "元の名前",
+      "customFileName": "カスタム",
+      "preview": "プレビュー",
+      "availableVars": "利用可能な変数"
+    }
   },
   "otherSetting": {
     "label": "その他の設定",

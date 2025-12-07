@@ -42,7 +42,14 @@
     "hardwareDecoding": "硬體解碼",
     "hardwareDecodingDesc": "硬體解碼利用GPU來加速這一過程，可減少CPU利用。",
     "gpuDecoderMethod": "GPU解碼器方法",
-    "gpuDecoderMethodDesc": "請確保您的硬體及驅動程式正常，如遇到錯誤，請選擇CPU作為解碼器"
+     "gpuDecoderMethodDesc": "請確保您的硬體及驅動程式正常，如遇到錯誤，請選擇CPU作為解碼器",
+    "customFileName": {
+      "label": "檔案名稱",
+      "origin": "原始",
+      "customFileName": "自訂",
+      "preview": "預覽",
+      "availableVars": "可用變數"
+    }
   },
   "otherSetting": {
     "label": "其他設定",

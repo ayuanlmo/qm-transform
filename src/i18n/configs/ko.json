@@ -42,7 +42,14 @@
     "hardwareDecoding": "하드웨어 디코딩",
     "hardwareDecodingDesc": "하드웨어 디코딩은 GPU를 사용하여 프로세스를 가속화하고 CPU 부담을 줄입니다.",
     "gpuDecoderMethod": "GPU 디코더 방법",
-    "gpuDecoderMethodDesc": "하드웨어 및 드라이버가 정상적으로 작동하는지 확인하세요. 오류 발생 시 CPU를 디코더로 선택하십시오."
+     "gpuDecoderMethodDesc": "하드웨어 및 드라이버가 정상적으로 작동하는지 확인하세요. 오류 발생 시 CPU를 디코더로 선택하십시오.",
+    "customFileName": {
+      "label": "파일 이름",
+      "origin": "원본",
+      "customFileName": "사용자 지정",
+      "preview": "미리보기",
+      "availableVars": "사용 가능한 변수"
+    }
   },
   "otherSetting": {
     "label": "기타 설정",

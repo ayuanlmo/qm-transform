@@ -42,7 +42,14 @@
     "hardwareDecoding": "Hardware-Decodierung",
     "hardwareDecodingDesc": "Die Hardware-Decodierung verwendet die GPU, um den Vorgang zu beschleunigen und die CPU-Auslastung zu reduzieren.",
     "gpuDecoderMethod": "GPU-Decodermethode",
-    "gpuDecoderMethodDesc": "Stellen Sie sicher, dass Ihre Hardware und Treiber ordnungsgemäß funktionieren. Wenn Fehler auftreten, wählen Sie die CPU als Decoder."
+    "gpuDecoderMethodDesc": "Stellen Sie sicher, dass Ihre Hardware und Treiber ordnungsgemäß funktionieren. Wenn Fehler auftreten, wählen Sie die CPU als Decoder.",
+    "customFileName": {
+      "label": "Dateiname",
+      "origin": "Original",
+      "customFileName": "Benutzerdefiniert",
+      "preview": "Vorschau",
+      "availableVars": "Verfügbare Variablen"
+    }
   },
   "otherSetting": {
     "label": "Weitere Einstellungen",

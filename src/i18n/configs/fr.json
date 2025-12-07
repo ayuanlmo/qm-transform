@@ -42,7 +42,14 @@
     "hardwareDecoding": "Décodage matériel",
     "hardwareDecodingDesc": "Le décodage matériel utilise le GPU pour accélérer le traitement et réduire l'utilisation du CPU.",
     "gpuDecoderMethod": "Méthode de décodage GPU",
-    "gpuDecoderMethodDesc": "Assurez-vous que votre matériel et vos pilotes fonctionnent correctement. En cas d'erreur, choisissez le CPU comme décodeur."
+    "gpuDecoderMethodDesc": "Assurez-vous que votre matériel et vos pilotes fonctionnent correctement. En cas d'erreur, choisissez le CPU comme décodeur.",
+    "customFileName": {
+      "label": "Nom de fichier",
+      "origin": "Original",
+      "customFileName": "Personnalisé",
+      "preview": "Aperçu",
+      "availableVars": "Variables disponibles"
+    }
   },
   "otherSetting": {
     "label": "Autres paramètres",

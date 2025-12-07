@@ -42,7 +42,14 @@
     "hardwareDecoding": "Hardware Decoding",
     "hardwareDecodingDesc": "Hardware decoding uses the GPU to accelerate the process and reduce CPU utilization.",
     "gpuDecoderMethod": "GPU Decoder Method",
-    "gpuDecoderMethodDesc": "Ensure that your hardware and drivers are working properly. If errors occur, choose CPU as the decoder."
+    "gpuDecoderMethodDesc": "Ensure that your hardware and drivers are working properly. If errors occur, choose CPU as the decoder.",
+    "customFileName": {
+      "label": "File Name",
+      "origin": "Original",
+      "customFileName": "Custom",
+      "preview": "Preview",
+      "availableVars": "Available variables"
+    }
   },
   "otherSetting": {
     "label": "Other Settings",

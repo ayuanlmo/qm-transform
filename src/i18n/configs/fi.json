@@ -42,7 +42,14 @@
     "hardwareDecoding": "Laitteistopurku",
     "hardwareDecodingDesc": "Laitteistopurku käyttää näytönohjainta prosessin nopeuttamiseen ja vähentää prosessorin kuormitusta.",
     "gpuDecoderMethod": "GPU-purkutapa",
-    "gpuDecoderMethodDesc": "Varmista, että laitteisto ja ajurit toimivat oikein. Jos virheitä ilmenee, valitse purkajaksi CPU."
+    "gpuDecoderMethodDesc": "Varmista, että laitteisto ja ajurit toimivat oikein. Jos virheitä ilmenee, valitse purkajaksi CPU.",
+    "customFileName": {
+      "label": "Tiedostonimi",
+      "origin": "Alkuperäinen",
+      "customFileName": "Mukautettu",
+      "preview": "Esikatselu",
+      "availableVars": "Käytettävissä olevat muuttujat"
+    }
   },
   "otherSetting": {
     "label": "Muut asetukset",
