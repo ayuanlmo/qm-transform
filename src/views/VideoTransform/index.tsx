@@ -1,7 +1,7 @@
 import * as React from "react";
 import DropFiles from "../../components/DropFiles";
 import AddMediaFiles from "../../components/AddMediaFiles";
-import TaskList from "../../components/Task/TaskList";
+import VtTaskList from "../../components/Task/VtTaskList";
 import YExtendTemplate from "../../components/YExtendTemplate";
 import {useMainEventListener} from "../../bin/Hooks";
 import {sendIpcMessage} from "../../bin/IPC";
@@ -36,7 +36,7 @@ const VideoTransform: React.FC = (): React.JSX.Element => {
                 <DropFiles/>
             </YExtendTemplate>
             <YExtendTemplate show={currentVTTask.length > 0}>
-                <TaskList task={currentVTTask}/>
+                <VtTaskList task={currentVTTask}/>
             </YExtendTemplate>
         </div>
     );
