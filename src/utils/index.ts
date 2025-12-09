@@ -3,7 +3,9 @@ import type FS from 'node:fs';
 import type Path from 'node:path';
 import Global from "./Global";
 import {sendIpcMessage} from "../bin/IPC";
+import type Electron from "electron";
 
+const {webUtils} = Global.requireNodeModule<typeof Electron>('electron');
 const {readdirSync, existsSync, statSync, unlinkSync} = Global.requireNodeModule<typeof FS>('fs');
 const uuid = Global.requireNodeModule<any>('uuid');
 const {resolve} = Global.requireNodeModule<typeof Path>('path');
@@ -67,4 +69,14 @@ export const openExternalUrl = (url: string): void => {
     sendIpcMessage('window:on:open-external-url', {
         url
     });
+};
+
+export const getLocalPathForFile = (file: File): string | null => {
+    try {
+        const p: string = webUtils.getPathForFile?.(file);
+
+        return p.length > 0 ? p : null;
+    } catch {
+        return null;
+    }
 };
