@@ -78,7 +78,7 @@
     "downloaded": "Update downloaded successfully. Do you want to restart the application now to apply the update?",
     "error": "Update download failed. Please check your network connection."
   },
-    "mediaFile": {
+  "mediaFile": {
     "options": {
       "add": "Add File",
       "openNetworkStreaming": "Open Network Stream",
@@ -88,12 +88,14 @@
       "clickImportAndDrop": "Click to import a file, or drag and drop it here",
       "clickImportAndDropDesc": "Supports importing mp4, mov, mkv, avi, mp3, flac formats",
       "startConversionAll": "Convert All",
+      "stopAll": "Stop all",
       "startProcessing": "Start Processing",
       "inProgress": "In Progress",
       "getMediaFileInformation": "Retrieving media file information...",
       "startConcat": "Start Merging",
       "conversionSuccessMessage": "[{{name}}] converted successfully",
       "conversionFailed": "Conversion failed",
+      "batchRunning": "Running: {{current}} / {{total}}",
       "showInExplorer": "Show in Explorer",
       "showInFinder": "Show in Finder",
       "addTitle": "Add Title",

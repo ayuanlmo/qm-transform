@@ -9,6 +9,7 @@ import {generateMediaFileId} from "../../utils";
 import {useDispatch, useSelector} from "react-redux";
 import {appendCurrentVTTask, clearCurrentVTTask} from "../../store/AppStore";
 import {RootState} from "../../store";
+import VTTaskListFooter from "../../components/Task/VTTaskListFooter";
 
 const VideoTransform: React.FC = (): React.JSX.Element => {
     const dispatch = useDispatch();
@@ -37,6 +38,9 @@ const VideoTransform: React.FC = (): React.JSX.Element => {
             </YExtendTemplate>
             <YExtendTemplate show={currentVTTask.length > 0}>
                 <VtTaskList task={currentVTTask}/>
+            </YExtendTemplate>
+            <YExtendTemplate show={currentVTTask.length > 0}>
+                <VTTaskListFooter/>
             </YExtendTemplate>
         </div>
     );

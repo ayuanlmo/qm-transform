@@ -161,6 +161,28 @@
     }
   }
 
+  .task-list-footer {
+    .task-list-footer-content {
+      padding: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .task-list-footer-content .task-list-footer-item {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      margin-right: 1.5rem;
+    }
+
+    .task-list-footer-actions {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+  }
+
   .main-menu {
     width: 16.25rem;
     height: 100vh;
@@ -495,7 +517,7 @@
   justify-content: space-between;
   margin: 1rem 0;
 
-  .task-options-item{
+  .task-options-item {
     padding-bottom: .8rem;
   }
 }
