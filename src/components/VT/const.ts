@@ -10,7 +10,8 @@ export const qualityOptions = [
 
 export const codecOptions = [
     {value: 'h264', label: 'H.264 (x264)'},
-    {value: 'hevc', label: 'H.265 (x265)'}
+    {value: 'hevc', label: 'H.265 (x265)'},
+    {value: 'vp9', label: 'VP9 (libvpx-vp9)'}
 ];
 
 export const presetOptions = [
@@ -30,9 +31,9 @@ export const pixelFormatOptions = [
 ];
 
 export const videoBitrateOptions = [
-    {value:'500k',label:'mediaFile.videoBitrate.veryLow'},
-    {value:'1000k',label:'mediaFile.videoBitrate.low'},
-    {value:'2000k',label:'mediaFile.videoBitrate.medium'},
-    {value:'5000k',label:'mediaFile.videoBitrate.high'},
-    {value:'8000k',label:'mediaFile.videoBitrate.veryHigh'}
+    {value: '500k', label: 'mediaFile.videoBitrate.veryLow'},
+    {value: '1000k', label: 'mediaFile.videoBitrate.low'},
+    {value: '2000k', label: 'mediaFile.videoBitrate.medium'},
+    {value: '5000k', label: 'mediaFile.videoBitrate.high'},
+    {value: '8000k', label: 'mediaFile.videoBitrate.veryHigh'}
 ];

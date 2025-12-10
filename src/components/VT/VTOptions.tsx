@@ -11,6 +11,7 @@ import {Divider, InfoLabel, Label, Select} from "@fluentui/react-components";
 import {useTranslation} from "react-i18next";
 import {codecOptions, pixelFormatOptions, presetOptions, qualityOptions, videoBitrateOptions} from "./const";
 import TaskFormats from "../Task/TaskFormats";
+import {IFormatType, videoFormatType} from "../../const/formatType";
 
 export interface IVTOptionsProps {
     mediaInfo: IMediaInfo;
@@ -25,6 +26,29 @@ const VTOptions: ForwardRefExoticComponent<IVTOptionsProps & React.RefAttributes
     const {mediaInfo, onUpdate} = props;
     const {t} = useTranslation();
     const [visible, setVisible] = useState(false);
+
+    // 当前封装格式信息，用于限制可用的视频编码器
+    const currentFormat = React.useMemo(
+        (): IFormatType | undefined => videoFormatType.find((item): boolean => item.name === mediaInfo.optFormat),
+        [mediaInfo.optFormat]
+    );
+
+    const filteredCodecOptions = React.useMemo(
+        () => {
+            if (!currentFormat || !currentFormat.supportedCodecs)
+                return codecOptions;
+            return codecOptions.filter((opt): boolean | undefined => currentFormat.supportedCodecs?.includes(opt.value));
+        },
+        [currentFormat]
+    );
+
+    const currentCodecValue: string | undefined = React.useMemo(() => {
+        const allowedValues: string[] = filteredCodecOptions.map((opt): string => opt.value);
+
+        if (mediaInfo.videoParams.codec && allowedValues.includes(mediaInfo.videoParams.codec))
+            return mediaInfo.videoParams.codec;
+        return allowedValues[0] ?? mediaInfo.videoParams.codec;
+    }, [filteredCodecOptions, mediaInfo.videoParams.codec]);
 
     const open = (): void => {
         setVisible(!visible);
@@ -84,7 +108,7 @@ const VTOptions: ForwardRefExoticComponent<IVTOptionsProps & React.RefAttributes
                         <div className={'task-options-item'}>
                             <Label>{t('mediaFile.codec')}</Label>
                             <Select
-                                value={mediaInfo.videoParams.codec}
+                                value={currentCodecValue}
                                 onChange={(_, data): void => {
                                     changeEvent({
                                         videoParams: {

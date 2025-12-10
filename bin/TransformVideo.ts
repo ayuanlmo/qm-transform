@@ -50,8 +50,14 @@ class TransformVideo {
 
         if (media.optFormat) {
             const lowerOpt: string = media.optFormat.toLowerCase();
+            const knownContainers: string[] = [
+                'mp4', 'm3u8', 'ts', 'mkv', 'avi', 'mov',
+                'webm', 'flv', 'wmv', 'mpg', 'mpeg', '3gp'
+            ];
 
-            if (lowerOpt.includes('mp4'))
+            if (knownContainers.includes(lowerOpt)) {
+                outputExt = lowerOpt;
+            } else if (lowerOpt.includes('mp4'))
                 outputExt = 'mp4';
             else if (lowerOpt.includes('m3u8'))
                 outputExt = 'm3u8';
@@ -63,6 +69,16 @@ class TransformVideo {
                 outputExt = 'avi';
             else if (lowerOpt.includes('mov'))
                 outputExt = 'mov';
+            else if (lowerOpt.includes('webm'))
+                outputExt = 'webm';
+            else if (lowerOpt.includes('flv'))
+                outputExt = 'flv';
+            else if (lowerOpt.includes('wmv'))
+                outputExt = 'wmv';
+            else if (lowerOpt.includes('3gp'))
+                outputExt = '3gp';
+            else if (lowerOpt.includes('mpg') || lowerOpt.includes('mpeg'))
+                outputExt = 'mpg';
         }
 
         const outputPath: string = path.resolve(
@@ -140,24 +156,31 @@ class TransformVideo {
             mp4: ['h264', 'hevc'],
             m3u8: ['h264', 'hevc'],
             ts: ['h264', 'hevc'],
-            mkv: ['h264', 'hevc'],
+            mkv: ['h264', 'hevc', 'vp9'],
             avi: ['h264'], // 仅保留 H.264
-            mov: ['h264', 'hevc']
+            mov: ['h264', 'hevc'],
+            webm: ['vp9'],
+            flv: ['h264'],
+            wmv: ['h264'],
+            mpg: ['h264'],
+            mpeg: ['h264'],
+            '3gp': ['h264']
         };
 
-        const supportedCodecs: string[] = containerCodecSupport[container] || ['h264', 'hevc'];
+        const supportedCodecs: string[] = containerCodecSupport[container] || ['h264', 'hevc', 'vp9'];
 
-        // 用户选择的目标视频编解码器（前端传入的是 'h264' | 'hevc'）
+        // 用户选择的目标视频编解码器（前端传入的是 'h264' | 'hevc' | 'vp9'）
         let selectedCodec: string = (videoParams.codec || (media.isH265 ? 'hevc' : 'h264')).toLowerCase();
 
-        // 容器不支持当前编解码器时回退到 H.264
+        // 容器不支持当前编解码器时回退到容器支持的第一个编码器
         if (!supportedCodecs.includes(selectedCodec))
-            selectedCodec = 'h264';
+            selectedCodec = supportedCodecs[0] || 'h264';
 
         // 根据配置文件中的 codecType / codecMethod 以及当前平台，推断 GPU 编码器后缀
         let hardwareEncoderSuffix: string | null = null;
 
-        if (videoParams.gpuAcceleration) {
+        // 目前仅对 H.264 / H.265 尝试 GPU 加速，VP9 等保持 CPU 编码
+        if (videoParams.gpuAcceleration && (selectedCodec === 'h264' || selectedCodec === 'hevc')) {
             const methodRaw: string = (appConf.output.codecMethod || '').toLowerCase();
             const platform: NodeJS.Platform = os.platform();
 
@@ -190,9 +213,11 @@ class TransformVideo {
                 // libs 形如 "-c:v libx264"，直接拆分为 ffmpeg 参数
                 ffmpegCommand.addOutputOptions(media.libs.trim().split(/\s+/));
             } else if (selectedCodec) {
-                // 将 'h264' / 'hevc' 映射到实际的 libx264 / libx265 编码器
+                // 将 'h264' / 'hevc' / 'vp9' 映射到实际的编码器实现
                 if (selectedCodec === 'hevc')
                     ffmpegCommand.videoCodec('libx265');
+                else if (selectedCodec === 'vp9')
+                    ffmpegCommand.videoCodec('libvpx-vp9');
                 else
                     ffmpegCommand.videoCodec('libx264');
             }
@@ -246,15 +271,52 @@ class TransformVideo {
             return;
         }
 
-        // 默认音频设置
-        if (!media.audioParams)
-            return void ffmpegCommand.audioCodec('aac')
-                .audioBitrate('192k')
-                .audioChannels(2);
+        // 推断目标容器
+        const container: string = (media.optFormat || path.extname(media.fullPath).replace('.', '')).toLowerCase();
 
+        // 拆出用户传入的参数，后续按容器补默认值 / 做兼容处理
+        let codec: string | undefined = media.audioParams?.codec;
+        let bitrate: string | undefined = media.audioParams?.bitrate;
+        let sampleRate: number | undefined = media.audioParams?.sampleRate;
+        let channels: number | undefined = media.audioParams?.channels;
 
-        const {codec, bitrate, sampleRate, channels} = media.audioParams;
+        // 按容器限制可用的音频编码器，并设置合理默认值
+        switch (container) {
+            case 'webm':
+                // WebM 规范推荐 Opus/Vorbis，这里统一使用 libopus
+                if (!codec || !['opus', 'libopus', 'vorbis', 'libvorbis'].includes(codec)) {
+                    codec = 'libopus';
+                }
+                if (!bitrate)
+                    bitrate = '160k';
+                break;
+            case 'flv':
+                // FLV 只可靠支持 AAC / MP3
+                if (!codec || !['aac', 'mp3'].includes(codec)) {
+                    codec = 'aac';
+                }
+                if (!bitrate)
+                    bitrate = '128k';
+                break;
+            case 'wmv':
+                // WMV 默认使用 WMA（wmav2），提高兼容性
+                if (!codec)
+                    codec = 'wmav2';
+                if (!bitrate)
+                    bitrate = '160k';
+                break;
+            default:
+                // 其它容器保持 AAC 默认
+                if (!codec)
+                    codec = 'aac';
+                if (!bitrate)
+                    bitrate = '192k';
+        }
 
+        if (!channels)
+            channels = 2;
+
+        // 实际写入 FFmpeg 参数
         if (codec)
             ffmpegCommand.audioCodec(codec);
         if (bitrate)

@@ -6,23 +6,18 @@ export type ITaskFormatsProps = {
     type: 'video' | 'audio';
     value?: string;
     defaultValue?: string;
-    // 当前选择的目标视频编解码器（如 'h264' | 'hevc'），用于过滤不支持的封装格式
+    // 当前选择的目标视频编解码器（保留字段，当前不再用于过滤封装格式）
     codec?: string;
     disabled?: boolean;
     onChange?: (format: IFormatType) => void;
 }
 
 const TaskFormats: React.FC<ITaskFormatsProps> = (props: ITaskFormatsProps): React.JSX.Element => {
-    const {type, value, defaultValue, codec, disabled} = props;
+    const {type, value, defaultValue, disabled} = props;
     let types: IFormatType[] = [];
 
-    if (type === 'video') {
-        types = videoFormatType.filter((item) => {
-            if (!codec || !item.supportedCodecs)
-                return true;
-            return item.supportedCodecs.includes(codec);
-        });
-    }
+    if (type === 'video')
+        types = videoFormatType;
 
     if (type === 'audio')
         types = audioFormatType;

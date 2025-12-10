@@ -17,6 +17,7 @@ import {
 } from "../../store/AppStore";
 import {sendIpcMessage} from "../../bin/IPC";
 import {useMainEventListener} from "../../bin/Hooks";
+import {IFormatType, videoFormatType} from "../../const/formatType";
 
 const VTTaskListFooter: React.FC = (): React.JSX.Element => {
     const {t} = useTranslation();
@@ -133,6 +134,21 @@ const VTTaskListFooter: React.FC = (): React.JSX.Element => {
     }, [vtBatch, currentVTTask, parallelTasks, dispatch]);
 
     const codecSelect = useMemo((): React.JSX.Element => {
+        // 根据当前批量格式限制可选的编码器
+        let allowedCodecValues: string[] | void | null = null;
+
+        if (batchFormat) {
+            const currentFormat: IFormatType | void = videoFormatType.find(
+                (item: IFormatType): boolean => item.name === batchFormat
+            );
+
+            allowedCodecValues = currentFormat?.supportedCodecs;
+        }
+
+        const options = allowedCodecValues
+            ? codecOptions.filter((item) => allowedCodecValues?.includes(item.value))
+            : codecOptions;
+
         return (
             <Select
                 value={batchCodec}
@@ -142,7 +158,7 @@ const VTTaskListFooter: React.FC = (): React.JSX.Element => {
                 }}
             >
                 {
-                    codecOptions.map((item): React.JSX.Element => {
+                    options.map((item): React.JSX.Element => {
                         return (
                             <option
                                 key={item.value}
@@ -155,7 +171,7 @@ const VTTaskListFooter: React.FC = (): React.JSX.Element => {
                 }
             </Select>
         );
-    }, [batchCodec, hasTask, t]);
+    }, [batchCodec, batchFormat, hasTask, t]);
 
     return (
         <BaseTaskListFooter
