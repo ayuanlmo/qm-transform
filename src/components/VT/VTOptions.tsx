@@ -76,10 +76,25 @@ const VTOptions: ForwardRefExoticComponent<IVTOptionsProps & React.RefAttributes
                             <TaskFormats
                                 type={'video'}
                                 value={mediaInfo.optFormat}
-                                codec={mediaInfo.videoParams.codec}
-                                onChange={(format) => {
+                                onChange={(format: IFormatType): void => {
+                                    const nextFormat: IFormatType | void = videoFormatType.find(
+                                        (item: IFormatType): boolean => item.name === format.name
+                                    );
+                                    const supported: string[] | void = nextFormat?.supportedCodecs;
+
+                                    let nextCodec: string | undefined = mediaInfo.videoParams.codec;
+
+                                    if (supported && supported.length > 0) {
+                                        if (!nextCodec || !supported.includes(nextCodec))
+                                            nextCodec = supported[0];
+                                    }
+
                                     changeEvent({
-                                        optFormat: format.name
+                                        optFormat: format.name,
+                                        videoParams: {
+                                            ...mediaInfo.videoParams,
+                                            codec: nextCodec
+                                        }
                                     });
                                 }}
                             />
@@ -119,7 +134,7 @@ const VTOptions: ForwardRefExoticComponent<IVTOptionsProps & React.RefAttributes
                                 }}
                             >
                                 {
-                                    codecOptions.map((i): React.JSX.Element => {
+                                    filteredCodecOptions.map((i): React.JSX.Element => {
                                         return (
                                             <option value={i.value} label={t(i.label)} key={i.label}/>
                                         );
