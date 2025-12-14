@@ -41,7 +41,11 @@ class TransformVideo {
         const appConf: IDefaultSettingConfig | null = getLocalConfigAsMain();
         const extName: string = path.extname(media.fullPath);
         const outputBaseName: string = Media.getOutputMediaFileName(media.fullPath);
-        const outputDir: string = appConf?.output?.outputPath ?? '';
+        // 更健壮的输出目录推断：优先使用配置中的绝对路径，否则回落到源文件所在目录
+        const confOutputPath: string | undefined = appConf?.output?.outputPath?.trim();
+        const outputDir: string = confOutputPath && path.isAbsolute(confOutputPath)
+            ? confOutputPath
+            : path.dirname(media.fullPath);
 
         mkdirSync(outputDir, {recursive: true});
 
@@ -81,10 +85,7 @@ class TransformVideo {
                 outputExt = 'mpg';
         }
 
-        const outputPath: string = path.resolve(
-            outputDir,
-            `${outputBaseName}.${outputExt}`
-        );
+        const outputPath: string = path.resolve(outputDir, `${outputBaseName}.${outputExt}`);
 
         // 初始化FFmpeg命令
         const ffmpegCommand = ffmpeg(media.fullPath)
@@ -111,15 +112,45 @@ class TransformVideo {
                     error: true,
                     errorMessage: err.message
                 });
+                // 确保任务在出错时也能结束，避免前端批量调度卡死
+                ctx.reply('main:on:task-end', {
+                    id: media.id,
+                    progress: 100,
+                    path: null,
+                    baseName: media.baseName,
+                    error: true,
+                    errorMessage: err.message
+                });
             });
 
         // 设置输出路径
         ffmpegCommand.output(outputPath);
-        // 处理视频编码参数
-        if (appConf)
-            this.configureVideoEncoding(ffmpegCommand, media, appConf);
-        // 处理音频编码参数
-        this.configureAudioEncoding(ffmpegCommand, media);
+
+        // 在“保持原画质 + 无额外参数 + 容器不变时，尝试直接流拷贝，可极大提升编码之速度
+        const sourceExt: string = extName.replace('.', '').toLowerCase();
+        const sameContainer: boolean = outputExt === sourceExt;
+
+        const hasVideoParams: boolean = !!media.videoParams && Object.keys(media.videoParams).length > 0;
+        const hasAudioParams: boolean = !!media.audioParams && Object.keys(media.audioParams).length > 0;
+        const keepOriginalQuality: boolean = !media.quality || media.quality === ('original' as MediaQuality);
+
+        const canCopyVideo: boolean = sameContainer && keepOriginalQuality && !hasVideoParams && !media.libs;
+        const canCopyAudio: boolean = !media.noAudio && !hasAudioParams;
+
+        if (canCopyVideo && (canCopyAudio || media.noAudio)) {
+            // 单纯的容器内重封装：视频/音频按需 copy 或禁用音频，速度快
+            ffmpegCommand.videoCodec('copy');
+            if (media.noAudio)
+                ffmpegCommand.noAudio();
+            else
+                ffmpegCommand.audioCodec('copy');
+        } else {
+            // 需要重新编码时，按原有逻辑配置视频/音频编码参数
+            if (appConf)
+                this.configureVideoEncoding(ffmpegCommand, media, appConf);
+            this.configureAudioEncoding(ffmpegCommand, media);
+        }
+
         // 开始转码
         ffmpegCommand.run();
     }
@@ -229,8 +260,13 @@ class TransformVideo {
             ffmpegCommand.videoBitrate(videoParams.bitrate);
         if (videoParams.fps)
             ffmpegCommand.fps(videoParams.fps);
-        if (videoParams.preset)
-            ffmpegCommand.addOutputOptions(`-preset ${videoParams.preset}`);
+        // 对 CPU 编码路径设置一个偏向速度的默认 preset（未指定时使用 faster）
+        const effectivePreset: string | undefined = useHardwareAcceleration
+            ? videoParams.preset
+            : videoParams.preset || 'faster';
+
+        if (effectivePreset)
+            ffmpegCommand.addOutputOptions(`-preset ${effectivePreset}`);
         if (videoParams.tune)
             ffmpegCommand.addOutputOptions(`-tune ${videoParams.tune}`);
         if (videoParams.profile)
