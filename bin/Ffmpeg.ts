@@ -31,24 +31,33 @@ class Ffmpeg {
      * @description 获取视频媒体第一帧
      * **/
     public static getVideoMediaFirstFrame(mediaFile: string, ctx: IpcMainEvent): Promise<string | undefined> {
-        return new Promise((resolve, reject) => {
-            const optFileName: string = `${v4()}.t.png`;
-            ffmpeg(mediaFile).screenshots({
-                count: 1,
-                timestamps: ['1%'],
-                filename: optFileName,
-                folder: appTempDir,
-                size: '244x160'
-            }).on('end', (): void => {
-                resolve(path.resolve(appTempDir, optFileName));
-            }).on('error', (e): void => {
-                Logger.error(e.message);
-                reject();
-                ctx.reply('main:on:error', {
-                    type: 'media-first-frame-error',
-                    message: e.message,
-                    mediaFile
-                });
+        const optFileName: string = `${v4()}.t.png`;
+        const optPath: string = path.resolve(appTempDir, optFileName);
+
+        // 规范像素格式和缩放规则，避免 H265 / HDR 等情况下截图色彩“发飘”
+        const args: string[] = [
+            '-i', mediaFile,
+            '-vf', 'scale=244:160:force_original_aspect_ratio=decrease:flags=lanczos,pad=244:160:(ow-iw)/2:(oh-ih)/2:black',
+            '-frames:v', '1',
+            '-pix_fmt', 'rgb24',// 统一输出为 SDR / sRGB 友好的 RGB24，避免 YUV / HDR 影响效果
+            optPath,
+            '-y'
+        ];
+
+        return new Promise((resolve, reject): void => {
+            const ffmpegProcess: ChildProcessWithoutNullStreams = spawn(ffmpegPath ?? '', args);
+
+            ffmpegProcess.on('exit', (code: number | null): void => {
+                if (code !== 0) {
+                    Logger.error(`FFMPEG exited with code ${code}`);
+                    ctx.reply('main:on:error', {
+                        type: 'media-first-frame-error',
+                        message: `FFMPEG exited with code ${code}`,
+                        mediaFile
+                    });
+                    reject();
+                } else
+                    resolve(optPath);
             });
         });
     }
