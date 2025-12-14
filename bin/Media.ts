@@ -109,6 +109,47 @@ class Media {
      * @description 媒体文件格式
      * **/
     public static mediaFormat(target: FfprobeData): string {
+        // 优先使用 ffprobe 的容器格式（format_name）
+        const formatNameRaw: string = (target.format?.format_name ?? '').toLowerCase();
+
+        if (formatNameRaw) {
+            const formatTokens: string[] = formatNameRaw.split(',');
+            const formatNameMap: Record<string, string> = {
+                mpegts: 'ts',
+                mov: 'mov',
+                mp4: 'mp4',
+                m4v: 'm4v',
+                m4a: 'm4a',
+                m4b: 'm4b',
+                m4r: 'm4r',
+                '3gp': '3gp',
+                '3g2': '3g2',
+                matroska: 'mkv',
+                webm: 'webm',
+                avi: 'avi',
+                flv: 'flv',
+                asf: 'wmv',
+                mpeg: 'mpg',
+                ogg: 'ogg',
+                ogv: 'ogv',
+                ogx: 'ogx',
+                mp3: 'mp3',
+                flac: 'flac',
+                wav: 'wav',
+                wma: 'wma',
+                aac: 'aac',
+                opus: 'opus'
+            };
+
+            for (const token of formatTokens) {
+                const mapped: string | undefined = formatNameMap[token];
+
+                if (mapped && commonFormats.includes(mapped))
+                    return mapped;
+            }
+        }
+
+        // 识别不到再根据流信息 + codec_long_name 映射（老逻辑）
         if (Media.targetIs(target, 'video'))
             for (const stream of target.streams) {
                 if (stream.codec_type === 'video' && !audioTrackVideoTypes.includes(stream.codec_name ?? '')) {
@@ -125,6 +166,16 @@ class Media {
                     return mediaFormatsMap.audio.get(codecName) ?? 'unknown';
                 }
             }
+
+        // 还识别不到？走文件后缀（当然，文件不一定有后缀名。但是，都走到这里了，这到底是什么？？）
+        const filename: string = target.format?.filename ?? '';
+
+        if (filename) {
+            const ext: string = path.extname(filename).replace('.', '').toLowerCase();
+
+            if (ext && commonFormats.includes(ext))
+                return ext;
+        }
 
         return 'unknown';
     }
