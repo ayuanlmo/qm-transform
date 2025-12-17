@@ -7,7 +7,7 @@ import AppMenu from "./lib/Menu";
 import AppUpdate from "./bin/AppUpdate";
 import Extensions from "./DevTools";
 
-const __DEV_MODEL = process.env.NODE_ENV?.trim() === 'development';
+const __DEV_MODEL: boolean = app.isPackaged;
 
 class MainApp {
     private mainWindow: BrowserWindow | undefined;
@@ -27,11 +27,10 @@ class MainApp {
             const winWidth: number = Math.min(1500, Math.floor(width * 0.8));
             const winHeight: number = Math.min(800, Math.floor(height * 0.8));
 
-            console.log(Extensions);
-
-            Extensions.map(async (i: string): Promise<void> => {
-                await session.defaultSession.loadExtension(i);
-            });
+            if (__DEV_MODEL)
+                Extensions.map(async (i: string): Promise<void> => {
+                    await session.defaultSession.loadExtension(i);
+                });
 
             this.mainWindow = new BrowserWindow({
                 width: winWidth,
@@ -60,33 +59,35 @@ class MainApp {
                 this.mainWindow?.webContents.openDevTools();
             });
 
-            if (__DEV_MODEL) {
-                const tryLoad = async () => {
-                    await this.mainWindow?.loadURL(`http://localhost:${process.env.PORT || 8088}`);
-
-                    nativeTheme.on('updated', () => {
-                        this.mainWindow?.webContents.send('os:theme-change', {darkMode: nativeTheme.shouldUseDarkColors});
+            const setupCommonListeners = (): void => {
+                nativeTheme.on('updated', (): void => {
+                    this.mainWindow?.webContents.send('os:theme-change', {
+                        darkMode: nativeTheme.shouldUseDarkColors
                     });
+                });
 
-                    this.appUpdate?.checkForUpdates();
+                this.mainWindow?.webContents.once('did-finish-load', (): void => {
+                    Logger.info('launched...');
+                });
+            };
+
+            if (__DEV_MODEL) {
+                const tryLoad = async (): Promise<void> => {
+                    await this.mainWindow?.loadURL(`http://localhost:${process.env.PORT || 8088}`);
                 };
 
                 try {
                     await tryLoad();
                 } catch (e) {
                     console.log(e);
-
-                    setTimeout(() => {
-                        tryLoad();
-                    }, 3000);
+                    setTimeout(tryLoad, 3000);
                 }
 
-                this.mainWindow?.webContents.on('did-finish-load', (): void => {
-                    Logger.info('launched...');
-                });
+                setupCommonListeners();
             } else {
                 // 生产环境下 __dirname 指向 app.asar/build，index.html 也在 build 目录
                 await this.mainWindow.loadFile(join(__dirname, 'index.html'));
+                setupCommonListeners();
                 this.appUpdate?.checkForUpdates();
             }
         });
