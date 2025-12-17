@@ -1,18 +1,30 @@
 import ffmpeg, {Encoders, FfprobeData, FfprobeStream} from "fluent-ffmpeg";
-import ffmpegPath from "ffmpeg-static";
-import {path as ffprobePath} from "ffprobe-static";
+import rawFfmpegPath from "ffmpeg-static";
+import {path as rawFfprobePath} from "ffprobe-static";
 import {v4} from "uuid";
 import {appTempDir} from "../lib/Dir";
-import {IpcMainEvent} from "electron";
-import fs from "fs";
+import {app, IpcMainEvent} from "electron";
 import path from "path";
 import {ChildProcessWithoutNullStreams, spawn} from "node:child_process";
 import Logger from "../lib/Logger";
 
+// 此函数用于获取并修正 构建后，可执行文件被放到了 app.asar.unpacked中，导致无法直接获取ffmpeg等可执行文件的真实路径
+const getBinaryFilePath = (p: string | null | undefined): string => {
+    if (!p) return '';
+
+    if (app && app.isPackaged)
+        return p.replace('app.asar', 'app.asar.unpacked');
+
+    return p;
+};
+
+const ffmpegPath: string = getBinaryFilePath(rawFfmpegPath as string);
+const ffprobePath: string = getBinaryFilePath(rawFfprobePath);
+
 ((): void => {
     'use strict';
 
-    ffmpeg.setFfmpegPath(ffmpegPath ?? '');
+    ffmpeg.setFfmpegPath(ffmpegPath);
     ffmpeg.setFfprobePath(ffprobePath);
 })();
 
@@ -45,7 +57,7 @@ class Ffmpeg {
         ];
 
         return new Promise((resolve, reject): void => {
-            const ffmpegProcess: ChildProcessWithoutNullStreams = spawn(ffmpegPath ?? '', args);
+            const ffmpegProcess: ChildProcessWithoutNullStreams = spawn(ffmpegPath, args);
 
             ffmpegProcess.on('exit', (code: number | null): void => {
                 if (code !== 0) {
