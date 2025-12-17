@@ -7,7 +7,7 @@ import AppMenu from "./lib/Menu";
 import AppUpdate from "./bin/AppUpdate";
 import Extensions from "./DevTools";
 
-const __DEV_MODEL: boolean = app.isPackaged;
+const __DEV_MODEL: boolean = !app.isPackaged;
 
 class MainApp {
     private mainWindow: BrowserWindow | undefined;
