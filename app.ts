@@ -84,8 +84,11 @@ class MainApp {
                 this.mainWindow?.webContents.on('did-finish-load', (): void => {
                     Logger.info('launched...');
                 });
-            } else
-                await this.mainWindow.loadFile(join(__dirname, '/index.html'));
+            } else {
+                // 生产环境下 __dirname 指向 app.asar/build，index.html 也在 build 目录
+                await this.mainWindow.loadFile(join(__dirname, 'index.html'));
+                this.appUpdate?.checkForUpdates();
+            }
         });
     }
 }
