@@ -14,7 +14,7 @@ import {
     vtBatchStart,
     vtBatchStop,
     vtBatchTaskFinished
-} from "../../store/AppStore";
+} from "../../store/VTTStore";
 import {sendIpcMessage} from "../../bin/IPC";
 import {useMainEventListener} from "../../bin/Hooks";
 import {IFormatType, videoFormatType} from "../../const/formatType";
@@ -22,8 +22,8 @@ import {IFormatType, videoFormatType} from "../../const/formatType";
 const VTTaskListFooter: React.FC = (): React.JSX.Element => {
     const {t} = useTranslation();
     const dispatch = useDispatch();
-    const currentVTTask: IMediaInfo[] = useSelector((state: RootState): IMediaInfo[] => state.app.currentVTTask);
-    const vtBatch: IVTBatchState = useSelector((state: RootState): IVTBatchState => state.app.vtBatch);
+    const currentVTTask: IMediaInfo[] = useSelector((state: RootState): IMediaInfo[] => state.vtt.currentVTTask);
+    const vtBatch: IVTBatchState = useSelector((state: RootState): IVTBatchState => state.vtt.vtBatch);
     const parallelTasks: number = useSelector(
         (state: RootState): number => state.app.currentSettingConfig.output.parallelTasks || 1
     );

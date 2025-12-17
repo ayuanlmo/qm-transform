@@ -7,7 +7,7 @@ import {useTranslation} from "react-i18next";
 import TaskFormats from "./TaskFormats";
 import VTOptions, {IVTOptionsRef} from "../VT/VTOptions";
 import {useDispatch, useSelector} from "react-redux";
-import {removeCurrentVTTaskItem, updateCurrentVTTaskItem} from "../../store/AppStore";
+import {removeCurrentVTTaskItem, updateCurrentVTTaskItem} from "../../store/VTTStore";
 import {useMainEventListener} from "../../bin/Hooks";
 import {RootState} from "../../store";
 import Dialog from "../FluentTemplates/Dialog";
@@ -26,7 +26,7 @@ const VTTaskItem: React.FC<VTTaskItemProps> = (props: VTTaskItemProps): React.JS
 
     // 确保始终拿到 Redux 中该任务的最新数据
     const latestData: IMediaInfo = useSelector((state: RootState): IMediaInfo =>
-        state.app.currentVTTask.find((item: IMediaInfo): boolean => item.id === data.id) || data
+        state.vtt.currentVTTask.find((item: IMediaInfo): boolean => item.id === data.id) || data
     );
 
     const isProcessing: boolean = latestData.status === 'processing';

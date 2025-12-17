@@ -7,13 +7,13 @@ import {useMainEventListener} from "../../bin/Hooks";
 import {sendIpcMessage} from "../../bin/IPC";
 import {generateMediaFileId} from "../../utils";
 import {useDispatch, useSelector} from "react-redux";
-import {appendCurrentVTTask, clearCurrentVTTask} from "../../store/AppStore";
+import {appendCurrentVTTask, clearCurrentVTTask} from "../../store/VTTStore";
 import {RootState} from "../../store";
 import VTTaskListFooter from "../../components/Task/VTTaskListFooter";
 
 const VideoTransform: React.FC = (): React.JSX.Element => {
     const dispatch = useDispatch();
-    const currentVTTask: IMediaInfo[] = useSelector((state: RootState) => state.app.currentVTTask);
+    const currentVTTask: IMediaInfo[] = useSelector((state: RootState) => state.vtt.currentVTTask);
 
     useMainEventListener<string[]>('window:on:select-media-file', (data: string[]): void => {
         sendIpcMessage('main:on:get-media-info', generateMediaFileId(data));

@@ -2,7 +2,7 @@ import React from "react";
 import {Button, Text} from "@fluentui/react-components";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store";
-import {IVTBatchState} from "../../store/AppStore";
+import {IVTBatchState} from "../../store/VTTStore";
 import {useTranslation} from "react-i18next";
 
 export interface ITaskListFooterProps {
@@ -14,7 +14,7 @@ export interface ITaskListFooterProps {
 const BaseTaskListFooter: React.FC<ITaskListFooterProps> = (props: ITaskListFooterProps): React.JSX.Element => {
     const {surface, onStartAll, onStopAll} = props;
     const {t} = useTranslation();
-    const vtBatch: IVTBatchState = useSelector((state: RootState): IVTBatchState => state.app.vtBatch);
+    const vtBatch: IVTBatchState = useSelector((state: RootState): IVTBatchState => state.vtt.vtBatch);
     const isRunning: boolean = vtBatch.status === 'running' || vtBatch.status === 'stopping' && vtBatch.running.length > 0;
     const total: number = vtBatch.queue.length + vtBatch.running.length;
     const runningCount: number = vtBatch.running.length;

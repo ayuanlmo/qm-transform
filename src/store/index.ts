@@ -1,9 +1,11 @@
 import {configureStore} from '@reduxjs/toolkit';
 import AppStore from "./AppStore";
+import VTTStore from "./VTTStore";
 
 const store = configureStore({
     reducer: {
-        app: AppStore
+        app: AppStore,
+        vtt: VTTStore
     }
 });
 
