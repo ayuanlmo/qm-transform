@@ -1,13 +1,13 @@
 import AppConfig from "../conf/AppConfig";
 import type FS from 'node:fs';
 import type Path from 'node:path';
+import {v4 as uuidV4} from "uuid";
 import Global from "./Global";
 import {sendIpcMessage} from "../bin/IPC";
 import type Electron from "electron";
 
 const {webUtils} = Global.requireNodeModule<typeof Electron>('electron');
 const {readdirSync, existsSync, statSync, unlinkSync} = Global.requireNodeModule<typeof FS>('fs');
-const uuid = Global.requireNodeModule<any>('uuid');
 const {resolve} = Global.requireNodeModule<typeof Path>('path');
 const {tmpdir} = AppConfig;
 
@@ -49,7 +49,7 @@ export const selectMediaFiles = () => {
 };
 
 export const getUUID = (): string => {
-    return uuid.v4() as string;
+    return uuidV4();
 };
 
 export const generateMediaFileId = (files: string[]): { id: string; path: string }[] => {
