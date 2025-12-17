@@ -29,6 +29,15 @@ const MenuItem: React.FC<IMenuItemProps> = (
     const {t} = useTranslation();
     const navigate = useNavigate();
 
+    const resolveStaticPath = (p: string): string => {
+        if (!p) return p;
+        // 在打包后的 file:// 协议下，去掉开头的 /，改为相对路径，从 build 目录加载静态资源
+        if (window.location.protocol === 'file:' && p.startsWith('/'))
+            return `.${p}`;
+
+        return p;
+    };
+
     const menuItemContent: React.JSX.Element =
         <div
             className={`main-menu-content-item app_position_relative app_flex_box app_cursor_pointer ${isActive ? ' main-menu-content-item-active' : ''}`}
@@ -36,7 +45,7 @@ const MenuItem: React.FC<IMenuItemProps> = (
         >
             <div className={'main-menu-content-item-ico'}>
                 <img
-                    src={icon}
+                    src={resolveStaticPath(icon)}
                     alt="icon"
                 />
             </div>
@@ -71,7 +80,7 @@ const LeftMenu: React.FC = (): React.JSX.Element => {
                             aboutDialogRef.current?.open?.();
                         }}
                         className={'app_cursor_pointer'}
-                        src="/icon.svg"
+                        src={window.location.protocol === 'file:' ? './icon.svg' : '/icon.svg'}
                         alt="logo"
                     />
                 </div>

@@ -1,3 +1,4 @@
+import "./setPublicPath";
 import {createRoot, Root} from "react-dom/client";
 import * as React from "react";
 import {StrictMode} from "react";

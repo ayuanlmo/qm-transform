@@ -1,6 +1,5 @@
 import {Route, Routes} from "react-router-dom";
-import *as React from "react";
-import {Suspense} from "react";
+import * as React from "react";
 import Router from "./Config";
 
 const RouterView: React.FC = (): React.JSX.Element => {
@@ -9,11 +8,11 @@ const RouterView: React.FC = (): React.JSX.Element => {
             {
                 Router.map((Ri) => {
                     return (
-                        <Route key={Ri.path} path={Ri.path} element={
-                            <Suspense>
-                                <Ri.template/>
-                            </Suspense>
-                        }/>
+                        <Route
+                            key={Ri.path}
+                            path={Ri.path}
+                            element={<Ri.template/>}
+                        />
                     );
                 })
             }

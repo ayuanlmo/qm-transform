@@ -1,10 +1,14 @@
-import {FC, lazy, LazyExoticComponent} from "react";
+import type {FC} from "react";
+import VideoTransform from "../views/VideoTransform";
+import AudioTransform from "../views/AudioTransform";
+import VideoConcat from "../views/VideoConcat";
+import VideoCompress from "../views/VideoCompress";
 
 export interface IRouterItem {
     name: string;
     path: string;
     icon: string;
-    template: LazyExoticComponent<FC>;
+    template: FC;
 }
 
 export default [
@@ -12,24 +16,24 @@ export default [
         name: 'menu.videoTransform',
         path: '/',
         icon: '/react-app-static/ico/video-transform.svg',
-        template: lazy(() => import("../views/VideoTransform"))
+        template: VideoTransform
     },
     {
         name: 'menu.audioTransform',
         path: '/audio-transform',
         icon: '/react-app-static/ico/audio-transform.svg',
-        template: lazy(() => import("../views/AudioTransform"))
+        template: AudioTransform
     },
     {
         name: 'menu.videoConcat',
         path: '/video-concat',
         icon: '/react-app-static/ico/vide-concat.svg',
-        template: lazy(() => import("../views/VideoConcat"))
+        template: VideoConcat
     },
     {
         name: 'menu.videoCompress',
         path: '/video-compress',
         icon: '/react-app-static/ico/video-compress.svg',
-        template: lazy(() => import("../views/VideoCompress"))
+        template: VideoCompress
     }
 ];
