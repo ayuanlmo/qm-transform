@@ -21,9 +21,11 @@ export const videoFormatType: IFormatType[] = [
 ];
 
 export const audioFormatType: IFormatType[] = [
-    {name: "mp3", type: "audio/mpeg", label: "MP3"},
-    {name: "m4a", type: "audio/m4a", label: "M4A"},
-    {name: "wav", type: "audio/wav", label: "WAV"},
-    {name: "aac", type: "audio/aac", label: "AAC"},
-    {name: "ogg", type: "audio/ogg", label: "OGG"}
+    {name: "mp3", type: "audio/mpeg", label: "MP3", supportedCodecs: ['mp3']},
+    {name: "aac", type: "audio/aac", label: "AAC", supportedCodecs: ['aac']},
+    {name: "m4a", type: "audio/m4a", label: "M4A", supportedCodecs: ['aac']},
+    {name: "wav", type: "audio/wav", label: "WAV", supportedCodecs: ['aac', 'mp3', 'flac']},
+    {name: "flac", type: "audio/flac", label: "FLAC", supportedCodecs: ['flac']},
+    {name: "ogg", type: "audio/ogg", label: "OGG", supportedCodecs: ['opus']},
+    {name: "opus", type: "audio/opus", label: "OPUS", supportedCodecs: ['opus']}
 ];

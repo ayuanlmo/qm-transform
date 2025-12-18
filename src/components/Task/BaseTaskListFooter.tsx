@@ -1,23 +1,26 @@
 import React from "react";
 import {Button, Text} from "@fluentui/react-components";
-import {useSelector} from "react-redux";
-import {RootState} from "../../store";
-import {IVTBatchState} from "../../store/VTTStore";
 import {useTranslation} from "react-i18next";
+
+export interface IBatchState {
+    status: 'idle' | 'running' | 'stopping';
+    queue: string[];
+    running: string[];
+}
 
 export interface ITaskListFooterProps {
     surface: string | React.ReactElement;
     onStartAll?: () => void;
     onStopAll?: () => void;
+    batch?: IBatchState;
 }
 
 const BaseTaskListFooter: React.FC<ITaskListFooterProps> = (props: ITaskListFooterProps): React.JSX.Element => {
-    const {surface, onStartAll, onStopAll} = props;
+    const {surface, onStartAll, onStopAll, batch} = props;
     const {t} = useTranslation();
-    const vtBatch: IVTBatchState = useSelector((state: RootState): IVTBatchState => state.vtt.vtBatch);
-    const isRunning: boolean = vtBatch.status === 'running' || vtBatch.status === 'stopping' && vtBatch.running.length > 0;
-    const total: number = vtBatch.queue.length + vtBatch.running.length;
-    const runningCount: number = vtBatch.running.length;
+    const isRunning: boolean = batch ? batch.status === 'running' || batch.status === 'stopping' && batch.running.length > 0 : false;
+    const total: number = batch ? batch.queue.length + batch.running.length : 0;
+    const runningCount: number = batch ? batch.running.length : 0;
 
     const handleClick = (): void => {
         if (isRunning)
@@ -32,11 +35,11 @@ const BaseTaskListFooter: React.FC<ITaskListFooterProps> = (props: ITaskListFoot
                 {surface}
 
                 <div className={'task-list-footer-actions'}>
-                    {total > 0 && isRunning &&
+                    {total > 0 && isRunning && batch &&
                         <Text size={200} className={'task-list-footer-status'}>
                             {t('mediaFile.options.batchRunning', {
                                 current: runningCount,
-                                total: runningCount + vtBatch.queue.length
+                                total: runningCount + batch.queue.length
                             })}
                         </Text>
                     }

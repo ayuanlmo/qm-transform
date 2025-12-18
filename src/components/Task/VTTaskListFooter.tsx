@@ -6,8 +6,8 @@ import {useTranslation} from "react-i18next";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {codecOptions} from "../VT/const";
+import type {IVTBatchState} from "../../store/VTTStore";
 import {
-    IVTBatchState,
     updateCurrentVTTaskItem,
     vtBatchMarkRunning,
     vtBatchReset,
@@ -175,6 +175,7 @@ const VTTaskListFooter: React.FC = (): React.JSX.Element => {
 
     return (
         <BaseTaskListFooter
+            batch={vtBatch}
             surface={
                 <div className={'app_flex_box'}>
                     <div className={'task-list-footer-item'}>
