@@ -83,17 +83,17 @@ module.exports = {
             webpackConfig.output.path = path.join(path.resolve(), 'build');
             webpackConfig.plugins.forEach((plugin) => {
                 if (plugin.constructor.name === 'MiniCssExtractPlugin')
-                    plugin.options.filename = 'css/_t_style_[contenthash].t.css';
+                    plugin.options.filename = 'css/_lmo_style_[contenthash].qm.css';
             });
-            webpackConfig.output.filename = 'script/_t_script_[contenthash].t.js';
-            webpackConfig.output.chunkFilename = 'script/_t_script_[contenthash].chunk.t.js';
+            webpackConfig.output.filename = 'script/_lmo_script_[contenthash].qm.js';
+            webpackConfig.output.chunkFilename = 'script/_lmo_script_[contenthash].chunk.qm.js';
             webpackConfig.module.rules.push({
                 test: /\.(png|svg|jpg|gif)$/,
                 use: [
                     {
                         loader: 'file-loader',
                         options: {
-                            name: 'static/_t_static_[contenthash].t.[ext]'
+                            name: 'static/_lmo_static_[contenthash].qm.[ext]'
                         }
                     }
                 ]
