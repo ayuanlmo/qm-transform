@@ -1,5 +1,11 @@
 import {FfprobeData} from "fluent-ffmpeg";
 
+declare namespace NodeJS {
+    interface ProcessEnv {
+        LMO_APP_VERSION?: string;
+    }
+}
+
 declare global {
     // 主题类型 （自动、暗色、浅色）
     type TThemeType = 'auto' | 'dark' | 'light';

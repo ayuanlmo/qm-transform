@@ -9,7 +9,7 @@ import {
     useState
 } from "react";
 import Dialog from "../FluentTemplates/Dialog";
-import {Button, Divider, Link,Tag} from "@fluentui/react-components";
+import {Button, Divider, Link, Tag} from "@fluentui/react-components";
 import {useTranslation} from "react-i18next";
 import {useMainEventListener} from "../../bin/Hooks";
 import AppLicenseNotices, {IAppLicenseNoticesProps} from "./AppLicenseNotices";
@@ -24,6 +24,7 @@ const About: ForwardRefExoticComponent<RefAttributes<IAboutRef>> = forwardRef((_
     const {t} = useTranslation();
     const [visible, setVisible] = useState(false);
     const appLicenseNoticesRef = useRef<IAppLicenseNoticesProps>(null);
+    const {appName} = AppConfig;
 
     const open = () => {
         setVisible(!visible);
@@ -47,9 +48,21 @@ const About: ForwardRefExoticComponent<RefAttributes<IAboutRef>> = forwardRef((_
                     <div className="icon">
                         <img src="/icon.svg" alt="App Icon"/>
                     </div>
-                    <h1 className="app-about-name">lmo-Transform</h1>
+                    <h1 className="app-about-name">{appName}</h1>
+                    <p className={'app-about-version'}>
+                        Code Name <Tag selected size={'extra-small'}>QM</Tag>
+                    </p>
                     <p className="app-about-version">
-                        App Version: 0.0.1 <Tag selected size={'extra-small'}>{AppConfig.arch}</Tag>
+                        App Version: {process.env.LMO_APP_VERSION || '?.?.?'}
+                        <Tag
+                            style={{
+                                marginLeft: '.5rem'
+                            }}
+                            selected
+                            size={'extra-small'}
+                        >
+                            {AppConfig.arch.toUpperCase()}
+                        </Tag>
                     </p>
                     <div className="app-about-update">
                         <Button>{t('about.checkForUpdate')}</Button>

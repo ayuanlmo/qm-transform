@@ -1,6 +1,6 @@
 {
   "name": "lmo-transform",
-  "version": "2.0.0",
+  "version": "2.0.0-Bata",
   "description": "",
   "main": "main.ts",
   "private": false,
@@ -25,8 +25,8 @@
     "c": "tsc",
     "start-electron-app": "pnpm run c && cross-env NODE_ENV=development electron build/main.js",
     "build": "pnpm run c && cross-env NODE_ENV=production pnpm run start-react-app-build && electron-builder",
-    "start-react-app": "cross-env BROWSER=none PORT=8088 craco start",
-    "start-react-app-build": "cross-env BROWSER=none PORT=8088 craco build"
+    "start-react-app": "cross-env BROWSER=none PORT=8088 LMO_APP_VERSION=$npm_package_version craco start",
+    "start-react-app-build": "cross-env BROWSER=none PORT=8088 LMO_APP_VERSION=$npm_package_version craco build"
   },
   "build": {
     "productName": "lmo-Transform",
