@@ -1,19 +1,29 @@
 import {FluentProvider} from "@fluentui/react-components";
 import * as React from "react";
 import {useEffect} from "react";
-import {useTheme} from "./bin/Hooks";
-import {useSelector} from "react-redux";
+import {useMainEventListener, useTheme} from "./bin/Hooks";
+import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "./store";
 import MainApp from "./App.main";
 import "./lib/Theme";
 import {appDarkTheme, appLightTheme} from "./lib/Theme";
 import {generateMediaFileId, getLocalPathForFile} from "./utils";
 import {sendIpcMessage} from "./bin/IPC";
+import {setAppVersion} from "./store/AppStore";
 
 
 const App: React.FC = (): React.JSX.Element => {
     const {theme: {appearance}} = useSelector((state: RootState) => state.app.currentSettingConfig);
     const theme = useTheme(appearance === 'auto', appearance);
+    const dispatch = useDispatch();
+
+    useMainEventListener<string>('main:on:get-app-version', (version: string): void => {
+        dispatch(setAppVersion(version));
+    });
+
+    useEffect((): void => {
+        sendIpcMessage('main:on:get-app-version');
+    }, []);
 
     useEffect(() => {
         const handleDragOver = (e: Event): void => e.preventDefault();

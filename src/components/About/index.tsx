@@ -15,6 +15,8 @@ import {useMainEventListener} from "../../bin/Hooks";
 import AppLicenseNotices, {IAppLicenseNoticesProps} from "./AppLicenseNotices";
 import {openExternalUrl} from "../../utils";
 import AppConfig from "../../conf/AppConfig";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store";
 
 export interface IAboutRef {
     open: () => void;
@@ -25,6 +27,7 @@ const About: ForwardRefExoticComponent<RefAttributes<IAboutRef>> = forwardRef((_
     const [visible, setVisible] = useState(false);
     const appLicenseNoticesRef = useRef<IAppLicenseNoticesProps>(null);
     const {appName} = AppConfig;
+    const appVersion: string = useSelector((state: RootState): string => state.app.appVersion);
 
     const open = () => {
         setVisible(!visible);
@@ -49,11 +52,8 @@ const About: ForwardRefExoticComponent<RefAttributes<IAboutRef>> = forwardRef((_
                         <img src="/icon.svg" alt="App Icon"/>
                     </div>
                     <h1 className="app-about-name">{appName}</h1>
-                    <p className={'app-about-version'}>
-                        Code Name <Tag selected size={'extra-small'}>QM</Tag>
-                    </p>
                     <p className="app-about-version">
-                        App Version: {process.env.LMO_APP_VERSION || '?.?.?'}
+                        App Version: {appVersion || '--'}
                         <Tag
                             style={{
                                 marginLeft: '.5rem'

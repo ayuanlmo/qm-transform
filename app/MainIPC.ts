@@ -1,4 +1,4 @@
-import {app, BrowserWindow, globalShortcut, ipcMain, powerSaveBlocker} from "electron";
+import {app, BrowserWindow, globalShortcut, ipcMain, IpcMainEvent, powerSaveBlocker} from "electron";
 import "./MediaIpc";
 import PowerManagementIpc from "./PowerManagementIpc";
 import WindowStatusIpc from "./WindowStatusIpc";
@@ -6,6 +6,7 @@ import AppDirectoryDialogIpc from "./AppDirectoryDialogIpc";
 import ExternalUrlIpc from "./ExternalUrlIpc";
 import SysIpc from "./SysIpc";
 import TaskIpc from "./TaskIpc";
+import packageJSON from "../package.json";
 
 /**
  * @class MainIpcHandles
@@ -40,6 +41,9 @@ class MainIpcHandles {
 
     private initHandles(): void {
         ipcMain.on('window:on:close', async (): Promise<void> => await this.closeApp());
+        ipcMain.on('main:on:get-app-version', (event: IpcMainEvent): void => {
+            event.reply('main:on:get-app-version', packageJSON.version);
+        });
     }
 
     private async closeApp(instant: boolean = false, exit: boolean = false): Promise<void> {
