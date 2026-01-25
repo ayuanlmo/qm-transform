@@ -16,7 +16,7 @@ module.exports = {
                             ...htmlPlugin.options.templateParameters,
                             __LMO_BUILD_CONFIG: {
                                 __LMO_APP_BUILD_TIME: Date.now(),
-                                __LMO_APP_NAME: 'lmo-Transform'
+                                __LMO_APP_NAME: 'QM-Transform'
                             }
                         };
                     }

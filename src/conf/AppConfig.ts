@@ -10,13 +10,13 @@ const {existsSync, writeFileSync, readFileSync} = Global.requireNodeModule<typeo
 const isWin32 = _OS.platform() === 'win32';
 
 const AppConfig = {
-    appName: 'lmo-Transform',
+    appName: 'QM-Transform',
     platform: _OS.platform(),
-    tmpdir: _Path.resolve(_OS.tmpdir(), 'lmo-Transform'),
+    tmpdir: _Path.resolve(_OS.tmpdir(), 'QM-Transform'),
     arch: _OS.arch(),
     homedir: _OS.homedir(),
-    appHomedir: isWin32 ? _Path.resolve(_OS.homedir(), 'AppData', 'Local', 'lmo-Transform') : _Path.resolve(_OS.homedir(), '.lmo-Transform'),
-    appRepository: 'https://github.com/ayuanlmo/lmo-transform',
+    appHomedir: isWin32 ? _Path.resolve(_OS.homedir(), 'AppData', 'Local', 'QM-Transform') : _Path.resolve(_OS.homedir(), '.QM-Transform'),
+    appRepository: 'https://github.com/ayuanlmo/qm-transform',
     authorGitHubHome:'https://github.com/ayuanlmo/'
 } as const;
 

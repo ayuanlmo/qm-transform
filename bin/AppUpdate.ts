@@ -9,7 +9,7 @@ class AppUpdate {
         this.window = window;
         autoUpdater.setFeedURL({
             provider: 'github',
-            repo: 'https://github.com/ayuanlmo/lmo-transform/',
+            repo: 'https://github.com/ayuanlmo/qm-transform/',
             private: false
         });
         autoUpdater.on('update-available', (): void => {

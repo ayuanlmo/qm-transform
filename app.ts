@@ -95,7 +95,7 @@ class MainApp {
 }
 
 ((): void => {
-    process.title = 'lmo-Transform';
+    process.title = 'QM-Transform';
 })();
 
 export default MainApp;

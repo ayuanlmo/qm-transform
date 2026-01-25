@@ -3,9 +3,9 @@ import {resolve} from "path";
 import {homedir, platform, tmpdir} from "os";
 
 export const isWin32 = platform() === 'win32';
-export const appHomeDir: string = isWin32 ? resolve(homedir(), 'AppData', 'Local', 'lmo-Transform') : resolve(homedir(), '.lmo-Transform');
-export const appConfigDir: string = isWin32 ? resolve(homedir(), 'AppData', 'Local', 'lmo-Transform', 'config') : resolve(appHomeDir, 'config');
-export const appTempDir: string = resolve(tmpdir(), 'lmo-Transform');
+export const appHomeDir: string = isWin32 ? resolve(homedir(), 'AppData', 'Local', 'QM-Transform') : resolve(homedir(), '.QM-Transform');
+export const appConfigDir: string = isWin32 ? resolve(homedir(), 'AppData', 'Local', 'QM-Transform', 'config') : resolve(appHomeDir, 'config');
+export const appTempDir: string = resolve(tmpdir(), 'QM-Transform');
 
 (() => {
     'use strict';
