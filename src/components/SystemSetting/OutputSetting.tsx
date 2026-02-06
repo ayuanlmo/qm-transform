@@ -6,7 +6,7 @@ import {
     Input,
     InteractionTag,
     InteractionTagPrimary,
-    Label,
+    Label, Link,
     Select,
     Text
 } from "@fluentui/react-components";
@@ -41,6 +41,8 @@ const selectOutputEventName = 'window:on:select-output-path';
 const getGPUNameEventName = 'window:on:get-gpu-name';
 const fileRules = ['name', 'ext', 'time', 'random'];
 const getCustomMediaFileNameEventName = 'window:on:test-media-name';
+const isWin32 = AppConfig.platform === 'win32';
+const openInSystemLabel: string = isWin32 ? 'mediaFile.options.showInExplorer' : 'mediaFile.options.showInFinder';
 
 const OutputSetting: React.FC = (): React.JSX.Element => {
     const {t} = useTranslation();
@@ -109,6 +111,23 @@ const OutputSetting: React.FC = (): React.JSX.Element => {
                                 onClick={(): void => {
                                     sendIpcMessage(selectOutputEventName);
                                 }}
+                                contentAfter={
+                                    <span
+                                        className={'app_position_relative'}
+                                        style={{
+                                            top: '-8px'
+                                        }}
+                                    >
+                                        <Link
+                                            inline
+                                            onClick={(): void => {
+                                                sendIpcMessage('window:on:open-directory', currentSettingConfig.output.outputPath);
+                                            }}
+                                        >
+                                            {t(openInSystemLabel)}
+                                        </Link>
+                                    </span>
+                                }
                                 readOnly
                             />
                         </div>
