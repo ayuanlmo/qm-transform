@@ -1,5 +1,7 @@
 import {ipcMain, IpcMainEvent} from "electron";
 import SysInfo from "../bin/SysInfo";
+import appPath from "app-path";
+import {platform} from "node:os";
 
 /**
  * @class SysIpc
@@ -18,6 +20,19 @@ class SysIpc {
             const name: TGPUVendors = await SysInfo.gpuInfo();
 
             event.reply('window:on:get-gpu-name', name);
+        });
+
+        ipcMain.handle('window:get-local-app-path', async (_event, appName: string): Promise<string> => {
+            if (platform() !== 'darwin') {
+                console.warn(`[SysIpc] "window:get-local-app-path" is macOS-only. Called on  $ {platform()}`);
+                return '';
+            }
+            try {
+                return await appPath(appName);
+            } catch (err) {
+                console.error(`Failed to get app path for " $ {appName}":`, err);
+                return '';
+            }
         });
     }
 }
