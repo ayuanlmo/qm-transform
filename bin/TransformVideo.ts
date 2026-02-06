@@ -1,4 +1,4 @@
-import ffmpeg, {FfmpegCommand} from 'fluent-ffmpeg';
+import ffmpeg, {FfmpegCommand, FfprobeStream} from 'fluent-ffmpeg';
 import path from 'path';
 import {IpcMainEvent} from "electron";
 import {mkdirSync} from "node:fs";
@@ -255,6 +255,10 @@ class TransformVideo {
         }
         // 应用清晰度设置
         this.applyQualitySettings(ffmpegCommand, media, videoParams);
+
+        // 应用分辨率设置
+        this.applyResolutionSettings(ffmpegCommand, media, videoParams);
+
         // 应用其他视频参数
         if (videoParams.bitrate)
             ffmpegCommand.videoBitrate(videoParams.bitrate);
@@ -295,6 +299,52 @@ class TransformVideo {
             ffmpegCommand.addOutputOptions(`-crf ${settings.crf}`);
         if (settings.pixFmt && !videoParams.pixFmt)
             ffmpegCommand.addOutputOptions(`-pix_fmt ${settings.pixFmt}`);
+    }
+
+    /**
+     * @author ayuanlmo
+     * @method applyResolutionSettings
+     * @param ffmpegCommand {FfmpegCommand}
+     * @param media {IMediaInfo}
+     * @param videoParams {VideoEncodingParams}
+     * @description 应用视频媒体分辨率设置
+     * **/
+    private static applyResolutionSettings(
+        ffmpegCommand: FfmpegCommand,
+        media: IMediaInfo,
+        videoParams: VideoEncodingParams
+    ): void {
+        // 获取原始视频分辨率
+        let originalWidth: number = 0;
+        let originalHeight: number = 0;
+
+        if (media.mediaInfo && media.mediaInfo.streams) {
+            const videoStream: FfprobeStream | undefined = media.mediaInfo.streams.find(
+                (stream: FfprobeStream): boolean => stream.codec_type === 'video'
+            );
+
+            if (videoStream) {
+                originalWidth = videoStream.width || 0;
+                originalHeight = videoStream.height || 0;
+            }
+        }
+
+        // 如果无法获取原始分辨率，使用 videoParams 中的值（作为 fallback）
+        if (!originalWidth || !originalHeight) {
+            originalWidth = videoParams.width || 0;
+            originalHeight = videoParams.height || 0;
+        }
+
+        // 目标分辨率
+        const targetWidth: number = videoParams.width || 0;
+        const targetHeight: number = videoParams.height || 0;
+
+        // 如果目标分辨率有效且与原始分辨率不同，应用缩放
+        if (targetWidth > 0 && targetHeight > 0 &&
+            (targetWidth !== originalWidth || targetHeight !== originalHeight)) {
+            // 使用 lanczos 算法进行高质量缩放
+            ffmpegCommand.addOutputOptions(`-vf scale=${targetWidth}:${targetHeight}:flags=lanczos`);
+        }
     }
 
     private static configureAudioEncoding(
