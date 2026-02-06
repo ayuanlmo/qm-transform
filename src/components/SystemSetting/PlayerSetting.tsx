@@ -8,13 +8,15 @@ import {setCurrentSettingConfig} from "../../store/AppStore";
 import {Dispatch} from "@reduxjs/toolkit";
 import {useMainEventListener} from "../../bin/Hooks";
 import {sendIpcMessage} from "../../bin/IPC";
-import Global, {pathParse} from "../../utils/Global";
 import YExtendTemplate from "../YExtendTemplate";
 import AppConfig from "../../conf/AppConfig";
 import {windowsMediaPlayerDefaultPath} from "../../conf/DefaultSettingConfig";
 import {MediaPlayerForMacOS, MediaPlayerForWindows} from "./Config";
+import type Electron from 'electron';
+import {pathParse} from "../../utils/Global";
+import Global from "../../utils/Global";
 
-const AppPath = Global.requireNodeModule<any>('app-path');
+const {ipcRenderer} = Global.requireNodeModule<typeof Electron>('electron');
 const selectMediaPlayerEventName = 'window:on:select-media-player-path';
 
 const PlayerSetting: React.FC = (): React.JSX.Element => {
@@ -34,15 +36,13 @@ const PlayerSetting: React.FC = (): React.JSX.Element => {
         let playerPath: string = '';
 
         if (AppConfig.platform === 'darwin') {
-            try {
-                if (value === 'qtp')
-                    playerPath = await AppPath.default('QuickTime Player');
-                if (value === 'vlc')
-                    playerPath = await AppPath.default('VLC');
+            let appName: string = '';
 
-            } catch (e) {
-                playerPath = '';
-            }
+            if (value === 'qtp') appName = 'QuickTime Player';
+            if (value === 'vlc') appName = 'VLC';
+
+            if (appName)
+                playerPath = await ipcRenderer.invoke('window:get-local-app-path', appName);
         } else if (AppConfig.platform === 'win32' && value === 'wmp')
             playerPath = windowsMediaPlayerDefaultPath;
 
