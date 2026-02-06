@@ -5,7 +5,7 @@ import {Select} from "@fluentui/react-components";
 import {useTranslation} from "react-i18next";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
-import {codecOptions} from "../VT/const";
+import {codecOptions, getAvailableResolutions} from "../VT/const";
 import type {IVTBatchState} from "../../store/VTTStore";
 import {
     updateCurrentVTTaskItem,
@@ -28,9 +28,10 @@ const VTTaskListFooter: React.FC = (): React.JSX.Element => {
         (state: RootState): number => state.app.currentSettingConfig.output.parallelTasks || 1
     );
 
-    // 批量格式 / 编解码器的本地状态
+    // 批量格式 / 编解码器 / 分辨率的本地状态
     const [batchFormat, setBatchFormat] = useState<string | undefined>(undefined);
     const [batchCodec, setBatchCodec] = useState<string | undefined>(undefined);
+    const [batchResolution, setBatchResolution] = useState<string | undefined>(undefined);
 
     // 是否有任务可供批量执行
     const hasTask: boolean = currentVTTask.length > 0;
@@ -63,6 +64,54 @@ const VTTaskListFooter: React.FC = (): React.JSX.Element => {
                     }
                 }
             }));
+        });
+    };
+
+    const handleBatchResolutionChange = (resolutionValue: string): void => {
+        setBatchResolution(resolutionValue);
+
+        // 批量更新所有任务的分辨率
+        currentVTTask.forEach((task: IMediaInfo): void => {
+            // 获取任务原始分辨率
+            let originalWidth: number = 0;
+            let originalHeight: number = 0;
+
+            if (task.mediaInfo && task.mediaInfo.streams) {
+                const videoStream = task.mediaInfo.streams.find(
+                    (stream) => stream.codec_type === 'video'
+                );
+
+                if (videoStream) {
+                    originalWidth = videoStream.width || 0;
+                    originalHeight = videoStream.height || 0;
+                }
+            }
+
+            // 获取该任务的可用分辨率列表
+            const availableResolutions = getAvailableResolutions(originalWidth, originalHeight);
+            const selectedResolution = availableResolutions.find(
+                (res) => res.value === resolutionValue
+            );
+
+            if (selectedResolution) {
+                const targetWidth = selectedResolution.value === 'original'
+                    ? originalWidth
+                    : selectedResolution.width;
+                const targetHeight = selectedResolution.value === 'original'
+                    ? originalHeight
+                    : selectedResolution.height;
+
+                dispatch(updateCurrentVTTaskItem({
+                    id: task.id,
+                    changes: {
+                        videoParams: {
+                            ...task.videoParams,
+                            width: targetWidth,
+                            height: targetHeight
+                        }
+                    }
+                }));
+            }
         });
     };
 
@@ -173,6 +222,42 @@ const VTTaskListFooter: React.FC = (): React.JSX.Element => {
         );
     }, [batchCodec, batchFormat, hasTask, t]);
 
+    // 计算批量分辨率选项（取所有任务中的最小分辨率作为上限）
+    const batchResolutionOptions = useMemo(() => {
+        if (!hasTask || currentVTTask.length === 0) {
+            return [];
+        }
+
+        // 获取所有任务的原始分辨率，取最小值作为上限
+        let minWidth: number = Infinity;
+        let minHeight: number = Infinity;
+
+        currentVTTask.forEach((task: IMediaInfo): void => {
+            if (task.mediaInfo && task.mediaInfo.streams) {
+                const videoStream = task.mediaInfo.streams.find(
+                    (stream) => stream.codec_type === 'video'
+                );
+
+                if (videoStream) {
+                    const width: number = videoStream.width || 0;
+                    const height: number = videoStream.height || 0;
+
+                    if (width > 0 && height > 0) {
+                        minWidth = Math.min(minWidth, width);
+                        minHeight = Math.min(minHeight, height);
+                    }
+                }
+            }
+        });
+
+        // 如果无法获取有效分辨率，返回空数组
+        if (minWidth === Infinity || minHeight === Infinity)
+            return [];
+
+        // 返回基于最小分辨率的可用分辨率列表
+        return getAvailableResolutions(minWidth, minHeight);
+    }, [currentVTTask, hasTask]);
+
     return (
         <BaseTaskListFooter
             batch={vtBatch}
@@ -192,6 +277,29 @@ const VTTaskListFooter: React.FC = (): React.JSX.Element => {
                     <div className={'task-list-footer-item'}>
                         <span>{t('mediaFile.codec')}：</span>
                         {codecSelect}
+                    </div>
+                    <div className={'task-list-footer-item'}>
+                        <span>{t('mediaFile.resolution')}：</span>
+                        <Select
+                            value={batchResolution}
+                            disabled={!hasTask || batchResolutionOptions.length === 0}
+                            onChange={(_, data): void => {
+                                handleBatchResolutionChange(data.value);
+                            }}
+                        >
+                            {
+                                batchResolutionOptions.map((item): React.JSX.Element => {
+                                    return (
+                                        <option
+                                            key={item.value}
+                                            value={item.value}
+                                        >
+                                            {t(item.label)}
+                                        </option>
+                                    );
+                                })
+                            }
+                        </Select>
                     </div>
                 </div>
             }

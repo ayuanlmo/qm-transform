@@ -130,6 +130,8 @@ class Ffmpeg {
         const defaultVideoParams: VideoEncodingParams = {
             width: 0,
             height: 0,
+            originWidth: 0,
+            originHeight: 0,
             codec: '',
             bitrate: '',
             fps: 0,
@@ -154,6 +156,8 @@ class Ffmpeg {
         return {
             width: videoStream.width ?? defaultVideoParams.width,
             height: videoStream.height ?? defaultVideoParams.height,
+            originWidth: videoStream.width ?? defaultVideoParams.width,
+            originHeight: videoStream.height ?? defaultVideoParams.height,
             codec: videoStream.codec_name ?? defaultVideoParams.codec,
             bitrate: videoStream.bit_rate?.toString() ?? defaultVideoParams.bitrate,
             fps: frameRate,

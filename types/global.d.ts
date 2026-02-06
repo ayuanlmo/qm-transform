@@ -67,6 +67,8 @@ declare global {
     export interface VideoEncodingParams {
         width: number;
         height: number;
+        readonly originWidth: number;
+        readonly originHeight: number;
         codec?: string; // 视频编解码器
         bitrate?: string; // 比特率
         fps?: number; // 帧率

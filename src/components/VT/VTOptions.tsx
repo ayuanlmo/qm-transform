@@ -9,7 +9,14 @@ import React, {
 } from "react";
 import {Divider, InfoLabel, Label, Select} from "@fluentui/react-components";
 import {useTranslation} from "react-i18next";
-import {codecOptions, pixelFormatOptions, presetOptions, qualityOptions, videoBitrateOptions} from "./const";
+import {
+    codecOptions,
+    getAvailableResolutions, IResolutionOption,
+    pixelFormatOptions,
+    presetOptions,
+    qualityOptions,
+    videoBitrateOptions
+} from "./const";
 import TaskFormats from "../Task/TaskFormats";
 import {IFormatType, videoFormatType} from "../../const/formatType";
 
@@ -49,6 +56,47 @@ const VTOptions: ForwardRefExoticComponent<IVTOptionsProps & React.RefAttributes
             return mediaInfo.videoParams.codec;
         return allowedValues[0] ?? mediaInfo.videoParams.codec;
     }, [filteredCodecOptions, mediaInfo.videoParams.codec]);
+
+    // 从原始媒体信息获取原始分辨率
+    const originalResolution = React.useMemo(() => {
+        if (!mediaInfo.mediaInfo || !mediaInfo.mediaInfo.streams)
+            return {width: 0, height: 0};
+
+        const videoStream = mediaInfo.mediaInfo.streams.find(
+            (stream): boolean => stream.codec_type === 'video'
+        );
+
+        if (!videoStream)
+            return {width: 0, height: 0};
+        return {
+            width: videoStream.width || 0,
+            height: videoStream.height || 0
+        };
+    }, [mediaInfo.mediaInfo]);
+
+    // 计算可用的分辨率选项（基于原始分辨率）
+    const availableResolutions: IResolutionOption[] = React.useMemo(() => {
+        return getAvailableResolutions(originalResolution.width, originalResolution.height);
+    }, [originalResolution.width, originalResolution.height]);
+
+    // 获取当前分辨率选项的值
+    const currentResolutionValue: string = React.useMemo(() => {
+        const currentWidth: number = mediaInfo.videoParams.width || 0;
+        const currentHeight: number = mediaInfo.videoParams.height || 0;
+
+        // 如果宽高为0或未设置，或与原始分辨率相同，使用"原始"
+        if (!currentWidth || !currentHeight ||
+            currentWidth === originalResolution.width && currentHeight === originalResolution.height) {
+            return 'original';
+        }
+
+        // 查找匹配的分辨率选项
+        const matched: IResolutionOption | undefined = availableResolutions.find(
+            (res: IResolutionOption) => res.width === currentWidth && res.height === currentHeight
+        );
+
+        return matched ? matched.value : 'original';
+    }, [mediaInfo.videoParams.width, mediaInfo.videoParams.height, originalResolution, availableResolutions]);
 
     const open = (): void => {
         setVisible(!visible);
@@ -207,6 +255,47 @@ const VTOptions: ForwardRefExoticComponent<IVTOptionsProps & React.RefAttributes
                                     videoBitrateOptions.map((i): React.JSX.Element => {
                                         return (
                                             <option value={i.value} label={t(i.label)} key={i.label}/>
+                                        );
+                                    })
+                                }
+                            </Select>
+                        </div>
+                        <div className={'task-options-item'}>
+                            <Label>{t('mediaFile.resolution')}</Label>
+                            <Select
+                                value={currentResolutionValue}
+                                onChange={(_, data): void => {
+                                    const selectedResolution = availableResolutions.find(
+                                        (res) => res.value === data.value
+                                    );
+
+                                    if (selectedResolution) {
+                                        // 如果选择"原始"，使用原始分辨率 否则使用选择的分辨率
+                                        const targetWidth: number = selectedResolution.value === 'original'
+                                            ? originalResolution.width
+                                            : selectedResolution.width;
+                                        const targetHeight: number = selectedResolution.value === 'original'
+                                            ? originalResolution.height
+                                            : selectedResolution.height;
+
+                                        changeEvent({
+                                            videoParams: {
+                                                ...mediaInfo.videoParams,
+                                                width: targetWidth,
+                                                height: targetHeight
+                                            }
+                                        });
+                                    }
+                                }}
+                            >
+                                {
+                                    availableResolutions.map((i: IResolutionOption): React.JSX.Element => {
+                                        return (
+                                            <option
+                                                value={i.value}
+                                                label={t(i.label)}
+                                                key={i.value}
+                                            />
                                         );
                                     })
                                 }
