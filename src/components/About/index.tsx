@@ -49,7 +49,7 @@ const About: ForwardRefExoticComponent<RefAttributes<IAboutRef>> = forwardRef((_
             surface={
                 <div className="app-about">
                     <div className="icon">
-                        <img src="/icon.svg" alt="App Icon"/>
+                        <img src={window.location.protocol === 'file:' ? './icon.svg' : '/icon.svg'} alt="App Icon"/>
                     </div>
                     <h1 className="app-about-name">{appName}</h1>
                     <p className="app-about-version">
