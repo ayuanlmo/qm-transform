@@ -160,12 +160,6 @@ class TransformVideo {
 
         // 初始化Ffmpeg命令
         const ffmpegCommand: FfmpegCommand = ffmpeg(media.fullPath)
-            .addInputOption(['-loglevel', 'verbose'])
-            .addInputOption(['-report'])
-            .on('stderr', (line: string): void => {
-                // 全量透传 ffmpeg stderr，便于现场排查
-                Logger.error(`Task ${media.id} ffmpeg stderr: ${line}`);
-            })
             .on('start', (commandLine: string): void => {
                 Logger.info(`Task ${media.id} ffmpeg start: ${commandLine}`);
                 if (videoEncodingMeta.useHardwareAcceleration)
