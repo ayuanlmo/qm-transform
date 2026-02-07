@@ -96,7 +96,7 @@ export function getAvailableResolutions(inputWidth: number, inputHeight: number)
         width: inputWidth,
         height: inputHeight,
         value: 'original',
-        label: 'resolutions.original'
+        label: 'mediaFile.resolutions.original'
     };
 
     // 如果没有匹配的标准分辨率，只返回原始选项
