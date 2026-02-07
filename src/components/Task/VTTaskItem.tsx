@@ -29,7 +29,7 @@ const VTTaskItem: React.FC<VTTaskItemProps> = (props: VTTaskItemProps): React.JS
         state.vtt.currentVTTask.find((item: IMediaInfo): boolean => item.id === data.id) || data
     );
 
-    const isProcessing: boolean = latestData.status === 'processing';
+    const isProcessing: boolean = latestData.status === 'processing' || latestData.status === 'paused';
 
     const handleTaskUpdate = (changes: Partial<IMediaInfo>): void => {
         dispatch(updateCurrentVTTaskItem({
@@ -52,12 +52,25 @@ const VTTaskItem: React.FC<VTTaskItemProps> = (props: VTTaskItemProps): React.JS
                 return;
             }
 
+            // 如果任务当前是暂停状态，只更新进度，不更新状态
+            const currentStatus = latestData.status;
+
             handleTaskUpdate({
                 progress: event.progress,
-                status: event.progress >= 100 ? 'complete' : 'processing'
+                status: currentStatus === 'paused' ? 'paused' : event.progress >= 100 ? 'complete' : 'processing'
             });
         }
     );
+
+    useMainEventListener<{ id: string }>('main:on:task-paused', (event): void => {
+        if (event.id !== data.id) return;
+        handleTaskUpdate({status: 'paused'});
+    });
+
+    useMainEventListener<{ id: string }>('main:on:task-resumed', (event): void => {
+        if (event.id !== data.id) return;
+        handleTaskUpdate({status: 'processing'});
+    });
 
     const headerTags: React.JSX.Element = <React.Fragment>
         <YExtendTemplate show={latestData.isH264}>
@@ -173,6 +186,12 @@ const VTTaskItem: React.FC<VTTaskItemProps> = (props: VTTaskItemProps): React.JS
                 onPlay={play}
                 onRemove={() => dispatch(removeCurrentVTTaskItem(data.id))}
                 onStart={(): void => sendIpcMessage('main:on:task-create:video-media-transform', latestData)}
+                onPause={(): void => {
+                    sendIpcMessage('main:on:task-pause', data.id);
+                }}
+                onResume={(): void => {
+                    sendIpcMessage('main:on:task-resume', data.id);
+                }}
                 onOpenSettings={(): void => vTOptionsRef.current?.open()}
                 headerTags={headerTags}
                 infoBlock={infoBlock}
@@ -180,6 +199,8 @@ const VTTaskItem: React.FC<VTTaskItemProps> = (props: VTTaskItemProps): React.JS
                 extraDialogs={extraDialogs}
                 startLabel={t('mediaFile.options.startProcessing')}
                 inProgressLabel={t('mediaFile.options.inProgress')}
+                pauseLabel={t('mediaFile.options.pause')}
+                resumeLabel={t('mediaFile.options.resume')}
             />
         </>
     );

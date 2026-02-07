@@ -8,6 +8,8 @@ export interface IBaseTaskItemProps {
     onPlay?: () => void;
     onRemove: () => void;
     onStart: () => void;
+    onPause?: () => void;
+    onResume?: () => void;
     onOpenSettings?: () => void;
     headerTags?: React.ReactNode;
     infoBlock: React.ReactNode;
@@ -15,6 +17,8 @@ export interface IBaseTaskItemProps {
     extraDialogs?: React.ReactNode;
     startLabel: string;
     inProgressLabel: string;
+    pauseLabel?: string;
+    resumeLabel?: string;
 }
 
 const BaseTaskItem: React.FC<IBaseTaskItemProps> = (props: IBaseTaskItemProps): React.JSX.Element => {
@@ -24,14 +28,21 @@ const BaseTaskItem: React.FC<IBaseTaskItemProps> = (props: IBaseTaskItemProps): 
         onPlay,
         onRemove,
         onStart,
+        onPause,
+        onResume,
         onOpenSettings,
         headerTags,
         infoBlock,
         optionsBlock,
         extraDialogs,
         startLabel,
-        inProgressLabel
+        inProgressLabel,
+        pauseLabel,
+        resumeLabel
     } = props;
+
+    const isPaused: boolean = data.status === 'paused';
+    const canPauseResume: boolean = isProcessing && !!(onPause || onResume);
 
     return (
         <ListItem className={"task-item"}>
@@ -44,7 +55,7 @@ const BaseTaskItem: React.FC<IBaseTaskItemProps> = (props: IBaseTaskItemProps): 
                         <div
                             className={'task-item-media-info-remove app_position_absolute'}
                             onClick={(): void => {
-                                if (isProcessing) return;
+                                if (isProcessing && !isPaused) return;
                                 onRemove();
                             }}
                         >
@@ -81,26 +92,42 @@ const BaseTaskItem: React.FC<IBaseTaskItemProps> = (props: IBaseTaskItemProps): 
                         <div className={'task-item-option app_position_absolute app_flex_box'}>
                             <div className={'task-item-option-setting'}>
                                 {onOpenSettings && <LauncherSettings24Regular
-                                        className={`app_cursor_pointer${isProcessing ? ' app_cursor_disabled' : ''}`}
-                                        onClick={(): void => {
-                                            if (isProcessing) return;
-                                            onOpenSettings();
-                                        }}
-                                    />
+                                    className={`app_cursor_pointer${isProcessing && !isPaused ? ' app_cursor_disabled' : ''}`}
+                                    onClick={(): void => {
+                                        if (isProcessing && !isPaused) return;
+                                        onOpenSettings();
+                                    }}
+                                />
                                 }
                             </div>
                             <div>
-                                <Button
-                                    appearance="primary"
-                                    disabled={isProcessing}
-                                    icon={isProcessing ? <Spinner size="tiny"/> : undefined}
-                                    onClick={(): void => {
-                                        if (isProcessing) return;
-                                        onStart();
-                                    }}
-                                >
-                                    {isProcessing ? inProgressLabel : startLabel}
-                                </Button>
+                                {canPauseResume ?
+                                    <Button
+                                        appearance="primary"
+                                        icon={isPaused ? undefined : <Spinner size="tiny"/>}
+                                        onClick={(): void => {
+                                            if (isPaused && onResume) {
+                                                onResume();
+                                            } else if (!isPaused && onPause) {
+                                                onPause();
+                                            }
+                                        }}
+                                    >
+                                        {isPaused ? resumeLabel || '继续' : pauseLabel || '暂停'}
+                                    </Button>
+                                    :
+                                    <Button
+                                        appearance="primary"
+                                        disabled={isProcessing && !isPaused}
+                                        icon={isProcessing && !isPaused ? <Spinner size="tiny"/> : undefined}
+                                        onClick={(): void => {
+                                            if (isProcessing && !isPaused) return;
+                                            onStart();
+                                        }}
+                                    >
+                                        {isProcessing && !isPaused ? inProgressLabel : startLabel}
+                                    </Button>
+                                }
                             </div>
                         </div>
                         {extraDialogs}

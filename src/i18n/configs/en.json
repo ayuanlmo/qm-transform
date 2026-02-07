@@ -92,6 +92,8 @@
       "stopAll": "Stop all",
       "startProcessing": "Start Processing",
       "inProgress": "In Progress",
+      "pause": "Pause",
+      "resume": "Resume",
       "getMediaFileInformation": "Retrieving media file information...",
       "startConcat": "Start Merging",
       "conversionSuccessMessage": "[{{name}}] converted successfully",

@@ -27,7 +27,7 @@ const ATTaskItem: React.FC<ATTaskItemProps> = (props: ATTaskItemProps): React.JS
         state.att.currentATTask.find((item: IMediaInfo): boolean => item.id === data.id) || data
     );
 
-    const isProcessing: boolean = latestData.status === 'processing';
+    const isProcessing: boolean = latestData.status === 'processing' || latestData.status === 'paused';
 
     const handleTaskUpdate = (changes: Partial<IMediaInfo>): void => {
         dispatch(updateCurrentATTaskItem({
@@ -50,14 +50,29 @@ const ATTaskItem: React.FC<ATTaskItemProps> = (props: ATTaskItemProps): React.JS
                 return;
             }
 
+            // 如果任务当前是暂停状态，只更新进度，不更新状态
+            const currentStatus = latestData.status;
+
             handleTaskUpdate({
                 progress: event.progress,
-                status: event.progress >= 100 ? 'complete' : 'processing'
+                status: currentStatus === 'paused' ? 'paused' : event.progress >= 100 ? 'complete' : 'processing'
             });
         }
     );
 
-    const infoBlock: React.JSX.Element = <div>
+    useMainEventListener<{ id: string }>('main:on:task-paused', (event): void => {
+        if (event.id !== data.id) return;
+        handleTaskUpdate({status: 'paused'});
+    });
+
+    useMainEventListener<{ id: string }>('main:on:task-resumed', (event): void => {
+        if (event.id !== data.id) return;
+        handleTaskUpdate({status: 'processing'});
+    });
+
+    const infoBlock: React.JSX.Element = <div style={{
+        marginTop: '3rem'
+    }}>
         <Text
             size={400}
             className={'task-item-media-info-text task-item-media-info-sub-item'}
@@ -145,10 +160,18 @@ const ATTaskItem: React.FC<ATTaskItemProps> = (props: ATTaskItemProps): React.JS
                     });
                     sendIpcMessage('main:on:task-create:audio-media-transform', latestData);
                 }}
+                onPause={(): void => {
+                    sendIpcMessage('main:on:task-pause', data.id);
+                }}
+                onResume={(): void => {
+                    sendIpcMessage('main:on:task-resume', data.id);
+                }}
                 onOpenSettings={(): void => aTOptionsRef.current?.open()}
                 infoBlock={infoBlock}
                 startLabel={t('mediaFile.options.startProcessing')}
                 inProgressLabel={t('mediaFile.options.inProgress')}
+                pauseLabel={t('mediaFile.options.pause')}
+                resumeLabel={t('mediaFile.options.resume')}
             />
         </>
     );

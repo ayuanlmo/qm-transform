@@ -91,6 +91,8 @@
       "stopAll": "모두 중지",
       "startProcessing": "처리 시작",
       "inProgress": "진행 중",
+      "pause": "일시 중지",
+      "resume": "재개",
       "getMediaFileInformation": "미디어 파일 정보를 가져오는 중...",
       "startConcat": "병합 시작",
       "conversionSuccessMessage": "[{{name}}] 변환이 성공적으로 완료됨",

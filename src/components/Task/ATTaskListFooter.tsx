@@ -125,7 +125,7 @@ const ATTaskListFooter: React.FC = (): React.JSX.Element => {
             return;
 
         const queue: string[] = currentATTask
-            .filter((task: IMediaInfo): boolean => task.status !== 'processing')
+            .filter((task: IMediaInfo): boolean => task.status !== 'processing' && task.status !== 'paused')
             .map((task: IMediaInfo): string => task.id);
 
         if (queue.length < 1)

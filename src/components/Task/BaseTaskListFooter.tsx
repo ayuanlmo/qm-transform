@@ -3,7 +3,7 @@ import {Button, Text} from "@fluentui/react-components";
 import {useTranslation} from "react-i18next";
 
 export interface IBatchState {
-    status: 'idle' | 'running' | 'stopping';
+    status: 'idle' | 'running' | 'paused' | 'stopping';
     queue: string[];
     running: string[];
 }
@@ -18,7 +18,7 @@ export interface ITaskListFooterProps {
 const BaseTaskListFooter: React.FC<ITaskListFooterProps> = (props: ITaskListFooterProps): React.JSX.Element => {
     const {surface, onStartAll, onStopAll, batch} = props;
     const {t} = useTranslation();
-    const isRunning: boolean = batch ? batch.status === 'running' || batch.status === 'stopping' && batch.running.length > 0 : false;
+    const isRunning: boolean = batch ? (batch.status === 'running' || batch.status === 'paused' || batch.status === 'stopping') && batch.running.length > 0 : false;
     const total: number = batch ? batch.queue.length + batch.running.length : 0;
     const runningCount: number = batch ? batch.running.length : 0;
 

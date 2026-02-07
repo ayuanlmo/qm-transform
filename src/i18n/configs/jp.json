@@ -91,6 +91,8 @@
       "stopAll": "すべて停止",
       "startProcessing": "処理開始",
       "inProgress": "進行中",
+      "pause": "一時停止",
+      "resume": "再開",
       "getMediaFileInformation": "メディアファイル情報を取得中...",
       "startConcat": "結合開始",
       "conversionSuccessMessage": "[{{name}}] 変換に成功しました",

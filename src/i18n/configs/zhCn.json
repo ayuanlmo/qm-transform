@@ -92,6 +92,8 @@
       "stopAll": "停止全部",
       "startProcessing": "开始处理",
       "inProgress": "进行中",
+      "pause": "暂停",
+      "resume": "继续",
       "getMediaFileInformation": "正在获取媒体文件信息...",
       "startConcat": "开始合并",
       "conversionSuccessMessage": "[{{name}}] 转换成功",

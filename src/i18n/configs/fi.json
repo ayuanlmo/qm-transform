@@ -91,6 +91,8 @@
       "stopAll": "Pysäytä kaikki",
       "startProcessing": "Aloita käsittely",
       "inProgress": "Käynnissä",
+      "pause": "Keskeytä",
+      "resume": "Jatka",
       "getMediaFileInformation": "Haetaan mediatiedoston tietoja...",
       "startConcat": "Aloita yhdistäminen",
       "conversionSuccessMessage": "[{{name}}] muunnettiin onnistuneesti",

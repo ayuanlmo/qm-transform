@@ -121,7 +121,7 @@ const VTTaskListFooter: React.FC = (): React.JSX.Element => {
             return;
 
         const queue: string[] = currentVTTask
-            .filter((task: IMediaInfo): boolean => task.status !== 'processing')
+            .filter((task: IMediaInfo): boolean => task.status !== 'processing' && task.status !== 'paused')
             .map((task: IMediaInfo): string => task.id);
 
         if (queue.length < 1)
@@ -142,6 +142,7 @@ const VTTaskListFooter: React.FC = (): React.JSX.Element => {
 
     // 根据vtBatch 状态与并发配置自动调度任务
     React.useEffect((): void => {
+        // 如果状态不是 running（包括 paused 和 stopping），则不继续调度
         if (vtBatch.status !== 'running')
             return;
 

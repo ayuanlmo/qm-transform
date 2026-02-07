@@ -5,6 +5,8 @@ import {mkdirSync} from "node:fs";
 import * as os from "node:os";
 import Media from "./Media";
 import {getLocalConfigAsMain} from "./Conf";
+import taskManager from "./TaskManager";
+import Logger from "../lib/Logger";
 
 // 根据清晰度等级映射到具体的编码参数
 const qualitySettings: Record<string, Partial<VideoEncodingParams>> = {
@@ -87,9 +89,26 @@ class TransformVideo {
 
         const outputPath: string = path.resolve(outputDir, `${outputBaseName}.${outputExt}`);
 
-        // 初始化FFmpeg命令
-        const ffmpegCommand = ffmpeg(media.fullPath)
-            .on('end', () => {
+        // 注册任务到 TaskManager
+        taskManager.registerTask(media.id, media, media.fullPath, outputPath, ctx, undefined);
+
+        // 初始化Ffmpeg命令
+        const ffmpegCommand: FfmpegCommand = ffmpeg(media.fullPath)
+            .on('start', (): void => {
+                // 获取进程 PID
+                const ffmpegProc = (ffmpegCommand as any).ffmpegProc;
+
+                if (ffmpegProc && ffmpegProc.pid)
+                    taskManager.attachPid(media.id, ffmpegProc.pid, ffmpegProc);
+            })
+            .on('end', (): void => {
+                // 检查任务是否处于暂停状态，如果是暂停导致的结束，不发送完成事件
+                if (taskManager.isPaused(media.id)) {
+                    Logger.info(`Task ${media.id} ended due to pause, not marking as complete`);
+                    return;
+                }
+                // 清理任务
+                taskManager.cleanup(media.id);
                 ctx.reply('main:on:task-end', {
                     id: media.id,
                     progress: 100,
@@ -98,13 +117,30 @@ class TransformVideo {
                 });
             })
             .on('progress', (progress) => {
+                // 如果任务已暂停，不处理进度更新
+                if (taskManager.isPaused(media.id)) {
+                    Logger.info(`Task ${media.id} progress event ignored (task is paused)`);
+                    return;
+                }
+
+                const progressPercent = Math.round(progress.percent || 0);
+
+                // 更新 TaskManager 中的进度
+                taskManager.updateProgress(media.id, progressPercent);
                 ctx.reply('main:on:media-transform-progress', {
                     id: media.id,
-                    progress: Math.round(progress.percent || 0),
+                    progress: progressPercent,
                     optPath: outputPath
                 });
             })
             .on('error', (err) => {
+                // 检查任务是否处于暂停状态，如果是暂停导致的错误，不发送完成事件
+                if (taskManager.isPaused(media.id)) {
+                    Logger.info(`Task ${media.id} error due to pause, not marking as complete`);
+                    return;
+                }
+                // 清理任务
+                taskManager.cleanup(media.id);
                 console.error('FFmpeg error:', err);
                 ctx.reply('main:on:media-transform-progress', {
                     id: media.id,
@@ -363,7 +399,7 @@ class TransformVideo {
         // 拆出用户传入的参数，后续按容器补默认值 / 做兼容处理
         let codec: string | undefined = media.audioParams?.codec;
         let bitrate: string | undefined = media.audioParams?.bitrate;
-        let sampleRate: number | undefined = media.audioParams?.sampleRate;
+        const sampleRate: number | undefined = media.audioParams?.sampleRate;
         let channels: number | undefined = media.audioParams?.channels;
 
         // 按容器限制可用的音频编码器，并设置合理默认值

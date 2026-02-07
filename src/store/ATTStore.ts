@@ -1,7 +1,7 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 export interface IATBatchState {
-    status: 'idle' | 'running' | 'stopping';
+    status: 'idle' | 'running' | 'paused' | 'stopping';
     queue: string[];
     running: string[];
 }

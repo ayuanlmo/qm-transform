@@ -91,6 +91,8 @@
       "stopAll": "Alle stoppen",
       "startProcessing": "Verarbeitung starten",
       "inProgress": "Wird verarbeitet",
+      "pause": "Pause",
+      "resume": "Fortsetzen",
       "getMediaFileInformation": "Mediendateiinformationen werden abgerufen...",
       "startConcat": "Zusammenfügen starten",
       "conversionSuccessMessage": "[{{name}}] wurde erfolgreich konvertiert",
