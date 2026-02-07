@@ -72,10 +72,14 @@ const OutputSetting: React.FC = (): React.JSX.Element => {
     });
 
     useMainEventListener(getGPUNameEventName, (data: TGPUVendors): void => {
-        if (currentSettingConfig.output.codecType === 'GPU')
+        const code = gpuCodes.get(data);
+
+        // 仅当推断到具体硬件编码器且当前选择 GPU 时再更新，避免将已选值意外清空
+        if (currentSettingConfig.output.codecType === 'GPU' && code) {
             setConfig({
-                codecMethod: gpuCodes.get(data)
+                codecMethod: code
             });
+        }
     });
 
     useMainEventListener<string>(getCustomMediaFileNameEventName, (data) => {
