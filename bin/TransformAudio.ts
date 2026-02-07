@@ -69,6 +69,12 @@ class TransformAudio {
                 }
                 // 清理任务
                 taskManager.cleanup(media.id);
+                // 补发一次 100% 进度，避免 Windows 下进度未满时前端卡住
+                ctx.reply('main:on:media-transform-progress', {
+                    id: media.id,
+                    progress: 100,
+                    optPath: outputPath
+                });
                 ctx.reply('main:on:task-end', {
                     id: media.id,
                     progress: 100,

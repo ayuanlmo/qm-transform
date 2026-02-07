@@ -60,6 +60,18 @@ const ATTaskItem: React.FC<ATTaskItemProps> = (props: ATTaskItemProps): React.JS
         }
     );
 
+    // 兜底：收到任务完成事件时，强制标记完成并移除
+    useMainEventListener<{ id: string; progress?: number }>('main:on:task-end', (event): void => {
+        if (event.id !== data.id)
+            return;
+
+        handleTaskUpdate({
+            progress: event.progress ?? 100,
+            status: 'complete'
+        });
+        dispatch(removeCurrentATTaskItem(data.id));
+    });
+
     useMainEventListener<{ id: string }>('main:on:task-paused', (event): void => {
         if (event.id !== data.id) return;
         handleTaskUpdate({status: 'paused'});
