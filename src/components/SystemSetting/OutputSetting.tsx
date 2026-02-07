@@ -48,6 +48,7 @@ const OutputSetting: React.FC = (): React.JSX.Element => {
     const {t} = useTranslation();
     const currentSettingConfig = useSelector((state: RootState) => state.app.currentSettingConfig);
     const dispatch: Dispatch = useDispatch();
+    const [detectedGpu, setDetectedGpu] = useState<TGPUVendors>('unknown');
     const [optFileRule, _setOptFileRule] = useState(currentSettingConfig.output.customNameRule ?? '');
     const [previewCustomMediaFileName, setPreviewCustomMediaFileName] = useState<string>('');
 
@@ -72,7 +73,18 @@ const OutputSetting: React.FC = (): React.JSX.Element => {
     });
 
     useMainEventListener(getGPUNameEventName, (data: TGPUVendors): void => {
+        setDetectedGpu(data);
         const code = gpuCodes.get(data);
+
+        if (data === 'unknown') {
+            // 未识别到 GPU 时强制回落到 CPU，避免错误的 GPU 配置
+            if (currentSettingConfig.output.codecType === 'GPU')
+                setConfig({
+                    codecType: 'CPU',
+                    codecMethod: ''
+                });
+            return;
+        }
 
         // 仅当推断到具体硬件编码器且当前选择 GPU 时再更新，避免将已选值意外清空
         if (currentSettingConfig.output.codecType === 'GPU' && code) {
@@ -81,6 +93,28 @@ const OutputSetting: React.FC = (): React.JSX.Element => {
             });
         }
     });
+
+    const availableGpuOptions = React.useMemo(() => {
+        if (detectedGpu === 'unknown')
+            return [];
+        const code = gpuCodes.get(detectedGpu);
+
+        if (!code)
+            return [];
+
+        const labelMap: Record<TGPUVendors, string> = {
+            NVIDIA: 'NVIDIA (nvenc)',
+            AMD: 'AMD (amf)',
+            Intel: 'Intel (qsv)',
+            Apple: 'Apple Silicon (video_toolbox)',
+            unknown: ''
+        };
+
+        return [{
+            value: code,
+            label: labelMap[detectedGpu] || code
+        }];
+    }, [detectedGpu]);
 
     useMainEventListener<string>(getCustomMediaFileNameEventName, (data) => {
         setPreviewCustomMediaFileName(data);
@@ -248,7 +282,7 @@ const OutputSetting: React.FC = (): React.JSX.Element => {
                             </Divider>
                         </div>
                     </div>
-                    <YExtendTemplate show={currentSettingConfig.output.codecType === 'GPU'}>
+                    <YExtendTemplate show={currentSettingConfig.output.codecType === 'GPU' && detectedGpu !== 'unknown'}>
                         <div
                             className={`system-setting-item animated ${currentSettingConfig.output.codecType === 'GPU' ? 'zoomIn' : 'zoomOut'}`}>
                             <Label>
@@ -257,21 +291,17 @@ const OutputSetting: React.FC = (): React.JSX.Element => {
                             </Label>
                             <div className={'system-setting-item-content'}>
                                 <Select
-                                    defaultValue={currentSettingConfig.output.codecMethod}
+                                    value={currentSettingConfig.output.codecMethod}
                                     onChange={(ev, {value}): void => {
                                         setConfig({
                                             codecMethod: value
                                         });
                                     }}
+                                    disabled={availableGpuOptions.length === 0}
                                 >
-                                    <YExtendTemplate show={AppConfig.platform === 'win32'}>
-                                        <option value={'nvenc'}>NVIDIA (nvenc)</option>
-                                        <option value={'amf'}>AMD (amf)</option>
-                                        <option value={'qsv'}>Intel (qsv)</option>
-                                    </YExtendTemplate>
-                                    <YExtendTemplate show={AppConfig.platform === 'darwin'}>
-                                        <option value={'video_toolbox'}>Apple Silicon (video_toolbox)</option>
-                                    </YExtendTemplate>
+                                    {availableGpuOptions.map((opt) =>
+                                        <option key={opt.value} value={opt.value} label={opt.label}/>
+                                    )}
                                 </Select>
                                 <div className={'system-setting-item-content-divider'}>
                                     <Divider
