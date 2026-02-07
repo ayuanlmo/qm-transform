@@ -4,10 +4,12 @@ import {saveConfig} from '../conf/AppConfig';
 
 export interface IAppStore {
     currentSettingConfig: IDefaultSettingConfig;
+    readonly appVersion: string;
 }
 
 const initialState: IAppStore = {
-    currentSettingConfig: {...DefaultSettingConfig}
+    currentSettingConfig: {...DefaultSettingConfig},
+    appVersion: ''
 };
 
 const AppStore = createSlice({
@@ -20,12 +22,16 @@ const AppStore = createSlice({
                 ...state,
                 currentSettingConfig: payload
             };
+        },
+        setAppVersion: (state, {payload}) => {
+            state.appVersion = payload;
         }
     }
 });
 
 export const {
-    setCurrentSettingConfig
+    setCurrentSettingConfig,
+    setAppVersion
 } = AppStore.actions;
 
 export default AppStore.reducer;
