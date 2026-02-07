@@ -38,7 +38,7 @@ const qualitySettings: Record<string, Partial<VideoEncodingParams>> = {
     original: {} // 使用原始设置
 };
 
-// 质量等级到 CRF 值的映射（用于 NVENC/QSV/AMF）
+// 质量等级到 CRF/CQ 值的映射（用于 NVENC/QSV/AMF）
 const qualityToCrfMap: Record<string, string> = {
     'very_high': '16',
     'high': '19',
@@ -61,6 +61,41 @@ const qualityToQValueMap: Record<string, string> = {
  */
 const getContainer = (media: IMediaInfo): string => {
     return (media.optFormat || path.extname(media.fullPath).replace('.', '')).toLowerCase();
+};
+
+type VideoEncodingMeta = {
+    useHardwareAcceleration: boolean;
+    hardwareEncoderSuffix: string | null;
+    selectedCodec: string;
+};
+
+/**
+ * 将音频码率规范到合理范围（主要避免探测值过高导致编码器拒绝）
+ */
+const normalizeAudioBitrate = (codec?: string, bitrate?: string): string | undefined => {
+    if (!bitrate) return bitrate;
+
+    const match: RegExpMatchArray | null = bitrate.match(/^(\d+(?:\.\d+)?)([kKmM]?)$/);
+
+    if (!match) return bitrate;
+
+    const value: number = parseFloat(match[1]);
+    const unit: string = match[2].toLowerCase();
+
+    // 当前仅针对 AAC/MP3 做上限限制，避免传入数百 Mbps 直接报错
+    const isAacOrMp3: boolean = !!codec && ['aac', 'mp3'].includes(codec.toLowerCase());
+
+    if (!isAacOrMp3) return bitrate;
+
+    // 将 Mbps 级别的值视为 k 误传，先换算到 k
+    const valueInKbps: number = unit === 'm' ? value * 1000 : value;
+
+    // 合理区间 64k - 512k；超出时压回 320k，过低则提升到 64k
+    if (valueInKbps > 512) return '320k';
+    if (valueInKbps < 32) return '64k';
+
+    // 保持原有单位（默认为 k）
+    return `${valueInKbps}${unit === 'm' ? 'k' : 'k'}`;
 };
 
 class TransformVideo {
@@ -117,9 +152,26 @@ class TransformVideo {
         // 注册任务到 TaskManager
         taskManager.registerTask(media.id, media, media.fullPath, outputPath, ctx, undefined);
 
+        let videoEncodingMeta: VideoEncodingMeta = {
+            useHardwareAcceleration: false,
+            hardwareEncoderSuffix: null,
+            selectedCodec: ''
+        };
+
         // 初始化Ffmpeg命令
         const ffmpegCommand: FfmpegCommand = ffmpeg(media.fullPath)
-            .on('start', (): void => {
+            .addInputOption(['-loglevel', 'verbose'])
+            .addInputOption(['-report'])
+            .on('stderr', (line: string): void => {
+                // 全量透传 ffmpeg stderr，便于现场排查
+                Logger.error(`Task ${media.id} ffmpeg stderr: ${line}`);
+            })
+            .on('start', (commandLine: string): void => {
+                Logger.info(`Task ${media.id} ffmpeg start: ${commandLine}`);
+                if (videoEncodingMeta.useHardwareAcceleration)
+                    Logger.info(`Task ${media.id} hardware encoder: ${videoEncodingMeta.selectedCodec}_${videoEncodingMeta.hardwareEncoderSuffix}`);
+                else
+                    Logger.info(`Task ${media.id} using software encoder: ${videoEncodingMeta.selectedCodec || 'auto'}`);
                 // 获取进程 PID
                 const ffmpegProc = (ffmpegCommand as any).ffmpegProc;
 
@@ -244,7 +296,7 @@ class TransformVideo {
         } else {
             // 需要重新编码时，按原有逻辑配置视频/音频编码参数
             if (appConf)
-                this.configureVideoEncoding(ffmpegCommand, media, appConf);
+                videoEncodingMeta = this.configureVideoEncoding(ffmpegCommand, media, appConf);
             this.configureAudioEncoding(ffmpegCommand, media);
         }
 
@@ -264,7 +316,7 @@ class TransformVideo {
         ffmpegCommand: FfmpegCommand,
         media: IMediaInfo,
         appConf: IDefaultSettingConfig
-    ): void {
+    ): VideoEncodingMeta {
         // 从配置中获取 GPU 加速设置，确保不被 media.videoParams 覆盖
         const gpuAccelerationFromConfig: boolean = appConf?.output?.codecType === 'GPU';
         const hardwareEncoderFromConfig: string | undefined = appConf?.output?.codecMethod;
@@ -326,6 +378,11 @@ class TransformVideo {
         }
 
         const useHardwareAcceleration: boolean = !!hardwareEncoderSuffix;
+        const resultMeta: VideoEncodingMeta = {
+            useHardwareAcceleration,
+            hardwareEncoderSuffix,
+            selectedCodec
+        };
 
         // 如果配置开启 GPU 加速并且推断出了可用的硬件编码器，优先使用硬件编码
         if (useHardwareAcceleration) {
@@ -355,7 +412,15 @@ class TransformVideo {
         // 应用清晰度设置
         // VideoToolbox 使用 q:v，不应用 CRF 和 bitrate
         // NVENC/QSV/AMF 使用 CRF/quality，已在上面设置，这里只应用像素格式
-        this.applyQualitySettings(ffmpegCommand, media, videoParams, useHardwareAcceleration && hardwareEncoderSuffix === 'videotoolbox');
+        this.applyQualitySettings(
+            ffmpegCommand,
+            media,
+            videoParams,
+            useHardwareAcceleration && hardwareEncoderSuffix === 'videotoolbox',
+            hardwareEncoderSuffix === 'nvenc',
+            hardwareEncoderSuffix === 'nvenc',
+            useHardwareAcceleration && hardwareEncoderSuffix === 'nvenc'
+        );
 
         // 应用分辨率设置
         this.applyResolutionSettings(ffmpegCommand, media, videoParams);
@@ -367,8 +432,10 @@ class TransformVideo {
             if (videoParams.fps)
                 ffmpegCommand.fps(videoParams.fps);
         } else {
-            // 其他编码器（CPU 或其他硬件编码器）使用 bitrate 和 preset
-            if (videoParams.bitrate)
+            // NVENC 走 CQ/VBR，不再设置显式 bitrate，避免探测到的超高码率导致失败
+            const shouldApplyBitrate: boolean = !(useHardwareAcceleration && hardwareEncoderSuffix === 'nvenc');
+
+            if (shouldApplyBitrate && videoParams.bitrate)
                 ffmpegCommand.videoBitrate(videoParams.bitrate);
             if (videoParams.fps)
                 ffmpegCommand.fps(videoParams.fps);
@@ -390,8 +457,12 @@ class TransformVideo {
                 ffmpegCommand.addOutputOptions(`-level ${videoParams.level}`);
         }
         // 像素格式对所有编码器都适用，但 VideoToolbox 会自动选择兼容格式
-        if (videoParams.pixFmt && !(useHardwareAcceleration && hardwareEncoderSuffix === 'videotoolbox'))
+        if (videoParams.pixFmt &&
+            !(useHardwareAcceleration && hardwareEncoderSuffix === 'videotoolbox') &&
+            !(useHardwareAcceleration && hardwareEncoderSuffix === 'nvenc'))
             ffmpegCommand.addOutputOptions(`-pix_fmt ${videoParams.pixFmt}`);
+
+        return resultMeta;
     }
 
     /**
@@ -420,12 +491,14 @@ class TransformVideo {
             this.setupHardwareDecoding(ffmpegCommand, media, 'cuda', {
                 h265: 'hevc_cuvid',
                 h264: 'h264_cuvid'
-            });
+            }, true);
 
             const crfValue: string = quality === 'original' ? '18' : qualityToCrfMap[quality] || '23';
 
             ffmpegCommand.addOutputOptions(['-preset', 'p4']);
-            ffmpegCommand.addOutputOptions(['-crf', crfValue]);
+            ffmpegCommand.addOutputOptions(['-rc', 'vbr']);
+            ffmpegCommand.addOutputOptions(['-cq', crfValue]);
+            ffmpegCommand.addOutputOptions(['-b:v', '0']);
         } else if (hardwareEncoderSuffix === 'qsv') {
             // Intel QSV 硬件编码器配置
             this.setupHardwareDecoding(ffmpegCommand, media, 'qsv', {
@@ -462,13 +535,21 @@ class TransformVideo {
         media: IMediaInfo,
         hwaccel: string,
         decoders: { h265: string; h264: string }
+        , allowDecoderFallback: boolean = false
     ): void {
         if (media.isH265 || media.isH264) {
-            ffmpegCommand.addInputOptions(['-hwaccel', hwaccel]);
-            if (media.isH265)
-                ffmpegCommand.addInputOptions(['-c:v', decoders.h265]);
-            else if (media.isH264)
-                ffmpegCommand.addInputOptions(['-c:v', decoders.h264]);
+            const inputOptions: string[] = ['-hwaccel', hwaccel];
+
+            // 在允许回退时，不强制指定具体解码器，避免 cuvid 缺失导致失败
+            if (!allowDecoderFallback) {
+                if (media.isH265)
+                    inputOptions.push('-c:v', decoders.h265);
+                else if (media.isH264)
+                    inputOptions.push('-c:v', decoders.h264);
+            } else if (hwaccel === 'cuda')
+                inputOptions.push('-hwaccel_output_format', 'cuda');
+
+            ffmpegCommand.addInputOptions(inputOptions);
         }
     }
 
@@ -479,7 +560,10 @@ class TransformVideo {
         ffmpegCommand: FfmpegCommand,
         media: IMediaInfo,
         videoParams: VideoEncodingParams,
-        isVideoToolbox: boolean = false
+        isVideoToolbox: boolean = false,
+        skipCrf: boolean = false,
+        skipBitrate: boolean = false,
+        skipPixFmt: boolean = false
     ): void {
         const quality = (media.quality || 'medium') as MediaQuality;
 
@@ -490,14 +574,14 @@ class TransformVideo {
 
         // VideoToolbox 不使用 bitrate 和 CRF，只使用 q:v（已在上面设置）
         if (!isVideoToolbox) {
-            if (settings.bitrate && !videoParams.bitrate)
+            if (settings.bitrate && !videoParams.bitrate && !skipBitrate)
                 ffmpegCommand.videoBitrate(settings.bitrate);
-            if (settings.crf !== undefined && !videoParams.crf)
+            if (settings.crf !== undefined && !videoParams.crf && !skipCrf)
                 ffmpegCommand.addOutputOptions(`-crf ${settings.crf}`);
         }
 
         // 像素格式对所有编码器都适用
-        if (settings.pixFmt && !videoParams.pixFmt)
+        if (settings.pixFmt && !videoParams.pixFmt && !skipPixFmt)
             ffmpegCommand.addOutputOptions(`-pix_fmt ${settings.pixFmt}`);
     }
 
@@ -581,6 +665,8 @@ class TransformVideo {
                     bitrate = '192k';
         }
 
+        // 避免探测到异常高的码率导致编码器拒绝
+        bitrate = normalizeAudioBitrate(codec, bitrate);
         if (!channels)
             channels = 2;
 
