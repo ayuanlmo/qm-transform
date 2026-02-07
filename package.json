@@ -1,8 +1,8 @@
 {
   "name": "qm-transform",
   "version": "2.0.0-Bata",
-  "description": "",
-  "main": "main.ts",
+  "description": "QM-Transform 现代化、开源的媒体格式转换工具",
+  "main": "build/main.js",
   "private": false,
   "keywords": [],
   "author": "ayuanlmo",
@@ -24,7 +24,8 @@
     "start": "pnpm run c && concurrently \"pnpm run start-react-app\" \"pnpm run start-electron-app\"",
     "c": "tsc",
     "start-electron-app": "pnpm run c && cross-env NODE_ENV=development electron build/main.js",
-    "build": "pnpm run c && cross-env NODE_ENV=production pnpm run start-react-app-build && electron-builder",
+    "build": "cross-env NODE_ENV=production pnpm run start-react-app-build && pnpm run c && pnpm run prepare-electron && electron-builder",
+    "prepare-electron": "ln -sf main.js build/electron.js || cp build/main.js build/electron.js",
     "start-react-app": "cross-env BROWSER=none PORT=8088 LMO_APP_VERSION=$npm_package_version craco start",
     "start-react-app-build": "cross-env BROWSER=none PORT=8088 LMO_APP_VERSION=$npm_package_version craco build"
   },
@@ -32,7 +33,6 @@
     "productName": "QM-Transform",
     "icon": "public/favicon.ico",
     "asar": true,
-    "generateVersion": false,
     "directories": {
       "buildResources": "build",
       "output": "dist"
@@ -50,7 +50,7 @@
       "license": "LICENSE.txt"
     },
     "win": {
-      "icon": "public/app-icon.ico",
+      "icon": "public/icon.ico",
       "target": [
         {
           "target": "nsis",
@@ -61,7 +61,7 @@
       ]
     },
     "mac": {
-      "icon": "public/mac/icon.icns",
+      "icon": "public/icon.icns",
       "target": [
         {
           "target": "dmg",
@@ -84,8 +84,6 @@
     "@fluentui/react-nav-preview": "^0.13.2",
     "@reduxjs/toolkit": "^2.6.1",
     "app-path": "^4.0.0",
-    "electron": "^35.0.3",
-    "electron-builder": "^25.1.8",
     "electron-log": "^5.3.3",
     "electron-updater": "^6.6.2",
     "ffmpeg-static": "^5.2.0",
@@ -118,6 +116,8 @@
     "autoprefixer": "^10.4.21",
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
+    "electron": "^35.0.3",
+    "electron-builder": "^25.1.8",
     "css-loader": "^7.1.2",
     "eslint": "^8.57.0",
     "eslint-config-airbnb": "^19.0.4",
