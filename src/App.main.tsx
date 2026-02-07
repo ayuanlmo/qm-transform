@@ -1,6 +1,6 @@
 import "./style/App.scss";
 import * as React from "react";
-import {BrowserRouter} from "react-router-dom";
+import {HashRouter} from "react-router-dom";
 import LeftMenu from "./components/AppMenu/LeftMenu";
 import Header from "./components/Header";
 import RouterView from "./router/RouterView";
@@ -15,7 +15,7 @@ const AppMain = (): React.JSX.Element => {
     const menuCollapse = navigationAppearance === 'collapse';
 
     return (
-        <BrowserRouter>
+        <HashRouter>
             <div className={'main-app main-menu-drawer'}>
                 <ErrorMessageToast/>
                 <TaskPendingToast/>
@@ -30,7 +30,7 @@ const AppMain = (): React.JSX.Element => {
                     </div>
                 </div>
             </div>
-        </BrowserRouter>
+        </HashRouter>
     );
 };
 
