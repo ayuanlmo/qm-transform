@@ -8,7 +8,7 @@ const gpuVendors: Map<string, TGPUVendors> = new Map<string, TGPUVendors>([
     ['ATI Technologies Inc', 'AMD'],
     ['Intel Corporation', 'Intel'],
     ['Apple', 'Apple'],
-    ['NVIDIA Corporation', 'NVIDIA']
+    ['NVIDIA', 'NVIDIA']
 ]);
 
 /**
