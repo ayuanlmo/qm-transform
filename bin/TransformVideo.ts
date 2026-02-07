@@ -453,7 +453,9 @@ class TransformVideo {
                 ffmpegCommand.addOutputOptions(`-tune ${videoParams.tune}`);
             if (videoParams.profile)
                 ffmpegCommand.addOutputOptions(`-profile:v ${videoParams.profile}`);
-            if (videoParams.level)
+            // NVENC 自动选择 level，源文件携带的 level（如 5.1 / 51）可能不被硬件接受
+            const shouldApplyLevel: boolean = !!videoParams.level && !(useHardwareAcceleration && hardwareEncoderSuffix === 'nvenc');
+            if (shouldApplyLevel)
                 ffmpegCommand.addOutputOptions(`-level ${videoParams.level}`);
         }
         // 像素格式对所有编码器都适用，但 VideoToolbox 会自动选择兼容格式
