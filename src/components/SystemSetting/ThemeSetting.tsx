@@ -37,7 +37,6 @@ const ThemeSetting: React.FC = (): React.JSX.Element => {
                             {t('themeSetting.lang')}
                         </Label>
                         <Select
-                            layout="horizontal"
                             defaultValue={currentSettingConfig.theme.lang}
                             onChange={async (ev, {value}): Promise<void> => {
                                 setConfig({

@@ -59,6 +59,7 @@ const MenuItem: React.FC<IMenuItemProps> = (
             withArrow
             positioning={'after'}
             content={t(name)}
+            relationship={"label"}
         >
             {menuItemContent}
         </Tooltip> : menuItemContent;

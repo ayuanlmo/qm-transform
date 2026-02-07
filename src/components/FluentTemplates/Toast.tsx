@@ -34,13 +34,12 @@ const Toast: React.FC<IToastProps> = (
         triggerDisplayValue = useTranslation().t('close'),
         triggerEvent,
         footer,
-        pauseOnHover = true,
         loading = false,
         titleMedia
     }: IToastProps): React.JSX.Element => {
 
     return (
-        <MSToast pauseOnHover={pauseOnHover}>
+        <MSToast>
             <ToastTitle
                 media={titleMedia}
                 action={

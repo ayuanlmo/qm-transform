@@ -186,7 +186,6 @@ const AppLicenseNotices: ForwardRefExoticComponent<RefAttributes<IAppLicenseNoti
                                             className={'license-item'}
                                         >
                                             <Link
-                                                size={1000}
                                                 onClick={(): void => {
                                                     openExternalUrl(`${githubBase}${url}`);
                                                 }}

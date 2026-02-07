@@ -31,7 +31,7 @@ const HeaderController_win32: React.FC = (): React.JSX.Element => {
         <>
             {
                 isWin32 ? <>
-                    <Tooltip content={t('window.hide')}>
+                    <Tooltip content={t('window.hide')} relationship={"label"}>
                         <div className={'header-controller-item'}
                              onClick={(): void => {
                                  sendIpcMessage('window:on:mini-size');
@@ -42,7 +42,7 @@ const HeaderController_win32: React.FC = (): React.JSX.Element => {
                             </svg>
                         </div>
                     </Tooltip>
-                    <Tooltip content={t(isMaxWindow ? 'window.mini' : 'window.max')}>
+                    <Tooltip content={t(isMaxWindow ? 'window.mini' : 'window.max')} relationship={"label"}>
                         <div className={'header-controller-item'}
                              onClick={(): void => {
                                  sendIpcMessage(isMaxWindow ? 'window:on:un-max-size' : 'window:on:max-size');
