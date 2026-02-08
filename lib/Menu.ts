@@ -31,11 +31,16 @@ const MenuI18n = {
 
 class AppMenu {
     constructor(window: BrowserWindow) {
-        const {theme: {lang}} = AppConf;
+        let lang: string = '';
+
+        if (!(AppConf && AppConf.theme))
+            lang = 'zh-CN';
+        else
+            lang = AppConf.theme.lang;
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        const i18n: any = MenuI18n[lang ?? 'zh-CN'];
+        const i18n: any = MenuI18n[lang] ?? MenuI18n['zh-CN'];
 
         const template = [
             {
