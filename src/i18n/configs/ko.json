@@ -75,8 +75,18 @@
   "update": {
     "checking": "업데이트 확인 중...",
     "noAvailable": "현재 사용 가능한 업데이트가 없습니다.",
+    "available": "새 버전 사용 가능",
+    "downloading": "업데이트 다운로드 중...",
+    "downloadProgress": "다운로드 진행률: {{percent}}%",
     "downloaded": "업데이트 다운로드가 완료되었습니다. 애플리케이션을 즉시 재시작하여 업데이트하시겠습니까?",
-    "error": "업데이트 다운로드에 실패했습니다. 네트워크 연결을 확인해 주세요."
+    "restartNow": "지금 재시작",
+    "restartLater": "나중에 재시작",
+    "error": {
+      "network": "네트워크 연결에 실패했습니다. 네트워크 설정을 확인해 주세요.",
+      "server": "업데이트 서버 오류입니다. 나중에 다시 시도해 주세요.",
+      "noReleases": "GitHub에 아직 발행된 버전이 없습니다. 현재 최신 버전입니다.",
+      "unknown": "업데이트 확인 실패: {{message}}"
+    }
   },
   "mediaFile": {
     "options": {

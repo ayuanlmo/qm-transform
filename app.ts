@@ -47,8 +47,8 @@ class MainApp {
                 }
             });
 
-            new MainIpcHandles(this.mainWindow);
             this.appUpdate = new AppUpdate(this.mainWindow);
+            new MainIpcHandles(this.mainWindow, this.appUpdate);
 
             Logger.info('launching...');
 
@@ -88,7 +88,7 @@ class MainApp {
                 // 生产环境下 __dirname 指向 app.asar/build，index.html 也在 build 目录
                 await this.mainWindow.loadFile(join(__dirname, 'index.html'));
                 setupCommonListeners();
-                this.appUpdate?.checkForUpdates();
+                this.appUpdate?.checkForUpdates(true); // 启动时静默检查
             }
         });
     }

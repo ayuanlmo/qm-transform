@@ -9,6 +9,7 @@ import {RootState} from "./store";
 import ErrorMessageToast from "./components/ErrorMessageToast";
 import TaskPendingToast from "./components/TaskPendingToast";
 import TaskEndToast from "./components/TaskEndToast";
+import UpdateToast from "./components/UpdateToast";
 
 const AppMain = (): React.JSX.Element => {
     const {theme: {navigationAppearance}} = useSelector((state: RootState) => state.app.currentSettingConfig);
@@ -20,6 +21,7 @@ const AppMain = (): React.JSX.Element => {
                 <ErrorMessageToast/>
                 <TaskPendingToast/>
                 <TaskEndToast />
+                <UpdateToast/>
                 <LeftMenu/>
                 <div
                     className={menuCollapse ? 'app-content-max' : 'app-content'}

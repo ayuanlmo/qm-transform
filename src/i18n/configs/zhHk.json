@@ -75,8 +75,18 @@
   "update": {
     "checking": "正在檢查更新…",
     "noAvailable": "目前沒有可用更新。",
+    "available": "發現新版本可用",
+    "downloading": "正在下載更新…",
+    "downloadProgress": "下載進度：{{percent}}%",
     "downloaded": "更新已下載完成，是否立刻重新啟動應用程式以套用更新？",
-    "error": "下載更新失敗，請檢查網絡連線。"
+    "restartNow": "立即重啟",
+    "restartLater": "稍後重啟",
+    "error": {
+      "network": "網絡連線失敗，請檢查您的網絡設定。",
+      "server": "更新伺服器錯誤，請稍後重試。",
+      "noReleases": "GitHub上暫未發布任何版本，目前已是最新版本。",
+      "unknown": "更新檢查失敗：{{message}}"
+    }
   },
   "mediaFile": {
     "options": {

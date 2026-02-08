@@ -76,8 +76,18 @@
   "update": {
     "checking": "正在检查更新...",
     "noAvailable": "更新不可用，或当前暂无更新。",
+    "available": "发现新版本可用",
+    "downloading": "正在下载更新...",
+    "downloadProgress": "下载进度：{{percent}}%",
     "downloaded": "更新下载完成，是否立即重启应用程序完成更新？",
-    "error": "更新下载失败，请检查网络连接。"
+    "restartNow": "立即重启",
+    "restartLater": "稍后重启",
+    "error": {
+      "network": "网络连接失败，请检查您的网络设置。",
+      "server": "更新服务器错误，请稍后重试。",
+      "noReleases": "GitHub上暂未发布任何版本，当前已是最新版本。",
+      "unknown": "更新检查失败：{{message}}"
+    }
   },
   "mediaFile": {
     "options": {

@@ -17,6 +17,7 @@ import {openExternalUrl} from "../../utils";
 import AppConfig from "../../conf/AppConfig";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store";
+import {sendIpcMessage} from "../../bin/IPC";
 
 export interface IAboutRef {
     open: () => void;
@@ -65,7 +66,9 @@ const About: ForwardRefExoticComponent<RefAttributes<IAboutRef>> = forwardRef((_
                         </Tag>
                     </p>
                     <div className="app-about-update">
-                        <Button>{t('about.checkForUpdate')}</Button>
+                        <Button onClick={(): void => {
+                            sendIpcMessage('main:on:check-for-updates');
+                        }}>{t('about.checkForUpdate')}</Button>
                     </div>
                     <div className={'app-about-license'}>
                         <AppLicenseNotices ref={appLicenseNoticesRef}/>

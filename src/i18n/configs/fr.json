@@ -75,8 +75,18 @@
   "update": {
     "checking": "Recherche de mises à jour...",
     "noAvailable": "Aucune mise à jour disponible pour le moment.",
+    "available": "Nouvelle version disponible",
+    "downloading": "Téléchargement de la mise à jour...",
+    "downloadProgress": "Progression du téléchargement : {{percent}}%",
     "downloaded": "La mise à jour a été téléchargée. Voulez-vous redémarrer l'application maintenant pour l'appliquer ?",
-    "error": "Échec du téléchargement de la mise à jour. Veuillez vérifier votre connexion réseau."
+    "restartNow": "Redémarrer maintenant",
+    "restartLater": "Redémarrer plus tard",
+    "error": {
+      "network": "Échec de la connexion réseau. Veuillez vérifier vos paramètres réseau.",
+      "server": "Erreur du serveur de mise à jour. Veuillez réessayer plus tard.",
+      "noReleases": "Aucune version n'a encore été publiée sur GitHub. Vous utilisez déjà la dernière version.",
+      "unknown": "Échec de la vérification de la mise à jour : {{message}}"
+    }
   },
   "mediaFile": {
     "options": {

@@ -76,8 +76,18 @@
   "update": {
     "checking": "Checking for updates...",
     "noAvailable": "No available updates at this time.",
+    "available": "New version available",
+    "downloading": "Downloading update...",
+    "downloadProgress": "Download progress: {{percent}}%",
     "downloaded": "Update downloaded successfully. Do you want to restart the application now to apply the update?",
-    "error": "Update download failed. Please check your network connection."
+    "restartNow": "Restart Now",
+    "restartLater": "Restart Later",
+    "error": {
+      "network": "Network connection failed. Please check your network settings.",
+      "server": "Update server error. Please try again later.",
+      "noReleases": "No releases published on GitHub yet. You are already on the latest version.",
+      "unknown": "Update check failed: {{message}}"
+    }
   },
   "mediaFile": {
     "options": {

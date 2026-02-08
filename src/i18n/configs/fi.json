@@ -75,8 +75,18 @@
   "update": {
     "checking": "Tarkistetaan päivityksiä...",
     "noAvailable": "Tällä hetkellä ei ole saatavilla päivityksiä.",
+    "available": "Uusi versio saatavilla",
+    "downloading": "Ladataan päivitystä...",
+    "downloadProgress": "Latausprosentti: {{percent}}%",
     "downloaded": "Päivitys on ladattu. Haluatko käynnistää sovelluksen uudelleen nyt, jotta päivitys otetaan käyttöön?",
-    "error": "Päivityksen lataus epäonnistui. Tarkista verkkoyhteytesi."
+    "restartNow": "Käynnistä uudelleen nyt",
+    "restartLater": "Käynnistä uudelleen myöhemmin",
+    "error": {
+      "network": "Verkkoyhteys epäonnistui. Tarkista verkkoyhteytesi.",
+      "server": "Päivityspalvelimen virhe. Yritä myöhemmin uudelleen.",
+      "noReleases": "GitHubissa ei ole vielä julkaistu versioita. Olet jo käyttämässä uusinta versiota.",
+      "unknown": "Päivityksen tarkistus epäonnistui: {{message}}"
+    }
   },
   "mediaFile": {
     "options": {

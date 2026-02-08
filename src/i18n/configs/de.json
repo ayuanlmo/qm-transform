@@ -75,8 +75,18 @@
   "update": {
     "checking": "Suche nach Updates...",
     "noAvailable": "Derzeit sind keine Updates verfügbar.",
+    "available": "Neue Version verfügbar",
+    "downloading": "Update wird heruntergeladen...",
+    "downloadProgress": "Download-Fortschritt: {{percent}}%",
     "downloaded": "Das Update wurde heruntergeladen. Möchten Sie die Anwendung jetzt neu starten, um es anzuwenden?",
-    "error": "Update-Download fehlgeschlagen. Bitte überprüfen Sie Ihre Netzwerkverbindung."
+    "restartNow": "Jetzt neu starten",
+    "restartLater": "Später neu starten",
+    "error": {
+      "network": "Netzwerkverbindung fehlgeschlagen. Bitte überprüfen Sie Ihre Netzwerkeinstellungen.",
+      "server": "Update-Serverfehler. Bitte versuchen Sie es später erneut.",
+      "noReleases": "Auf GitHub wurden noch keine Versionen veröffentlicht. Sie verwenden bereits die neueste Version.",
+      "unknown": "Update-Prüfung fehlgeschlagen: {{message}}"
+    }
   },
   "mediaFile": {
     "options": {

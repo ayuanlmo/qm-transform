@@ -6,6 +6,7 @@ import AppDirectoryDialogIpc from "./AppDirectoryDialogIpc";
 import ExternalUrlIpc from "./ExternalUrlIpc";
 import SysIpc from "./SysIpc";
 import TaskIpc from "./TaskIpc";
+import AppUpdate from "../bin/AppUpdate";
 import packageJSON from "../package.json";
 
 /**
@@ -27,9 +28,16 @@ class MainIpcHandles {
      * @type {PowerManagementIpc}
      * **/
     private pmc: PowerManagementIpc;
+    /**
+     * @private
+     * @readonly
+     * @type {AppUpdate | undefined}
+     * **/
+    private readonly appUpdate: AppUpdate | undefined;
 
-    constructor(window: BrowserWindow) {
+    constructor(window: BrowserWindow, appUpdate?: AppUpdate) {
         this.window = window;
+        this.appUpdate = appUpdate;
         this.pmc = new PowerManagementIpc();
         this.initHandles();
         new WindowStatusIpc(window);
@@ -43,6 +51,9 @@ class MainIpcHandles {
         ipcMain.on('window:on:close', async (): Promise<void> => await this.closeApp());
         ipcMain.on('main:on:get-app-version', (event: IpcMainEvent): void => {
             event.reply('main:on:get-app-version', packageJSON.version);
+        });
+        ipcMain.on('main:on:check-for-updates', (): void => {
+            this.appUpdate?.checkForUpdates();
         });
     }
 
