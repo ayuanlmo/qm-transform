@@ -1,16 +1,34 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom/client';
-import Root from './Root';
-import reportWebVitals from './reportWebVitals';
-import {Provider} from 'react-redux';
-import Store from "./lib/Store";
-import './bin/ffmpeg';
+import "./setPublicPath";
+import {createRoot, Root} from "react-dom/client";
+import * as React from "react";
+import {StrictMode} from "react";
+import {Provider} from "react-redux";
+import Store from "./store";
+import "./i18n";
+import "./style/Global.css";
+import "./style/animate.min.css";
+import "./style/App-Light.scss";
+import "./style/App-Dark.scss";
+import "./style/index.scss";
+import App from "./App";
+import "./conf/AppConfig";
 
-ReactDOM.createRoot(document.getElementById('__lmo__') as HTMLElement).render(
-    <Provider store={Store}>
-        <React.StrictMode>
-            <Root/>
-        </React.StrictMode>
-    </Provider>
-);
-reportWebVitals();
+const RootComponent: React.FC = (): React.JSX.Element => {
+
+    return (
+        <Provider store={Store}>
+            <App/>
+        </Provider>
+    );
+};
+
+((): void => {
+    'use strict';
+    const _Root_App: Root = createRoot(document.getElementById('__lmo_app__') as HTMLElement);
+
+    _Root_App.render(
+        <StrictMode>
+            <RootComponent/>
+        </StrictMode> as React.JSX.Element
+    );
+})();

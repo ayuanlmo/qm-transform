@@ -1,12 +1,36 @@
 {
-  "name": "lmo-Transform",
-  "version": "1.3.0",
-  "main": "./build/electron-app.js",
+  "name": "qm-transform",
+  "version": "2.0.0-Bata",
+  "description": "QM-Transform 现代化、开源的媒体格式转换工具",
+  "main": "build/main.js",
+  "private": false,
+  "keywords": [],
+  "author": "ayuanlmo",
   "license": "Apache",
   "homepage": ".",
-  "author": "ayuanlmo",
+  "packageManager": "pnpm@10.4.1",
+  "os": [
+    "darwin",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "pnpm run c && concurrently \"pnpm run start-react-app\" \"pnpm run start-electron-app\"",
+    "c": "tsc",
+    "start-electron-app": "pnpm run c && cross-env NODE_ENV=development electron build/main.js",
+    "build": "cross-env NODE_ENV=production pnpm run start-react-app-build && pnpm run c && pnpm run prepare-electron && electron-builder",
+    "prepare-electron": "node -e \"const fs=require('fs');fs.copyFileSync('build/main.js','build/electron.js');\"",
+    "start-react-app": "cross-env BROWSER=none PORT=8088 LMO_APP_VERSION=$npm_package_version craco start",
+    "start-react-app-build": "cross-env BROWSER=none PORT=8088 LMO_APP_VERSION=$npm_package_version craco build"
+  },
   "build": {
-    "productName": "lmo-Transform",
+    "productName": "QM-Transform",
     "icon": "public/favicon.ico",
     "asar": true,
     "directories": {
@@ -18,11 +42,15 @@
       "language": "2052",
       "perMachine": true,
       "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "allowToChangeInstallationDirectory": true
+      "createStartMenuShortcut": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "public/favicon.ico",
+      "uninstallerIcon": "public/favicon.ico",
+      "installerHeaderIcon": "public/favicon.ico",
+      "license": "LICENSE"
     },
     "win": {
-      "icon": "public/icon.png",
+      "icon": "public/icon.ico",
       "target": [
         {
           "target": "nsis",
@@ -32,54 +60,83 @@
         }
       ]
     },
-    "extends": null,
-    "files": [
-      "./build/**/*",
-      "./build/electron-app.js",
-      "./ffmpeg/*"
-    ],
-    "extraFiles": [
-      {
-        "from": "ffmpeg",
-        "to": "ffmpeg",
-        "filter": [
-          "**/*"
-        ]
-      }
+    "mac": {
+      "icon": "public/icon.icns",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        }
+      ]
+    }
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
     ]
   },
-  "scripts": {
-    "start": "tsc && concurrently \"yarn react-start\" \"set NODE_ENV=development && electron build/electron-app.js \"",
-    "build": "tsc && set NODE_ENV=production && electron-builder && node build/generate-hash.js",
-    "react-start": "set BROWSER=none&&set PORT=3000&&react-scripts start",
-    "react-build": "react-scripts build",
-    "react-test": "react-scripts test",
-    "react-eject": "react-scripts eject"
-  },
   "dependencies": {
-    "@reduxjs/toolkit": "^1.9.5",
-    "concurrently": "^8.2.0",
-    "fluent-ffmpeg": "^2.1.2",
-    "fs": "^0.0.1-security",
-    "ini": "^4.1.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-redux": "^8.1.2",
-    "react-scripts": "5.0.1",
-    "typescript": "^5.1.6",
-    "web-vitals": "^2.1.4"
+    "@fluentui/react-components": "^9.61.2",
+    "@fluentui/react-icons": "^2.0.292",
+    "@fluentui/react-nav-preview": "^0.13.2",
+    "@reduxjs/toolkit": "^2.6.1",
+    "app-path": "^4.0.0",
+    "electron-log": "^5.3.3",
+    "electron-updater": "^6.6.2",
+    "ffmpeg-static": "^5.3.0",
+    "ffprobe-static": "^3.1.0",
+    "fluent-ffmpeg": "^2.1.3",
+    "i18next": "^24.2.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-i18next": "^15.4.1",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^7.4.0",
+    "react-scripts": "^5.0.1",
+    "systeminformation": "^5.27.1",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/electron": "^1.6.10",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.39",
-    "@types/react": "^18.2.17",
-    "@types/react-dom": "^18.2.7",
-    "electron": "^26.0.0",
-    "electron-builder": "^24.6.3"
+    "@craco/craco": "^7.1.0",
+    "@eslint/js": "^9.22.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@types/electron": "^1.6.12",
+    "@types/ffprobe-static": "^2.0.3",
+    "@types/fluent-ffmpeg": "^2.1.27",
+    "@types/node": "^22.13.10",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
+    "@types/react-router-dom": "^5.3.3",
+    "@typescript-eslint/eslint-plugin": "^7.1.1",
+    "@typescript-eslint/parser": "^7.1.1",
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
+    "css-loader": "^7.1.2",
+    "electron": "^35.0.3",
+    "electron-builder": "^25.1.8",
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-react-app": "^7.0.1",
+    "eslint-loader": "^4.0.2",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "globals": "^16.0.0",
+    "html-webpack-plugin": "^5.6.3",
+    "sass": "^1.86.0",
+    "sass-loader": "^16.0.5",
+    "style-loader": "^4.0.0",
+    "tailwindcss": "^4.0.14",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.27.0"
   },
   "browserslist": {
     "production": [

@@ -1,0 +1,54 @@
+@import "theme";
+
+.light-mode {
+  .main-menu {
+    background: #F5F5FF;
+  }
+
+  .header-controller-item {
+    &:hover {
+      background: #F5F5FF;
+    }
+  }
+
+  .main-menu-content-item-shared {
+    background: $__primary-sub-bg-color-light;
+  }
+
+  .main-menu-content-item {
+    &:hover {
+      @extend .main-menu-content-item-shared;
+    }
+
+    .main-menu-content-item-name {
+      color: #000;
+    }
+  }
+
+  .main-menu-content-item-active {
+    @extend .main-menu-content-item-shared;
+  }
+
+  .main-app-drop-file {
+    .main-app-drop-file-content {
+      border: 1px dashed $theme-color;
+      background: #FBFBFF;
+
+
+      .main-app-drop-file-content-icon {
+        svg {
+          fill: $theme-color;
+        }
+      }
+
+      .main-app-drop-file-content-message {
+        color: #000;
+      }
+
+      .main-app-drop-file-content-desc {
+        color: #A8A9B1;
+      }
+    }
+  }
+}
+

@@ -1,6 +1,0 @@
-appId: "com.lmo.app"
-asar: false
-win:
-  target: portable
-electronDownload:
-  platform: win32

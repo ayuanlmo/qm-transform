@@ -1,23 +1,24 @@
 import * as React from "react";
 
 type YExtendTemplateElementType = React.JSX.Element;
-type YExtendTemplateChildrenElementType = YExtendTemplateElementType | Array<YExtendTemplateElementType>;
+type YExtendTemplateChildrenElementType = React.JSX.Element;
 
 export interface YExtendTemplateProps {
-    children: YExtendTemplateElementType
+    children: YExtendTemplateElementType | YExtendTemplateElementType[];
     show?: boolean;
 }
 
-function YExtendTemplate(props: YExtendTemplateProps): YExtendTemplateChildrenElementType {
-    const {
+const YExtendTemplate: React.FC<YExtendTemplateProps> = (
+    {
         children,
-        show = true
-    } = props;
+        show
+    }: YExtendTemplateProps): YExtendTemplateChildrenElementType => {
+    if (!show) return <></>;
 
-    if (Array.isArray(children) && show)
-        return children.map((i: React.JSX.Element) => i);
+    if (Array.isArray(children))
+        return <React.Fragment>{children.map(child => child)}</React.Fragment>;
 
-    return show ? children : <></>;
-}
+    return children;
+};
 
 export default YExtendTemplate;

@@ -1,0 +1,216 @@
+{
+  "cancel": "Abbrechen",
+  "confirm": "Bestätigen",
+  "close": "Schließen",
+  "image": "Bild",
+  "audio": "Audio",
+  "video": "Video",
+  "add": "Hinzufügen",
+  "use": "Verwenden",
+  "return": "Zurück",
+  "continue": "Fortfahren",
+  "delete": "Löschen",
+  "deleteFile": "Datei löschen",
+  "edit": "Bearbeiten",
+  "save": "Speichern",
+  "search": "Suchen",
+  "clear": "Leeren",
+  "upload": "Hochladen",
+  "download": "Herunterladen",
+  "input": "Eingabe",
+  "select": "Auswählen",
+  "play": "Abspielen",
+  "pause": "Pause",
+  "noData": "Keine Daten",
+  "pleaseSelect": "Bitte auswählen",
+  "tips": "Hinweise",
+  "systemMessage": "Systemnachricht",
+  "systemSetting": "Einstellungen",
+  "menu": {
+    "videoTransform": "Videoformat konvertieren",
+    "audioTransform": "Audioformat konvertieren",
+    "videoConcat": "Videos zusammenfügen",
+    "videoCompress": "Video komprimieren"
+  },
+  "outputSetting": {
+    "label": "Ausgabe­einstellungen",
+    "optPath": "Ausgabepfad",
+    "parallelTasks": "Anzahl paralleler Aufgaben",
+    "parallelTasksDesc": "Passen Sie dies an die Leistung Ihres Computers an",
+    "codec": "Codec",
+    "softwareDecoding": "Software-Decodierung",
+    "hardwareDecoding": "Hardware-Decodierung",
+    "hardwareDecodingDesc": "Die Hardware-Decodierung verwendet die GPU, um den Vorgang zu beschleunigen und die CPU-Auslastung zu reduzieren.",
+    "gpuDecoderMethod": "GPU-Decodermethode",
+    "gpuDecoderMethodDesc": "Stellen Sie sicher, dass Ihre Hardware und Treiber ordnungsgemäß funktionieren. Wenn Fehler auftreten, wählen Sie die CPU als Decoder.",
+    "customFileName": {
+      "label": "Dateiname",
+      "origin": "Original",
+      "customFileName": "Benutzerdefiniert",
+      "preview": "Vorschau",
+      "availableVars": "Verfügbare Variablen"
+    }
+  },
+  "otherSetting": {
+    "label": "Weitere Einstellungen",
+    "tmpFile": "Temporäre Dateien",
+    "preventLowPowerMode": "Energiesparmodus verhindern",
+    "preventLowPowerModeDesc": "Verhindert, dass {{os}} in den Standby- oder Ruhezustand wechselt. Gilt nur für diese Sitzung."
+  },
+  "playerSetting": {
+    "label": "Player-Einstellungen",
+    "mediaPlayer": "Medienplayer",
+    "customMediaPlayer": "Benutzerdefinierter Player",
+    "mediaPlayerPath": "Player-Pfad",
+    "mediaPlayerDesc": "Alle oben genannten Wiedergabemethoden verwenden einen \"Direktaufruf\"."
+  },
+  "about": {
+    "label": "Über",
+    "viewOnGithub": "Dieses Projekt auf GitHub ansehen",
+    "checkForUpdate": "Nach Updates suchen",
+    "designer": "Designer",
+    "licenseAndOpenSourceNotices": "Lizenz- und Open-Source-Hinweise",
+    "appOpenSourceNotice": "<appName>{{name}}</appName> ist ein Open-Source-Projekt unter der Apache-2.0-Lizenz. Sie können den Quellcode einsehen und zu diesem Projekt auf <github>Github</github> beitragen."
+  },
+  "update": {
+    "checking": "Suche nach Updates...",
+    "noAvailable": "Derzeit sind keine Updates verfügbar.",
+    "available": "Neue Version verfügbar",
+    "downloading": "Update wird heruntergeladen...",
+    "downloadProgress": "Download-Fortschritt: {{percent}}%",
+    "downloaded": "Das Update wurde heruntergeladen. Möchten Sie die Anwendung jetzt neu starten, um es anzuwenden?",
+    "restartNow": "Jetzt neu starten",
+    "restartLater": "Später neu starten",
+    "error": {
+      "network": "Netzwerkverbindung fehlgeschlagen. Bitte überprüfen Sie Ihre Netzwerkeinstellungen.",
+      "server": "Update-Serverfehler. Bitte versuchen Sie es später erneut.",
+      "noReleases": "Auf GitHub wurden noch keine Versionen veröffentlicht. Sie verwenden bereits die neueste Version.",
+      "unknown": "Update-Prüfung fehlgeschlagen: {{message}}"
+    }
+  },
+  "mediaFile": {
+    "options": {
+      "add": "Datei hinzufügen",
+      "openNetworkStreaming": "Netzwerkstream öffnen",
+      "remove": "Entfernen",
+      "clearAll": "Alles löschen",
+      "clearAllConfirmMessage": "Möchten Sie wirklich alle Mediendateien löschen?",
+      "clickImportAndDrop": "Klicken Sie, um eine Datei zu importieren, oder ziehen Sie sie hierher",
+      "clickImportAndDropDesc": "Unterstützt Formate wie mp4, mov, mkv, avi, mp3, flac usw.",
+      "startConversionAll": "Alle konvertieren",
+      "stopAll": "Alle stoppen",
+      "startProcessing": "Verarbeitung starten",
+      "inProgress": "Wird verarbeitet",
+      "pause": "Pause",
+      "resume": "Fortsetzen",
+      "getMediaFileInformation": "Mediendateiinformationen werden abgerufen...",
+      "startConcat": "Zusammenfügen starten",
+      "conversionSuccessMessage": "[{{name}}] wurde erfolgreich konvertiert",
+      "conversionFailed": "Konvertierung fehlgeschlagen",
+      "batchRunning": "Läuft: {{current}} / {{total}}",
+      "showInExplorer": "Im Explorer anzeigen",
+      "showInFinder": "Im Finder anzeigen",
+      "addTitle": "Intro hinzufügen",
+      "addCredits": "Abspann hinzufügen",
+      "videoFps": "Video-FPS",
+      "type": "Typ",
+      "openInMediaPlayer": "Mit Medienplayer öffnen"
+    },
+    "format": "Format",
+    "resolution": "Auflösung",
+    "outPutFormat": "Ausgabeformat",
+    "audioCode": "Audio-Codec",
+    "bitRate": "Bitrate",
+    "samplingRate": "Abtastrate",
+    "videoCode": "Video-Codec",
+    "size": "Größe",
+    "duration": "Dauer",
+    "noAudio": "Kein Audio",
+    "noVideo": "Kein Video",
+    "audio": "Audio",
+    "video": "Video",
+    "volume": "Lautstärke",
+    "mute": "Stumm",
+    "codec": "Codec",
+    "optionsLabel": "Optionen",
+    "noAudioConfirmTitle": "\"Kein Audio\" aktivieren?",
+    "noAudioConfirmMessage": "Wenn \"Kein Audio\" aktiviert ist, werden beim Transkodieren alle Audiospuren dieser Mediendatei entfernt. Dies wirkt sich auf das Endergebnis aus. Möchten Sie fortfahren?",
+    "quality": {
+      "label": "Qualität",
+      "original": "Original (keine Neukomprimierung)",
+      "veryHigh": "Sehr hoch",
+      "high": "Hoch",
+      "medium": "Mittel (empfohlen)",
+      "low": "Niedrig",
+      "veryLow": "Sehr niedrig"
+    },
+    "preset": {
+      "label": "Kodiergeschwindigkeit",
+      "ultraFast": "Ultraschnell",
+      "superFast": "Superschnell",
+      "veryFast": "Sehr schnell",
+      "fast": "Schnell",
+      "medium": "Mittel (ausgewogen)",
+      "slow": "Langsam",
+      "slower": "Langsamer",
+      "verySlow": "Sehr langsam",
+      "desc": "Je höher die Kodiergeschwindigkeit, desto geringer die Kompressionsrate (größere Dateien). Je langsamer die Kodiergeschwindigkeit, desto höher die Kompressionsrate (kleinere Dateien)."
+    },
+    "pixelFormat": {
+      "label": "Pixelformat",
+      "yuv420p": "yuv420p (weitgehend kompatibel)",
+      "yuv444p": "yuv444p (höhere Qualität)"
+    },
+    "videoBitrate": {
+      "label": "Videobitrate",
+      "veryLow": "500 kb/s (sehr niedrig)",
+      "low": "1 Mb/s (niedrig)",
+      "medium": "2 Mb/s (mittel)",
+      "high": "5 Mb/s (hoch)",
+      "veryHigh": "8 Mb/s (sehr hoch)"
+    },
+    "resolutions": {
+      "original": "Original",
+      "8k": "8K UHD (7680×4320)",
+      "5k": "5K (5120×2880)",
+      "4k": "4K UHD / 2160p (3840×2160)",
+      "1440p": "2K / QHD / 1440p (2560×1440)",
+      "1080p": "Full HD / 1080p (1920×1080)",
+      "720p": "HD / 720p (1280×720)",
+      "480p": "FWVGA / 480p (854×480)",
+      "360p": "nHD (640×360)",
+      "240p": "240p (426×240)"
+    }
+  },
+  "themeSetting": {
+    "label": "Darstellungs­einstellungen",
+    "theme": "Design",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "auto": "Automatisch",
+    "lang": "Sprache",
+    "appearance": "Darstellung",
+    "navigation": "Navigation",
+    "zoomFactor": "Zoomfaktor",
+    "navigationSetting": {
+      "default": "Erweitern",
+      "collapse": "Einklappen"
+    }
+  },
+  "window": {
+    "mini": "Wiederherstellen",
+    "max": "Maximieren",
+    "hide": "Minimieren",
+    "closeMessage": "Möchten Sie wirklich schließen?"
+  },
+  "errMessage": {
+    "label": "Fehlermeldung",
+    "media-info-error": "Beim Abrufen der Basisinformationen zur Mediendatei [{{mediaFile}}] ist ein Fehler aufgetreten. Details: {{message}}",
+    "media-first-frame-error": "Beim Abrufen des ersten Bildes der Mediendatei [{{mediaFile}}] ist ein Fehler aufgetreten. Details: {{message}}",
+    "media-audio-av-error": "Beim Abrufen der Wellenform der Audiodatei [{{mediaFile}}] ist ein Fehler aufgetreten. Details: {{message}}",
+    "output-directory-not-exist": "Der Ausgabepfad [{{path}}] existiert nicht. Bitte wählen Sie einen anderen.",
+    "conversionFailedMessage": "Die Konvertierung von [{{name}}] ist fehlgeschlagen. Details: {{message}}."
+  }
+}
+
+

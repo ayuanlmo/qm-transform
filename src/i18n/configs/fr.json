@@ -1,0 +1,216 @@
+{
+  "cancel": "Annuler",
+  "confirm": "Confirmer",
+  "close": "Fermer",
+  "image": "Image",
+  "audio": "Audio",
+  "video": "Vidéo",
+  "add": "Ajouter",
+  "use": "Utiliser",
+  "return": "Retour",
+  "continue": "Continuer",
+  "delete": "Supprimer",
+  "deleteFile": "Supprimer le fichier",
+  "edit": "Modifier",
+  "save": "Enregistrer",
+  "search": "Rechercher",
+  "clear": "Effacer",
+  "upload": "Téléverser",
+  "download": "Télécharger",
+  "input": "Saisie",
+  "select": "Sélectionner",
+  "play": "Lire",
+  "pause": "Pause",
+  "noData": "Aucune donnée",
+  "pleaseSelect": "Veuillez sélectionner",
+  "tips": "Conseils",
+  "systemMessage": "Message système",
+  "systemSetting": "Paramètres",
+  "menu": {
+    "videoTransform": "Conversion de format vidéo",
+    "audioTransform": "Conversion de format audio",
+    "videoConcat": "Fusionner les vidéos",
+    "videoCompress": "Compresser la vidéo"
+  },
+  "outputSetting": {
+    "label": "Paramètres de sortie",
+    "optPath": "Dossier de sortie",
+    "parallelTasks": "Nombre de tâches parallèles",
+    "parallelTasksDesc": "Ajustez en fonction des performances de votre ordinateur",
+    "codec": "Codec",
+    "softwareDecoding": "Décodage logiciel",
+    "hardwareDecoding": "Décodage matériel",
+    "hardwareDecodingDesc": "Le décodage matériel utilise le GPU pour accélérer le traitement et réduire l'utilisation du CPU.",
+    "gpuDecoderMethod": "Méthode de décodage GPU",
+    "gpuDecoderMethodDesc": "Assurez-vous que votre matériel et vos pilotes fonctionnent correctement. En cas d'erreur, choisissez le CPU comme décodeur.",
+    "customFileName": {
+      "label": "Nom de fichier",
+      "origin": "Original",
+      "customFileName": "Personnalisé",
+      "preview": "Aperçu",
+      "availableVars": "Variables disponibles"
+    }
+  },
+  "otherSetting": {
+    "label": "Autres paramètres",
+    "tmpFile": "Fichiers temporaires",
+    "preventLowPowerMode": "Empêcher le mode économie d'énergie",
+    "preventLowPowerModeDesc": "Empêche {{os}} de passer en veille ou en état suspendu, uniquement pour cette session."
+  },
+  "playerSetting": {
+    "label": "Paramètres du lecteur",
+    "mediaPlayer": "Lecteur multimédia",
+    "customMediaPlayer": "Lecteur personnalisé",
+    "mediaPlayerPath": "Chemin du lecteur",
+    "mediaPlayerDesc": "Tous les modes de lecture ci-dessus utilisent un « appel direct »."
+  },
+  "about": {
+    "label": "À propos",
+    "viewOnGithub": "Voir ce projet sur GitHub",
+    "checkForUpdate": "Rechercher des mises à jour",
+    "designer": "Designer",
+    "licenseAndOpenSourceNotices": "Licence et mentions open source",
+    "appOpenSourceNotice": "<appName>{{name}}</appName> est un projet open source publié sous licence Apache 2.0. Vous pouvez consulter le code source et contribuer à ce projet sur <github>Github</github>."
+  },
+  "update": {
+    "checking": "Recherche de mises à jour...",
+    "noAvailable": "Aucune mise à jour disponible pour le moment.",
+    "available": "Nouvelle version disponible",
+    "downloading": "Téléchargement de la mise à jour...",
+    "downloadProgress": "Progression du téléchargement : {{percent}}%",
+    "downloaded": "La mise à jour a été téléchargée. Voulez-vous redémarrer l'application maintenant pour l'appliquer ?",
+    "restartNow": "Redémarrer maintenant",
+    "restartLater": "Redémarrer plus tard",
+    "error": {
+      "network": "Échec de la connexion réseau. Veuillez vérifier vos paramètres réseau.",
+      "server": "Erreur du serveur de mise à jour. Veuillez réessayer plus tard.",
+      "noReleases": "Aucune version n'a encore été publiée sur GitHub. Vous utilisez déjà la dernière version.",
+      "unknown": "Échec de la vérification de la mise à jour : {{message}}"
+    }
+  },
+  "mediaFile": {
+    "options": {
+      "add": "Ajouter un fichier",
+      "openNetworkStreaming": "Ouvrir un flux réseau",
+      "remove": "Supprimer",
+      "clearAll": "Tout effacer",
+      "clearAllConfirmMessage": "Êtes-vous sûr de vouloir effacer tous les fichiers multimédias ?",
+      "clickImportAndDrop": "Cliquez pour importer un fichier ou faites-le glisser ici",
+      "clickImportAndDropDesc": "Prend en charge les formats mp4, mov, mkv, avi, mp3, flac, etc.",
+      "startConversionAll": "Tout convertir",
+      "stopAll": "Tout arrêter",
+      "startProcessing": "Commencer le traitement",
+      "inProgress": "En cours",
+      "pause": "Pause",
+      "resume": "Reprendre",
+      "getMediaFileInformation": "Récupération des informations du fichier multimédia...",
+      "startConcat": "Commencer la fusion",
+      "conversionSuccessMessage": "[{{name}}] a été converti avec succès",
+      "conversionFailed": "Échec de la conversion",
+      "batchRunning": "En cours : {{current}} / {{total}}",
+      "showInExplorer": "Afficher dans l'Explorateur",
+      "showInFinder": "Afficher dans le Finder",
+      "addTitle": "Ajouter un générique de début",
+      "addCredits": "Ajouter un générique de fin",
+      "videoFps": "FPS vidéo",
+      "type": "Type",
+      "openInMediaPlayer": "Ouvrir avec le lecteur multimédia"
+    },
+    "format": "Format",
+    "resolution": "Résolution",
+    "outPutFormat": "Format de sortie",
+    "audioCode": "Codec audio",
+    "bitRate": "Débit binaire",
+    "samplingRate": "Fréquence d'échantillonnage",
+    "videoCode": "Codec vidéo",
+    "size": "Taille",
+    "duration": "Durée",
+    "noAudio": "Sans audio",
+    "noVideo": "Sans vidéo",
+    "audio": "Audio",
+    "video": "Vidéo",
+    "volume": "Volume",
+    "mute": "Muet",
+    "codec": "Codec",
+    "optionsLabel": "Options",
+    "noAudioConfirmTitle": "Activer « Sans audio » ?",
+    "noAudioConfirmMessage": "Après avoir activé « Sans audio », toutes les pistes audio de ce fichier seront supprimées lors du transcodage. Cela affectera le résultat final. Voulez-vous continuer ?",
+    "quality": {
+      "label": "Qualité",
+      "original": "Original (sans recompression)",
+      "veryHigh": "Très élevée",
+      "high": "Élevée",
+      "medium": "Moyenne (recommandé)",
+      "low": "Faible",
+      "veryLow": "Très faible"
+    },
+    "preset": {
+      "label": "Vitesse d'encodage",
+      "ultraFast": "Ultra rapide",
+      "superFast": "Super rapide",
+      "veryFast": "Très rapide",
+      "fast": "Rapide",
+      "medium": "Moyenne (équilibrée)",
+      "slow": "Lente",
+      "slower": "Plus lente",
+      "verySlow": "Très lente",
+      "desc": "Plus la vitesse d'encodage est élevée, plus le taux de compression est faible (fichiers plus volumineux). Plus la vitesse est faible, plus le taux de compression est élevé (fichiers plus petits)."
+    },
+    "pixelFormat": {
+      "label": "Format de pixel",
+      "yuv420p": "yuv420p (large compatibilité)",
+      "yuv444p": "yuv444p (meilleure qualité)"
+    },
+    "videoBitrate": {
+      "label": "Débit vidéo",
+      "veryLow": "500 kb/s (très faible)",
+      "low": "1 Mb/s (faible)",
+      "medium": "2 Mb/s (moyen)",
+      "high": "5 Mb/s (élevé)",
+      "veryHigh": "8 Mb/s (très élevé)"
+    },
+    "resolutions": {
+      "original": "Original",
+      "8k": "8K UHD (7680×4320)",
+      "5k": "5K (5120×2880)",
+      "4k": "4K UHD / 2160p (3840×2160)",
+      "1440p": "2K / QHD / 1440p (2560×1440)",
+      "1080p": "Full HD / 1080p (1920×1080)",
+      "720p": "HD / 720p (1280×720)",
+      "480p": "FWVGA / 480p (854×480)",
+      "360p": "nHD (640×360)",
+      "240p": "240p (426×240)"
+    }
+  },
+  "themeSetting": {
+    "label": "Paramètres d'apparence",
+    "theme": "Thème",
+    "light": "Clair",
+    "dark": "Sombre",
+    "auto": "Auto",
+    "lang": "Langue",
+    "appearance": "Apparence",
+    "navigation": "Navigation",
+    "zoomFactor": "Niveau de zoom",
+    "navigationSetting": {
+      "default": "Développer",
+      "collapse": "Réduire"
+    }
+  },
+  "window": {
+    "mini": "Restaurer",
+    "max": "Maximiser",
+    "hide": "Minimiser",
+    "closeMessage": "Voulez-vous vraiment fermer ?"
+  },
+  "errMessage": {
+    "label": "Message d'erreur",
+    "media-info-error": "Une erreur s'est produite lors de la récupération des informations de base du fichier [{{mediaFile}}], détails : {{message}}",
+    "media-first-frame-error": "Une erreur s'est produite lors de la récupération de la première image du fichier [{{mediaFile}}], détails : {{message}}",
+    "media-audio-av-error": "Une erreur s'est produite lors de la récupération de la forme d'onde du fichier audio [{{mediaFile}}], détails : {{message}}",
+    "output-directory-not-exist": "Le dossier de sortie [{{path}}] n'existe pas. Veuillez en choisir un autre.",
+    "conversionFailedMessage": "La conversion de [{{name}}] a échoué, détails : {{message}}."
+  }
+}
+
+

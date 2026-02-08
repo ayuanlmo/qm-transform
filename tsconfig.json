@@ -1,30 +1,31 @@
 {
-    "compilerOptions": {
-        "baseUrl": ".",
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "noImplicitAny": true,
-        "outDir": "build",
-        "paths": { },
-        "removeComments": false,
-        "sourceMap": true,
-        "strict": true,
-        "suppressImplicitAnyIndexErrors": false,
-        "target": "esnext",
-        "jsx": "react-jsx"
-    },
-    "include": [
-        "src",
-        "ipc.ts",
-        "electron-app.ts",
-        "electron-main.ts",
-        "renderer.d.ts",
-        "generate-hash.ts"
-    ],
-    "exclude": [
-        "src",
-        "node_modules",
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "build",
+    "jsx": "react-jsx",
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost"
     ]
+  },
+  "include": [
+    "src/",
+    "app",
+    "bin",
+    "app.ts",
+    "main.ts",
+    "DevTools.ts",
+    "types/global.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
