@@ -3,7 +3,7 @@ import {join} from "path";
 import Logger from "./lib/Logger";
 import {platform} from "os";
 import MainIpcHandles from "./app/MainIPC";
-import AppMenu from "./lib/Menu";
+// import AppMenu from "./lib/Menu";
 import AppUpdate from "./bin/AppUpdate";
 import Extensions from "./DevTools";
 
@@ -52,8 +52,8 @@ class MainApp {
 
             Logger.info('launching...');
 
-            if (platform() === 'darwin')
-                new AppMenu(this.mainWindow);
+            // if (platform() === 'darwin')
+            //     new AppMenu(this.mainWindow);
 
             globalShortcut.register('Alt+F12', (): void => {
                 this.mainWindow?.webContents.openDevTools();
