@@ -47,7 +47,7 @@
       "installerIcon": "public/favicon.ico",
       "uninstallerIcon": "public/favicon.ico",
       "installerHeaderIcon": "public/favicon.ico",
-      "license": "LICENSE.txt"
+      "license": "LICENSE"
     },
     "win": {
       "icon": "public/icon.ico",
