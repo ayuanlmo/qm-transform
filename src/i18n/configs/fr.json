@@ -55,7 +55,8 @@
     "label": "Autres paramètres",
     "tmpFile": "Fichiers temporaires",
     "preventLowPowerMode": "Empêcher le mode économie d'énergie",
-    "preventLowPowerModeDesc": "Empêche {{os}} de passer en veille ou en état suspendu, uniquement pour cette session."
+    "preventLowPowerModeDesc": "Empêche {{os}} de passer en veille ou en état suspendu, uniquement pour cette session.",
+    "logLevel": "Niveau de journal","logLevelDesc": "Contrôle le niveau de sortie des journaux du processus principal. Les modifications prennent effet immédiatement."
   },
   "playerSetting": {
     "label": "Paramètres du lecteur",

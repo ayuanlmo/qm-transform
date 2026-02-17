@@ -1,4 +1,5 @@
 import {FfprobeData} from "fluent-ffmpeg";
+import {LogLevel} from "electron-log";
 
 declare namespace NodeJS {
     interface ProcessEnv {
@@ -38,7 +39,11 @@ declare global {
         player: {
             playerType: string; // 播放器类型
             playerPath: string; // 播放器路径
-        }
+        };
+        // 其他配置
+        other: {
+            logLevel: LogLevel; // 日志级别
+        };
     }
 
     // 媒体信息

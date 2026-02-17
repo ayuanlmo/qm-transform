@@ -36,6 +36,9 @@ export const DefaultSettingConfig: IDefaultSettingConfig = {
     player: {
         playerType,
         playerPath
+    },
+    other: {
+        logLevel: 'info'
     }
 };
 

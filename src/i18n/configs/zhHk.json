@@ -55,7 +55,9 @@
     "label": "其他設定",
     "tmpFile": "臨時檔案",
     "preventLowPowerMode": "阻止低耗電模式",
-    "preventLowPowerModeDesc": "阻止 {{os}} 進入待機、暫停等狀態，只在本次使用期間生效"
+    "preventLowPowerModeDesc": "阻止 {{os}} 進入待機、暫停等狀態，只在本次使用期間生效",
+    "logLevel": "日誌級別",
+    "logLevelDesc": "控制主進程日誌輸出級別，修改後立即生效"
   },
   "playerSetting": {
     "label": "播放器設定",

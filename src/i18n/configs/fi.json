@@ -55,7 +55,8 @@
     "label": "Muut asetukset",
     "tmpFile": "Väliaikaiset tiedostot",
     "preventLowPowerMode": "Estä virransäästötila",
-    "preventLowPowerModeDesc": "Estää {{os}}-järjestelmää siirtymästä valmius- tai keskeytettyyn tilaan. Voimassa vain tämän istunnon ajan."
+    "preventLowPowerModeDesc": "Estää {{os}}-järjestelmää siirtymästä valmius- tai keskeytettyyn tilaan. Voimassa vain tämän istunnon ajan.",
+    "logLevel": "Lokitaso","logLevelDesc": "Hallitsee pääprosessin lokitustasoa. Muutokset tulevat voimaan heti."
   },
   "playerSetting": {
     "label": "Soittimen asetukset",

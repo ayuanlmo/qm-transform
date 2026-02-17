@@ -1,20 +1,28 @@
 import * as React from "react";
 import {Fragment, useEffect, useState} from "react";
-import {Button, Card, Divider, Label, Switch} from "@fluentui/react-components";
-import {DeleteLines20Filled, DesktopOff20Filled} from "@fluentui/react-icons";
+import {Button, Card, Divider, Label, Select, Switch} from "@fluentui/react-components";
+import {DeleteLines20Filled, DesktopOff20Filled, Whiteboard20Filled} from "@fluentui/react-icons";
 import {useTranslation} from "react-i18next";
 import {appTempFileInfo, deleteAppleTempFiles} from "../../utils";
 import YExtendTemplate from "../YExtendTemplate";
 import {useMainEventListener} from "../../bin/Hooks";
 import {sendIpcMessage} from "../../bin/IPC";
+import {LogLevels} from "./Config";
+import {useSelector, useDispatch} from "react-redux";
+import {RootState} from "../../store";
+import {setCurrentSettingConfig} from "../../store/AppStore";
+import type {LogLevel} from "electron-log";
 
 const platform = process.platform;
 
 const OtherSetting: React.FC = (): React.JSX.Element => {
     const {t} = useTranslation();
+    const dispatch = useDispatch();
     const [tempFileSize, setTempFileSize] = useState(0);
     const tmpFileSizeStr: string = tempFileSize > 1024 ? (tempFileSize / 1024).toFixed(2) + 'M' : tempFileSize + 'KB';
     const [pasOpen, setPasOpen] = useState(false);
+    const currentSettingConfig = useSelector((state: RootState) => state.app.currentSettingConfig);
+    const logLevel: LogLevel = (currentSettingConfig.other?.logLevel ?? 'info') as LogLevel;
 
     const init = (): void => {
         const {size} = appTempFileInfo();
@@ -89,6 +97,45 @@ const OtherSetting: React.FC = (): React.JSX.Element => {
                                     os: platform === 'win32' ? 'Windows' : platform === 'darwin' ? 'macOS' : 'Linux'
                                 })}
                             </Divider>
+                        </div>
+                    </div>
+                </Card>
+                <Card>
+                    <div className={'system-setting-item'}>
+                        <Label>
+                            <Whiteboard20Filled/>
+                            {t('otherSetting.logLevel', '日志级别')}
+                        </Label>
+                        <Divider
+                            appearance="brand"
+                            alignContent={'end'}
+                        >
+                            {t('otherSetting.logLevelDesc', '控制主进程日志输出级别，修改后立即生效')}
+                        </Divider>
+                        <div>
+                            <Select
+                                value={logLevel}
+                                onChange={(_ev, data): void => {
+                                    const level = (data.value ?? 'info') as LogLevel;
+
+                                    dispatch(setCurrentSettingConfig({
+                                        ...currentSettingConfig,
+                                        other: {
+                                            ...currentSettingConfig.other ?? {},
+                                            logLevel: level
+                                        }
+                                    }));
+                                    sendIpcMessage('window:on:set-log-level', level);
+                                }}
+                            >
+                                {
+                                    LogLevels.map(({label, value}): React.JSX.Element => {
+                                        return (
+                                            <option key={value} value={value}>{label}</option>
+                                        );
+                                    })
+                                }
+                            </Select>
                         </div>
                     </div>
                 </Card>

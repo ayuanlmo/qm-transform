@@ -55,7 +55,8 @@
     "label": "Weitere Einstellungen",
     "tmpFile": "Temporäre Dateien",
     "preventLowPowerMode": "Energiesparmodus verhindern",
-    "preventLowPowerModeDesc": "Verhindert, dass {{os}} in den Standby- oder Ruhezustand wechselt. Gilt nur für diese Sitzung."
+    "preventLowPowerModeDesc": "Verhindert, dass {{os}} in den Standby- oder Ruhezustand wechselt. Gilt nur für diese Sitzung.",
+    "logLevel": "Protokollstufe","logLevelDesc": "Steuert die Protokollausgabe des Hauptprozesses. Änderungen werden sofort wirksam."
   },
   "playerSetting": {
     "label": "Player-Einstellungen",

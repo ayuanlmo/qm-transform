@@ -9,7 +9,9 @@ import "./lib/Theme";
 import {appDarkTheme, appLightTheme} from "./lib/Theme";
 import {generateMediaFileId, getLocalPathForFile} from "./utils";
 import {sendIpcMessage} from "./bin/IPC";
-import {setAppVersion} from "./store/AppStore";
+import {setAppVersion, setCurrentSettingConfig} from "./store/AppStore";
+import {getLocalConfig, mergeConfig} from "./conf/AppConfig";
+import {DefaultSettingConfig} from "./conf/DefaultSettingConfig";
 
 
 const App: React.FC = (): React.JSX.Element => {
@@ -24,6 +26,16 @@ const App: React.FC = (): React.JSX.Element => {
     useEffect((): void => {
         sendIpcMessage('main:on:get-app-version');
     }, []);
+
+    useEffect((): (() => void) => {
+        const timer = setTimeout((): void => {
+            const merged = mergeConfig(DefaultSettingConfig, getLocalConfig());
+
+            dispatch(setCurrentSettingConfig(merged));
+        }, 0);
+
+        return (): void => clearTimeout(timer);
+    }, [dispatch]);
 
     useEffect(() => {
         const handleDragOver = (e: Event): void => e.preventDefault();

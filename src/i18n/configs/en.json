@@ -56,7 +56,9 @@
     "label": "Other Settings",
     "tmpFile": "Temporary Files",
     "preventLowPowerMode": "Prevent Low Power Mode",
-    "preventLowPowerModeDesc": "Prevents Windows from entering standby or suspended states, effective only for this session"
+    "preventLowPowerModeDesc": "Prevents Windows from entering standby or suspended states, effective only for this session",
+    "logLevel": "Log Level",
+    "logLevelDesc": "Controls the main process log output level. Changes take effect immediately."
   },
   "playerSetting": {
     "label": "Player Settings",

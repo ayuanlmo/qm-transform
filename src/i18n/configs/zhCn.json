@@ -56,7 +56,9 @@
     "label": "其他设置",
     "tmpFile": "临时文件",
     "preventLowPowerMode": "阻止低功耗模式",
-    "preventLowPowerModeDesc": "阻止{{os}}进入待机、暂停等状态，仅本次有效"
+    "preventLowPowerModeDesc": "阻止{{os}}进入待机、暂停等状态，仅本次有效",
+    "logLevel": "日志级别",
+    "logLevelDesc": "控制主进程日志输出级别，修改后立即生效"
   },
   "playerSetting": {
     "label": "播放器设置",

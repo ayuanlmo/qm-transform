@@ -55,7 +55,8 @@
     "label": "기타 설정",
     "tmpFile": "임시 파일",
     "preventLowPowerMode": "저전력 모드 방지",
-    "preventLowPowerModeDesc": "{{os}} 가 대기 또는 일시 중지 상태로 전환되지 않도록 합니다. 현재 세션에만 적용됩니다."
+    "preventLowPowerModeDesc": "{{os}} 가 대기 또는 일시 중지 상태로 전환되지 않도록 합니다. 현재 세션에만 적용됩니다.",
+    "logLevel": "로그 수준","logLevelDesc": "메인 프로세스 로그 출력 수준을 제어합니다. 변경 사항은 즉시 적용됩니다."
   },
   "playerSetting": {
     "label": "플레이어 설정",

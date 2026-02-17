@@ -55,7 +55,8 @@
     "label": "その他の設定",
     "tmpFile": "一時ファイル",
     "preventLowPowerMode": "低電力モードを防止",
-    "preventLowPowerModeDesc": "{{os}}がスリープや一時停止状態に入らないようにします。このセッションのみ有効です。"
+    "preventLowPowerModeDesc": "{{os}}がスリープや一時停止状態に入らないようにします。このセッションのみ有効です。",
+    "logLevel": "ログレベル","logLevelDesc": "メインプロセスのログ出力レベルを制御します。変更は即座に反映されます。"
   },
   "playerSetting": {
     "label": "プレイヤー設定",

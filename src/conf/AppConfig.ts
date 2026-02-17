@@ -17,7 +17,7 @@ const AppConfig = {
     homedir: _OS.homedir(),
     appHomedir: isWin32 ? _Path.resolve(_OS.homedir(), 'AppData', 'Local', 'QM-Transform') : _Path.resolve(_OS.homedir(), '.QM-Transform'),
     appRepository: 'https://github.com/ayuanlmo/qm-transform',
-    authorGitHubHome:'https://github.com/ayuanlmo/'
+    authorGitHubHome: 'https://github.com/ayuanlmo/'
 } as const;
 
 const configFileDir: string = _Path.resolve(AppConfig.appHomedir, 'config', 'Conf.t.json');
@@ -31,10 +31,33 @@ export const getLocalConfig = (): IDefaultSettingConfig => {
     return DefaultSettingConfig;
 };
 
+const loadConfig = (): void => {
+    const localConf = getLocalConfig();
+    const conf = mergeConfig(DefaultSettingConfig, localConf);
+
+    if (JSON.stringify(localConf) !== JSON.stringify(conf))
+        saveConfig(conf);
+};
+
+export const mergeConfig = (target: any, source: any) => {
+    const output = {...target};
+
+    for (const key in source) {
+        if (source[key] !== null && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+            output[key] = mergeConfig(output[key] || {}, source[key]);
+        } else {
+            output[key] = source[key];
+        }
+    }
+    return output;
+};
+
 export const saveConfig = (config: IDefaultSettingConfig): void => {
     writeFileSync(configFileDir, JSON.stringify(config, null, 4));
 };
 
 export default AppConfig;
 
-setTimeout(() => getLocalConfig(), 0);
+setTimeout((): void => {
+    loadConfig();
+}, 0);

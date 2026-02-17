@@ -1,3 +1,5 @@
+import {LogLevel} from "electron-log";
+
 export const GlobalPlayer = [
     {
         name: 'VLC media player',
@@ -27,4 +29,30 @@ export const MediaPlayerForMacOS = [
         value: 'qtp'
     },
     ...GlobalPlayer
+];
+
+export const LogLevels: {
+    label: Capitalize<LogLevel>;
+    value: LogLevel;
+}[] = [
+    {
+        label: 'Debug',
+        value: 'debug'
+    },
+    {
+        label: 'Info',
+        value: 'info'
+    },
+    {
+        label: 'Warn',
+        value: 'warn'
+    },
+    {
+        label: 'Error',
+        value: 'error'
+    },
+    {
+        label: 'Silly',
+        value: 'silly'
+    }
 ];
