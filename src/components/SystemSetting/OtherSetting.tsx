@@ -14,6 +14,8 @@ import {setCurrentSettingConfig} from "../../store/AppStore";
 import type {LogLevel} from "electron-log";
 
 const platform = process.platform;
+const isWin32 = platform === 'win32';
+const openInSystemLabel: string = isWin32 ? 'mediaFile.options.showInExplorer' : 'mediaFile.options.showInFinder';
 
 const OtherSetting: React.FC = (): React.JSX.Element => {
     const {t} = useTranslation();
@@ -136,6 +138,13 @@ const OtherSetting: React.FC = (): React.JSX.Element => {
                                     })
                                 }
                             </Select>
+                            <Button style={{
+                                marginTop: '.5rem'
+                            }} onClick={(): void => {
+                                sendIpcMessage('window:on:open-app-logs-directory');
+                            }}>
+                                {t(openInSystemLabel)}
+                            </Button>
                         </div>
                     </div>
                 </Card>

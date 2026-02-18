@@ -1,6 +1,7 @@
 import {BrowserWindow, dialog, ipcMain, IpcMainEvent, OpenDialogReturnValue, shell} from "electron";
 import {platform} from "node:os";
 import Logger from "electron-log/main";
+import path from "path";
 
 /**
  * @class AppDirectoryDialogIpc
@@ -37,6 +38,11 @@ class AppDirectoryDialogIpc {
         ipcMain.on(selectMediaPlayerPath, (event: IpcMainEvent): void => this.showDirectoryDialog(this.window, event, selectMediaPlayerPath));
         ipcMain.on(selectMediaFile, (event: IpcMainEvent): void => this.showDirectoryDialog(this.window, event, selectMediaFile));
         ipcMain.on(openDirectory, (event: IpcMainEvent, path: string): void => this.openDirectory(path));
+        ipcMain.on('window:on:open-app-logs-directory', (): void => {
+            const logPath: string = path.dirname(Logger.transports.file.getFile().path);
+
+            this.openDirectory(logPath);
+        });
     }
 
     private showDirectoryDialog(window: BrowserWindow, event: IpcMainEvent, evtName: string): void {
