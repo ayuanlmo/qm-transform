@@ -106,9 +106,30 @@
           .task-item-media-info-name {
             margin-left: 1.08rem;
             margin-top: 1.06rem;
+            margin-right: 2.5rem;
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            overflow: hidden;
 
             .task-item-media-info-text {
               margin-left: .38rem;
+            }
+
+            .task-item-media-info-name-text {
+              display: block;
+              min-width: 0;
+              flex: 1;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+
+              .task-item-media-info-text {
+                display: block;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+              }
             }
           }
 

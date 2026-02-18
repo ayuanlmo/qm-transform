@@ -1,5 +1,5 @@
 import * as React from "react";
-import {ListItem, Card, ProgressBar, Button, Spinner, Text} from "@fluentui/react-components";
+import {ListItem, Card, ProgressBar, Button, Spinner, Text, Tooltip} from "@fluentui/react-components";
 import {LauncherSettings24Regular} from "@fluentui/react-icons";
 
 export interface IBaseTaskItemProps {
@@ -69,13 +69,22 @@ const BaseTaskItem: React.FC<IBaseTaskItemProps> = (props: IBaseTaskItemProps): 
                         </div>
                         <div className={'task-item-media-info-name'}>
                             {headerTags}
-                            <Text
-                                size={400}
-                                className={'task-item-media-info-text app_position_absolute'}
-                                truncate
+                            <Tooltip
+                                content={data.baseName}
+                                relationship="label"
+                                positioning="above-start"
                             >
-                                {data.baseName}
-                            </Text>
+                                <span className={'task-item-media-info-name-text'}>
+                                    <Text
+                                        size={400}
+                                        className={'task-item-media-info-text'}
+                                        truncate
+                                        as="span"
+                                    >
+                                        {data.baseName}
+                                    </Text>
+                                </span>
+                            </Tooltip>
                         </div>
                         <div className={'task-item-media-info-sub'}>
                             {infoBlock}
