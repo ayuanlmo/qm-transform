@@ -13,9 +13,21 @@ import {setAppVersion, setCurrentSettingConfig} from "./store/AppStore";
 import {getLocalConfig, mergeConfig} from "./conf/AppConfig";
 import {DefaultSettingConfig} from "./conf/DefaultSettingConfig";
 
+/** Whether any task is in progress (processing or paused) */
+const hasTaskInProgressSelector = (state: RootState): boolean => {
+    const atProcessing: boolean = state.att.currentATTask.some(
+        (t: IMediaInfo) => t.status === 'processing' || t.status === 'paused'
+    );
+    const vtProcessing: boolean = state.vtt.currentVTTask.some(
+        (t: IMediaInfo) => t.status === 'processing' || t.status === 'paused'
+    );
+
+    return atProcessing || vtProcessing;
+};
 
 const App: React.FC = (): React.JSX.Element => {
     const {theme: {appearance}} = useSelector((state: RootState) => state.app.currentSettingConfig);
+    const hasTaskInProgress = useSelector(hasTaskInProgressSelector);
     const theme = useTheme(appearance === 'auto', appearance);
     const dispatch = useDispatch();
 
@@ -54,6 +66,11 @@ const App: React.FC = (): React.JSX.Element => {
             document.body.removeEventListener('drop', handleDrop);
         };
     }, []);
+
+    // Auto-enable prevent low power mode when any task is in progress, disable when all tasks complete
+    useEffect((): void => {
+        sendIpcMessage('window:on:open-pas', hasTaskInProgress);
+    }, [hasTaskInProgress]);
 
     return (
         <FluentProvider theme={theme === 'dark' ? appDarkTheme : appLightTheme}>
