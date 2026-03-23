@@ -24,7 +24,7 @@ const DefaultOutputPath: string = _Path.resolve(AppConfig.appHomedir, 'output');
 
 export const DefaultSettingConfig: IDefaultSettingConfig = {
     theme: {
-        lang: 'zh-Cn',
+        lang: 'en',
         appearance: 'auto',
         navigationAppearance: 'default',
         zoomFactor: '100'

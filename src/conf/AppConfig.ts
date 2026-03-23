@@ -3,6 +3,7 @@ import type FS from 'node:fs';
 import type Path from 'node:path';
 import Global from "../utils/Global";
 import {DefaultSettingConfig} from "./DefaultSettingConfig";
+import {getDetectedLanguage} from "../utils/languageDetect";
 
 const _OS = Global.requireNodeModule<typeof OS>('os');
 const _Path = Global.requireNodeModule<typeof Path>('path');
@@ -26,9 +27,17 @@ export const getLocalConfig = (): IDefaultSettingConfig => {
     if (existsSync(configFileDir))
         return JSON.parse(readFileSync(configFileDir, 'utf8'));
 
-    writeFileSync(configFileDir, JSON.stringify(DefaultSettingConfig, null, 4));
+    const initialConfig: IDefaultSettingConfig = {
+        ...DefaultSettingConfig,
+        theme: {
+            ...DefaultSettingConfig.theme,
+            lang: typeof navigator !== 'undefined' ? getDetectedLanguage() : DefaultSettingConfig.theme.lang
+        }
+    };
 
-    return DefaultSettingConfig;
+    writeFileSync(configFileDir, JSON.stringify(initialConfig, null, 4));
+
+    return initialConfig;
 };
 
 const loadConfig = (): void => {
