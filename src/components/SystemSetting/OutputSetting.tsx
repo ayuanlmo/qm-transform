@@ -262,10 +262,17 @@ const OutputSetting: React.FC = (): React.JSX.Element => {
                         </Label>
                         <div>
                             <Select
-                                defaultValue={currentSettingConfig.output.codecType}
+                                value={currentSettingConfig.output.codecType}
                                 onChange={(ev, {value}): void => {
-                                    setConfig({
+                                    const nextConfig: Record<string, string> = {
                                         codecType: value
+                                    };
+
+                                    if (value === 'GPU' && availableGpuOptions.length > 0)
+                                        nextConfig.codecMethod = availableGpuOptions[0].value;
+
+                                    setConfig({
+                                        ...nextConfig
                                     });
                                 }}
                             >
