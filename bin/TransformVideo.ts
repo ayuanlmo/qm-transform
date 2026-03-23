@@ -147,7 +147,15 @@ class TransformVideo {
                 outputExt = 'mpg';
         }
 
-        const outputPath: string = Media.buildOutputPath(outputDir, outputBaseName, outputExt);
+        let outputPath: string = Media.buildOutputPath(outputDir, outputBaseName, outputExt);
+
+        // For m3u8/HLS: output m3u8 and ts segments into a dedicated subfolder for easier discovery
+        if (outputExt === 'm3u8') {
+            const m3u8BaseName = path.basename(outputPath, '.m3u8');
+            const m3u8Dir = path.join(outputDir, m3u8BaseName);
+            mkdirSync(m3u8Dir, {recursive: true});
+            outputPath = path.join(m3u8Dir, `${m3u8BaseName}.m3u8`);
+        }
 
         // 注册任务到 TaskManager
         taskManager.registerTask(media.id, media, media.fullPath, outputPath, ctx, undefined);
