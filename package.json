@@ -99,6 +99,12 @@
     "systeminformation": "^5.27.1",
     "uuid": "^11.1.0"
   },
+  "optionalDependencies": {
+    "ntsuspend": "^1.0.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["ntsuspend"]
+  },
   "devDependencies": {
     "@craco/craco": "^7.1.0",
     "@eslint/js": "^9.22.0",
