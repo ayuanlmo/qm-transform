@@ -1,8 +1,10 @@
 import AppConfig, {getLocalConfig} from "./AppConfig";
 import type Path from 'node:path';
+import type FS from 'node:fs';
 import Global from "../utils/Global";
 
 const _Path = Global.requireNodeModule<typeof Path>('path');
+const _Fs = Global.requireNodeModule<typeof FS>('fs');
 
 export const windowsMediaPlayerDefaultPath: string = 'C:\\Program Files (x86)\\Windows Media Player\\wmplayer.exe';
 export const appleQuickTimePlayerDefaultPath: string = '/Applications/QuickTime Player.app';
@@ -18,6 +20,8 @@ if (AppConfig.platform === 'win32') {
     playerPath = appleQuickTimePlayerDefaultPath;
 }
 
+const DefaultOutputPath: string = _Path.resolve(AppConfig.appHomedir, 'output');
+
 export const DefaultSettingConfig: IDefaultSettingConfig = {
     theme: {
         lang: 'zh-Cn',
@@ -26,7 +30,7 @@ export const DefaultSettingConfig: IDefaultSettingConfig = {
         zoomFactor: '100'
     },
     output: {
-        outputPath: _Path.resolve(AppConfig.tmpdir, AppConfig.appName),
+        outputPath: DefaultOutputPath,
         parallelTasks: 2,
         codecType: 'CPU',
         codecMethod: 'amf',
@@ -42,4 +46,10 @@ export const DefaultSettingConfig: IDefaultSettingConfig = {
     }
 };
 
+((): void => {
+    'use strict';
+
+    if (!_Fs.existsSync(DefaultOutputPath))
+        _Fs.mkdirSync(DefaultOutputPath);
+})();
 export default getLocalConfig();
