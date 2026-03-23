@@ -153,6 +153,7 @@ class TransformVideo {
         if (outputExt === 'm3u8') {
             const m3u8BaseName = path.basename(outputPath, '.m3u8');
             const m3u8Dir = path.join(outputDir, m3u8BaseName);
+
             mkdirSync(m3u8Dir, {recursive: true});
             outputPath = path.join(m3u8Dir, `${m3u8BaseName}.m3u8`);
         }
