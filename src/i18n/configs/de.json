@@ -204,6 +204,14 @@
     "hide": "Minimieren",
     "closeMessage": "Möchten Sie wirklich schließen?"
   },
+  "videoConcat": {
+    "onlyOneVideo": "Mindestens 2 Videos erforderlich zum Zusammenführen",
+    "startMerge": "Zusammenführen starten",
+    "pauseMerge": "Pause",
+    "resumeMerge": "Fortsetzen",
+    "mergeSuccess": "Videos erfolgreich zusammengeführt",
+    "mergeFailed": "Zusammenführen fehlgeschlagen"
+  },
   "errMessage": {
     "label": "Fehlermeldung",
     "media-info-error": "Beim Abrufen der Basisinformationen zur Mediendatei [{{mediaFile}}] ist ein Fehler aufgetreten. Details: {{message}}",

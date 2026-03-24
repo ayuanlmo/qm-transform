@@ -205,6 +205,14 @@
     "hide": "最小化",
     "closeMessage": "你確定要關閉嗎？"
   },
+  "videoConcat": {
+    "onlyOneVideo": "至少需要 2 個影片才能合併",
+    "startMerge": "開始合併",
+    "pauseMerge": "暫停",
+    "resumeMerge": "繼續",
+    "mergeSuccess": "影片合併成功",
+    "mergeFailed": "合併失敗"
+  },
   "errMessage": {
     "label": "錯誤訊息",
     "media-info-error": "取得媒體檔案 [{{mediaFile}}] 基本資訊時發生錯誤，詳細內容為：{{message}}",

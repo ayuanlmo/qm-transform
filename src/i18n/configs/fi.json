@@ -204,6 +204,14 @@
     "hide": "Pienennä",
     "closeMessage": "Haluatko varmasti sulkea?"
   },
+  "videoConcat": {
+    "onlyOneVideo": "Tarvitaan vähintään 2 videota yhdistämiseen",
+    "startMerge": "Aloita yhdistäminen",
+    "pauseMerge": "Keskeytä",
+    "resumeMerge": "Jatka",
+    "mergeSuccess": "Videot yhdistetty onnistuneesti",
+    "mergeFailed": "Yhdistäminen epäonnistui"
+  },
   "errMessage": {
     "label": "Virheilmoitus",
     "media-info-error": "Virhe ilmeni haettaessa mediatiedoston [{{mediaFile}}] perustietoja. Lisätiedot: {{message}}",

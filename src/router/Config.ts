@@ -1,7 +1,7 @@
 import type {FC} from "react";
 import VideoTransform from "../views/VideoTransform";
 import AudioTransform from "../views/AudioTransform";
-// import VideoConcat from "../views/VideoConcat";
+import VideoConcat from "../views/VideoConcat";
 // import VideoCompress from "../views/VideoCompress";
 
 export interface IRouterItem {
@@ -24,13 +24,13 @@ export default [
         icon: '/react-app-static/ico/audio-transform.svg',
         template: AudioTransform
     }
-    // ,
-    // {
-    //     name: 'menu.videoConcat',
-    //     path: '/video-concat',
-    //     icon: '/react-app-static/ico/vide-concat.svg',
-    //     template: VideoConcat
-    // },
+    ,
+    {
+        name: 'menu.videoConcat',
+        path: '/video-concat',
+        icon: '/react-app-static/ico/vide-concat.svg',
+        template: VideoConcat
+    }
     // {
     //     name: 'menu.videoCompress',
     //     path: '/video-compress',

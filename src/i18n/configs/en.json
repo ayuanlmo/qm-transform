@@ -211,6 +211,14 @@
     "hide": "Minimize",
     "closeMessage": "Are you sure you want to close?"
   },
+  "videoConcat": {
+    "onlyOneVideo": "At least 2 videos required to merge",
+    "startMerge": "Start Merge",
+    "pauseMerge": "Pause",
+    "resumeMerge": "Resume",
+    "mergeSuccess": "Video merged successfully",
+    "mergeFailed": "Merge failed"
+  },
   "errMessage": {
     "label": "Error Message",
     "media-info-error": "An error occurred while retrieving basic information for media file [{{mediaFile}}], details: {{message}}",

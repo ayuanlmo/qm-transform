@@ -204,6 +204,14 @@
     "hide": "Minimiser",
     "closeMessage": "Voulez-vous vraiment fermer ?"
   },
+  "videoConcat": {
+    "onlyOneVideo": "Au moins 2 vidéos requises pour fusionner",
+    "startMerge": "Démarrer la fusion",
+    "pauseMerge": "Pause",
+    "resumeMerge": "Reprendre",
+    "mergeSuccess": "Vidéos fusionnées avec succès",
+    "mergeFailed": "Échec de la fusion"
+  },
   "errMessage": {
     "label": "Message d'erreur",
     "media-info-error": "Une erreur s'est produite lors de la récupération des informations de base du fichier [{{mediaFile}}], détails : {{message}}",

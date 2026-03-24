@@ -204,6 +204,14 @@
     "hide": "최소화",
     "closeMessage": "정말 닫으시겠습니까?"
   },
+  "videoConcat": {
+    "onlyOneVideo": "병합하려면 최소 2개의 동영상이 필요합니다",
+    "startMerge": "병합 시작",
+    "pauseMerge": "일시 중지",
+    "resumeMerge": "계속",
+    "mergeSuccess": "동영상 병합 완료",
+    "mergeFailed": "병합 실패"
+  },
   "errMessage": {
     "label": "오류 메시지",
     "media-info-error": "미디어 파일 [{{mediaFile}}]의 기본 정보를 가져오는 중 오류가 발생했습니다. 상세 내용: {{message}}",

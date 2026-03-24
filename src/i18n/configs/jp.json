@@ -204,6 +204,14 @@
     "hide": "最小化",
     "closeMessage": "本当に閉じますか？"
   },
+  "videoConcat": {
+    "onlyOneVideo": "マージには少なくとも2つのビデオが必要です",
+    "startMerge": "マージ開始",
+    "pauseMerge": "一時停止",
+    "resumeMerge": "再開",
+    "mergeSuccess": "動画のマージが完了しました",
+    "mergeFailed": "マージに失敗しました"
+  },
   "errMessage": {
     "label": "エラーメッセージ",
     "media-info-error": "メディアファイル [{{mediaFile}}] の基本情報を取得中にエラーが発生しました。詳細: {{message}}",

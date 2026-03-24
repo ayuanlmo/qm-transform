@@ -184,15 +184,16 @@ class Media {
      * @method getCustomMediaFileName
      * @param {string} originPath - Original media file path
      * @param {string} rule - Custom naming rule with {name}, {time}, {ext}, {random}
+     * @param targetExt
      * @return {string} - Resolved filename, may include extension when rule uses {ext}
      * @author ayuanlmo
      * @description Custom media file name, e.g. myVideo.mp4 -> myVideo-2025520-xxx.mp4
      * **/
-    public static getCustomMediaFileName(originPath: string, rule: string): string {
+    public static getCustomMediaFileName(originPath: string, rule: string, targetExt?: string): string {
         const date: Date = new Date();
-        const ext: string = path.extname(originPath) || '.mov';
+        const ext: string = targetExt ? `.${targetExt.replace(/^\./, '')}` : (path.extname(originPath) || '.mov');
         const time: string = `${new Date().getUTCFullYear()}${date.getMonth() + 1}${date.getUTCDate()}`;
-        const baseName: string = path.basename(originPath, ext);
+        const baseName: string = path.basename(originPath, path.extname(originPath));
         const random: string = v4().split('-')[0];
 
         let res: string = rule
@@ -204,9 +205,31 @@ class Media {
         res = res.replace(/\.{2,}/g, '.');
 
         if (path.extname(res) === '')
-            return res + '.mov';
+            return res + (targetExt ? `.${targetExt.replace(/^\./, '')}` : '.mov');
 
         return res;
+    }
+
+    /**
+     * Get output file name for concat task based on user config.
+     * Origin: combine all source base names with hyphen.
+     * Custom: use customNameRule with first file, targetExt for output format.
+     */
+    public static getConcatOutputMediaFileName(fullPaths: string[], targetExt: string): string {
+        const appConf: IDefaultSettingConfig | null = getLocalConfigAsMain();
+        const rule = (appConf?.output?.customNameRule ?? '').trim();
+
+        if (appConf?.output?.fileNameSpase === 'custom' && fullPaths.length > 0 && rule)
+            return Media.getCustomMediaFileName(fullPaths[0], rule, targetExt);
+
+        const baseNames: string[] = fullPaths.map((p): string => {
+            const ext = path.extname(p);
+
+            return path.basename(p, ext);
+        });
+        const combined = baseNames.join('-');
+
+        return combined || `concat_${Date.now()}`;
     }
 
     /**

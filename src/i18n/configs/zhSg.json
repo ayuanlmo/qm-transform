@@ -211,6 +211,14 @@
     "hide": "最小化",
     "closeMessage": "您确定要关闭吗？"
   },
+  "videoConcat": {
+    "onlyOneVideo": "至少需要 2 个视频才能合并",
+    "startMerge": "开始合并",
+    "pauseMerge": "暂停",
+    "resumeMerge": "继续",
+    "mergeSuccess": "视频合并成功",
+    "mergeFailed": "合并失败"
+  },
   "errMessage": {
     "label": "错误信息",
     "media-info-error": "获取媒体档案[{{mediaFile}}]基本信息时出现错误，详细信息为：{{message}}",
