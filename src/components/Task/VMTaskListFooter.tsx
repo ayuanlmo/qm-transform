@@ -249,6 +249,7 @@ const VMTaskListFooter: React.FC = (): React.JSX.Element => {
                 <div className="vc-concat-progress-bar">
                     <ProgressBar
                         max={100}
+                        thickness="large"
                         value={Math.min(100, Math.max(0, vcConcatProgress))}
                     />
                 </div>
