@@ -43,15 +43,19 @@ class Ffmpeg {
      * @description 获取视频媒体第一帧
      * **/
     public static getVideoMediaFirstFrame(mediaFile: string, ctx: IpcMainEvent): Promise<string | undefined> {
-        const optFileName: string = `${v4()}.t.png`;
+        const optFileName: string = `${v4()}.t.webp`;
         const optPath: string = path.resolve(appTempDir, optFileName);
 
-        // 规范像素格式和缩放规则，避免 H265 / HDR 等情况下截图色彩“发飘”
+        // Generate a compact cover image without letterbox bars.
         const args: string[] = [
             '-i', mediaFile,
-            '-vf', 'scale=244:160:force_original_aspect_ratio=decrease:flags=lanczos,pad=244:160:(ow-iw)/2:(oh-ih)/2:black',
+            '-vf', 'scale=244:160:force_original_aspect_ratio=increase:flags=lanczos,crop=244:160',
             '-frames:v', '1',
-            '-pix_fmt', 'rgb24',// 统一输出为 SDR / sRGB 友好的 RGB24，避免 YUV / HDR 影响效果
+            // Force SDR-friendly pixel format to avoid HDR-looking washed screenshots.
+            '-pix_fmt', 'rgb24',
+            '-vcodec', 'libwebp',
+            '-q:v', '70',
+            '-compression_level', '6',
             optPath,
             '-y'
         ];
