@@ -1,6 +1,8 @@
 import * as React from "react";
 import {ListItem, Card, ProgressBar, Button, Spinner, Text, Tooltip} from "@fluentui/react-components";
 import {LauncherSettings24Regular} from "@fluentui/react-icons";
+import YExtendTemplate from "../YExtendTemplate";
+import {formatDuration, formatFileSize} from "../../utils";
 
 export interface IBaseTaskItemProps {
     data: IMediaInfo;
@@ -43,6 +45,7 @@ const BaseTaskItem: React.FC<IBaseTaskItemProps> = (props: IBaseTaskItemProps): 
 
     const isPaused: boolean = data.status === 'paused';
     const canPauseResume: boolean = isProcessing && !!(onPause || onResume);
+    const {mediaInfo} = data;
 
     return (
         <ListItem className={"task-item"}>
@@ -50,6 +53,26 @@ const BaseTaskItem: React.FC<IBaseTaskItemProps> = (props: IBaseTaskItemProps): 
                 <div className={'task-item-content app_flex_box'}>
                     <div className={'task-item-content-cover app_cursor_pointer'}>
                         <img onClick={onPlay} src={data.cover} alt="cover"/>
+                        <YExtendTemplate show={data.isVideo}>
+                            <div className={'task-item-tag app_flex_box'}>
+                                <Text
+                                    size={400}
+                                    className={'task-item-media-info-text'}
+                                    truncate
+                                    as="span"
+                                >
+                                    {formatDuration(mediaInfo.format.duration ?? 0)}
+                                </Text>
+                                <Text
+                                    size={400}
+                                    className={'task-item-media-info-text'}
+                                    truncate
+                                    as="span"
+                                >
+                                    {formatFileSize(mediaInfo.format.size ?? 0)}
+                                </Text>
+                            </div>
+                        </YExtendTemplate>
                     </div>
                     <div className={'task-item-media-info app_position_relative'}>
                         <div

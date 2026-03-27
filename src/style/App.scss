@@ -94,6 +94,24 @@
             object-fit: cover;
             object-position: center;
           }
+
+          .task-item-tag {
+            position: relative;
+            top: -2rem;
+            left: .81rem;
+            justify-content: space-between;
+            padding: 0 .81rem;
+
+            span {
+              border-radius: 0.625rem;
+              background: rgba(0, 0, 0, 0.50);
+              padding: 0.13rem 0.81rem;
+              font-size: 0.75rem;
+              font-style: normal;
+
+              color: #fff;
+            }
+          }
         }
 
         .task-item-media-info {

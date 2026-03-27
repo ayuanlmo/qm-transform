@@ -80,3 +80,27 @@ export const getLocalPathForFile = (file: File): string | null => {
         return null;
     }
 };
+
+export const formatDuration = (seconds: number): string => {
+    const totalSeconds: number = Math.floor(seconds);
+    const hours: number = Math.floor(totalSeconds / 3600);
+    const minutes: number = Math.floor(totalSeconds % 3600 / 60);
+    const secs: number = totalSeconds % 60;
+    const pad = (num: number): string => num.toString().padStart(2, '0');
+
+    return `${pad(hours)}:${pad(minutes)}:${pad(secs)}`;
+};
+
+export const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0KB';
+
+    const k = 1024;
+
+    if (bytes < k * k)
+        return `${Math.floor(bytes / k)}KB`;
+
+    if (bytes < k * k * k)
+        return `${(bytes / (k * k)).toFixed(1)}M`;
+
+    return `${(bytes / (k * k * k)).toFixed(1)}G`;
+};
