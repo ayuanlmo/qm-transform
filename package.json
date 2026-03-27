@@ -1,6 +1,6 @@
 {
   "name": "qm-transform",
-  "version": "2.0.0-Bata",
+  "version": "2.1.0",
   "description": "QM-Transform 现代化、开源的媒体格式转换工具",
   "main": "build/main.js",
   "private": false,
