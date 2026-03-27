@@ -10,7 +10,7 @@
   "return": "返回",
   "continue": "继续",
   "delete": "删除",
-  "deleteFile": "删除文件",
+  "deleteFile": "删除档案",
   "edit": "编辑",
   "save": "保存",
   "search": "搜索",
@@ -21,8 +21,8 @@
   "select": "选择",
   "play": "播放",
   "pause": "暂停",
-    "noData": "暂无数据",
-    "notAvailable": "不可用",
+  "noData": "暂无资料",
+  "notAvailable": "不可用",
   "pleaseSelect": "请选择",
   "tips": "提示",
   "systemMessage": "系统消息",
@@ -37,15 +37,15 @@
     "label": "输出设置",
     "optPath": "输出路径",
     "parallelTasks": "并行任务数量",
-    "parallelTasksDesc": "根据您的计算机性能，酌情调整",
+    "parallelTasksDesc": "根据您的电脑性能，酌情调整",
     "codec": "编解码方式",
     "softwareDecoding": "软件解码",
     "hardwareDecoding": "硬件解码",
-    "hardwareDecodingDesc": "硬件解码利用GPU来加速这一过程，可减少CPU利用。",
+    "hardwareDecodingDesc": "硬件解码利用GPU来加速这一过程，可减少CPU占用。",
     "gpuDecoderMethod": "GPU解码器方法",
-    "gpuDecoderMethodDesc": "请确保您的硬件及驱动方式正常，如遇到错误，请选择CPU作为解码器",
+    "gpuDecoderMethodDesc": "请确保您的硬件及驱动正常，如遇到错误，请选择CPU作为解码器",
     "customFileName": {
-      "label": "文件名称",
+      "label": "档案名称",
       "origin": "原始",
       "customFileName": "自定义",
       "preview": "预览",
@@ -54,7 +54,7 @@
   },
   "otherSetting": {
     "label": "其他设置",
-    "tmpFile": "临时文件",
+    "tmpFile": "临时档案",
     "preventLowPowerMode": "阻止低功耗模式",
     "preventLowPowerModeDesc": "阻止{{os}}进入待机、暂停等状态，仅本次有效",
     "logLevel": "日志级别",
@@ -65,7 +65,7 @@
     "mediaPlayer": "媒体播放器",
     "customMediaPlayer": "自定义播放器",
     "mediaPlayerPath": "播放器路径",
-    "mediaPlayerDesc": "以上播放器打开方式均为”直接调用方式“"
+    "mediaPlayerDesc": "以上播放器打开方式均为「直接调用方式」"
   },
   "about": {
     "label": "关于",
@@ -81,24 +81,24 @@
     "available": "发现新版本可用",
     "downloading": "正在下载更新...",
     "downloadProgress": "下载进度：{{percent}}%",
-    "downloaded": "更新下载完成，是否立即重启应用程序完成更新？",
+    "downloaded": "更新下载完成，是否立即重启应用程式完成更新？",
     "restartNow": "立即重启",
     "restartLater": "稍后重启",
     "error": {
       "network": "网络连接失败，请检查您的网络设置。",
-      "server": "更新服务器错误，请稍后重试。",
+      "server": "更新伺服器错误，请稍后重试。",
       "noReleases": "GitHub上暂未发布任何版本，当前已是最新版本。",
       "unknown": "更新检查失败：{{message}}"
     }
   },
   "mediaFile": {
     "options": {
-      "add": "添加文件",
+      "add": "添加档案",
       "openNetworkStreaming": "打开网络串流",
       "remove": "移除",
       "clearAll": "清空所有",
-      "clearAllConfirmMessage": "您确定要清空当前所有媒体文件吗？",
-      "clickImportAndDrop": "点击导入文件，或将文件拖到此处",
+      "clearAllConfirmMessage": "您确定要清空当前所有媒体档案吗？",
+      "clickImportAndDrop": "点击导入档案，或将档案拖到此处",
       "clickImportAndDropDesc": "支持导入mp4、mov、mkv、avi、mp3、flac等格式",
       "startConversionAll": "全部转换",
       "stopAll": "停止全部",
@@ -106,12 +106,12 @@
       "inProgress": "进行中",
       "pause": "暂停",
       "resume": "继续",
-      "getMediaFileInformation": "正在获取媒体文件信息...",
+      "getMediaFileInformation": "正在获取媒体档案信息...",
       "startConcat": "开始合并",
       "conversionSuccessMessage": "[{{name}}] 转换成功",
       "conversionFailed": "转换失败",
       "batchRunning": "进行中：{{current}}/{{total}}",
-      "showInExplorer": "在资源管理器显示",
+      "showInExplorer": "在档案总管显示",
       "showInFinder": "在Finder显示",
       "addTitle": "添加片头",
       "addCredits": "添加片尾",
@@ -129,7 +129,7 @@
     "channelsMono": "单声道",
     "channelsStereo": "立体声",
     "channelsMonoConfirmTitle": "切换为单声道？",
-    "channelsMonoConfirmMessage": "切换为单声道后，音频将失去立体声效果，此操作会影响导出文件的最终效果。是否继续？",
+    "channelsMonoConfirmMessage": "切换为单声道后，音频将失去立体声效果，此操作会影响导出档案的最终效果。是否继续？",
     "videoCode": "视频编码",
     "size": "大小",
     "duration": "时长",
@@ -142,7 +142,7 @@
     "codec": "编解码器",
     "optionsLabel": "选项",
     "noAudioConfirmTitle": "开启无音频？",
-    "noAudioConfirmMessage": "开启“无音频”后，将会在转码时删除该媒体文件中的所有音频轨道，此操作会影响导出文件的最终效果。是否继续？",
+    "noAudioConfirmMessage": "开启「无音频」后，将会在转码时删除该媒体档案中的所有音频轨道，此操作会影响导出档案的最终效果。是否继续？",
     "quality": {
       "label": "清晰度",
       "original": "原始（无压缩）",
@@ -162,7 +162,7 @@
       "slow": "慢",
       "slower": "缓慢",
       "verySlow": "极慢",
-      "desc": "编码速度越快，压缩率越低（文件越大）；编码速度越慢，压缩率越高（文件较小）。"
+      "desc": "编码速度越快，压缩率越低（档案越大）；编码速度越慢，压缩率越高（档案较小）。"
     },
     "pixelFormat": {
       "label": "像素格式",
@@ -209,7 +209,7 @@
     "mini": "还原",
     "max": "最大化",
     "hide": "最小化",
-    "closeMessage": "你确定要关闭吗？"
+    "closeMessage": "您确定要关闭吗？"
   },
   "videoConcat": {
     "onlyOneVideo": "至少需要 2 个视频才能合并",
@@ -221,9 +221,9 @@
   },
   "errMessage": {
     "label": "错误信息",
-    "media-info-error": "获取媒体文件[{{mediaFile}}]基本信息时出现错误，详细信息为：{{message}}",
-    "media-first-frame-error": "获取媒体文件[{{mediaFile}}]的第一帧图片时出现错误，详细信息为：{{message}}",
-    "media-audio-av-error": "获取音频文件[{{mediaFile}}]波形图时出现错误，详细信息为：{{message}}",
+    "media-info-error": "获取媒体档案[{{mediaFile}}]基本信息时出现错误，详细信息为：{{message}}",
+    "media-first-frame-error": "获取媒体档案[{{mediaFile}}]的第一帧图片时出现错误，详细信息为：{{message}}",
+    "media-audio-av-error": "获取音频档案[{{mediaFile}}]波形图时出现错误，详细信息为：{{message}}",
     "output-directory-not-exist": "输出目录:[{{path}}]不存在，请重新选择。",
     "conversionFailedMessage": "[{{name}}] 失败，详细信息：{{message}}。"
   }

@@ -1,4 +1,4 @@
-import ffmpeg, {FfmpegCommand, FfprobeStream} from 'fluent-ffmpeg';
+import ffmpeg, {FfmpegCommand} from 'fluent-ffmpeg';
 import path from 'path';
 import {IpcMainEvent} from "electron";
 import {mkdirSync} from "node:fs";
@@ -147,7 +147,16 @@ class TransformVideo {
                 outputExt = 'mpg';
         }
 
-        const outputPath: string = path.resolve(outputDir, `${outputBaseName}.${outputExt}`);
+        let outputPath: string = Media.buildOutputPath(outputDir, outputBaseName, outputExt);
+
+        // For m3u8/HLS: output m3u8 and ts segments into a dedicated subfolder for easier discovery
+        if (outputExt === 'm3u8') {
+            const m3u8BaseName = path.basename(outputPath, '.m3u8');
+            const m3u8Dir = path.join(outputDir, m3u8BaseName);
+
+            mkdirSync(m3u8Dir, {recursive: true});
+            outputPath = path.join(m3u8Dir, `${m3u8BaseName}.m3u8`);
+        }
 
         // 注册任务到 TaskManager
         taskManager.registerTask(media.id, media, media.fullPath, outputPath, ctx, undefined);
@@ -449,6 +458,7 @@ class TransformVideo {
                 ffmpegCommand.addOutputOptions(`-profile:v ${videoParams.profile}`);
             // NVENC 自动选择 level，源文件携带的 level（如 5.1 / 51）可能不被硬件接受
             const shouldApplyLevel: boolean = !!videoParams.level && !(useHardwareAcceleration && hardwareEncoderSuffix === 'nvenc');
+
             if (shouldApplyLevel)
                 ffmpegCommand.addOutputOptions(`-level ${videoParams.level}`);
         }

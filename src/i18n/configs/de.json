@@ -55,7 +55,8 @@
     "label": "Weitere Einstellungen",
     "tmpFile": "Temporäre Dateien",
     "preventLowPowerMode": "Energiesparmodus verhindern",
-    "preventLowPowerModeDesc": "Verhindert, dass {{os}} in den Standby- oder Ruhezustand wechselt. Gilt nur für diese Sitzung."
+    "preventLowPowerModeDesc": "Verhindert, dass {{os}} in den Standby- oder Ruhezustand wechselt. Gilt nur für diese Sitzung.",
+    "logLevel": "Protokollstufe","logLevelDesc": "Steuert die Protokollausgabe des Hauptprozesses. Änderungen werden sofort wirksam."
   },
   "playerSetting": {
     "label": "Player-Einstellungen",
@@ -202,6 +203,14 @@
     "max": "Maximieren",
     "hide": "Minimieren",
     "closeMessage": "Möchten Sie wirklich schließen?"
+  },
+  "videoConcat": {
+    "onlyOneVideo": "Mindestens 2 Videos erforderlich zum Zusammenführen",
+    "startMerge": "Zusammenführen starten",
+    "pauseMerge": "Pause",
+    "resumeMerge": "Fortsetzen",
+    "mergeSuccess": "Videos erfolgreich zusammengeführt",
+    "mergeFailed": "Zusammenführen fehlgeschlagen"
   },
   "errMessage": {
     "label": "Fehlermeldung",

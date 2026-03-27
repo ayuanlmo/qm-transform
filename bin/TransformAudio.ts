@@ -47,7 +47,7 @@ class TransformAudio {
                 outputExt = 'opus';
         }
 
-        const outputPath: string = path.resolve(outputDir, `${outputBaseName}.${outputExt}`);
+        const outputPath: string = Media.buildOutputPath(outputDir, outputBaseName, outputExt);
 
         // 注册任务到 TaskManager
         taskManager.registerTask(media.id, media, media.fullPath, outputPath, ctx, undefined);

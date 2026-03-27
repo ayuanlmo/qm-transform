@@ -24,8 +24,17 @@ class MainApp {
         app.whenReady().then(async () => {
             const primaryDisplay: Display = screen.getPrimaryDisplay();
             const {width, height}: Size = primaryDisplay.workAreaSize;
-            const winWidth: number = Math.min(1500, Math.floor(width * 0.8));
-            const winHeight: number = Math.min(800, Math.floor(height * 0.8));
+            const horizontalMargin: number = width >= 1400 ? 120 : 64;
+            const verticalMargin: number = height >= 900 ? 100 : 64;
+            const preferredWinWidth: number = width >= 1400 ? Math.floor(width * 0.8) : width - horizontalMargin;
+            const preferredWinHeight: number = height >= 900 ? Math.floor(height * 0.8) : height - verticalMargin;
+            const winWidth: number = Math.min(1500, preferredWinWidth, width - 40);
+            const winHeight: number = Math.min(800, preferredWinHeight, height - 40);
+            // Prefer a content width of 1200px on large screens; scale down based on workspace ratio for small screens or high-DPI displays. Compatible with Windows/macOS.
+            const preferredMinWidth: number = Math.max(960, Math.min(1200, Math.floor(width * 0.9)));
+            const preferredMinHeight: number = Math.max(600, Math.min(700, Math.floor(height * 0.9)));
+            const minWinWidth: number = Math.min(winWidth, preferredMinWidth);
+            const minWinHeight: number = Math.min(winHeight, preferredMinHeight);
 
             if (__DEV_MODEL)
                 Extensions.map(async (i: string): Promise<void> => {
@@ -36,8 +45,8 @@ class MainApp {
                 width: winWidth,
                 height: winHeight,
                 icon: 'public/favicon.ico',
-                minWidth: winWidth,
-                minHeight: winHeight,
+                minWidth: minWinWidth,
+                minHeight: minWinHeight,
                 frame: true,
                 titleBarStyle: 'hidden',
                 webPreferences: {

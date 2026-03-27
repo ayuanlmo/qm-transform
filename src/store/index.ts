@@ -2,12 +2,14 @@ import {configureStore} from '@reduxjs/toolkit';
 import AppStore from "./AppStore";
 import VTTStore from "./VTTStore";
 import ATTStore from "./ATTStore";
+import VideoConcatStore from "./VideoConcatStore";
 
 const store = configureStore({
     reducer: {
         app: AppStore,
         vtt: VTTStore,
-        att: ATTStore
+        att: ATTStore,
+        videoConcat: VideoConcatStore
     }
 });
 

@@ -182,17 +182,18 @@ class Media {
 
     /**
      * @method getCustomMediaFileName
-     * @param {string} originPath - 原始路径
-     * @param {string} rule - 规则
-     * @return {string}
+     * @param {string} originPath - Original media file path
+     * @param {string} rule - Custom naming rule with {name}, {time}, {ext}, {random}
+     * @param targetExt
+     * @return {string} - Resolved filename, may include extension when rule uses {ext}
      * @author ayuanlmo
-     * @description 自定义媒体文件名称。例如：myVideo.mp4 -> myVideo-2025520-xxx.mp4
+     * @description Custom media file name, e.g. myVideo.mp4 -> myVideo-2025520-xxx.mp4
      * **/
-    public static getCustomMediaFileName(originPath: string, rule: string): string {
+    public static getCustomMediaFileName(originPath: string, rule: string, targetExt?: string): string {
         const date: Date = new Date();
-        const ext: string = path.extname(originPath) || '.mov';
+        const ext: string = targetExt ? `.${targetExt.replace(/^\./, '')}` : (path.extname(originPath) || '.mov');
         const time: string = `${new Date().getUTCFullYear()}${date.getMonth() + 1}${date.getUTCDate()}`;
-        const baseName: string = path.basename(originPath, ext);
+        const baseName: string = path.basename(originPath, path.extname(originPath));
         const random: string = v4().split('-')[0];
 
         let res: string = rule
@@ -204,17 +205,39 @@ class Media {
         res = res.replace(/\.{2,}/g, '.');
 
         if (path.extname(res) === '')
-            return res + '.mov';
+            return res + (targetExt ? `.${targetExt.replace(/^\./, '')}` : '.mov');
 
         return res;
     }
 
     /**
+     * Get output file name for concat task based on user config.
+     * Origin: combine all source base names with hyphen.
+     * Custom: use customNameRule with first file, targetExt for output format.
+     */
+    public static getConcatOutputMediaFileName(fullPaths: string[], targetExt: string): string {
+        const appConf: IDefaultSettingConfig | null = getLocalConfigAsMain();
+        const rule = (appConf?.output?.customNameRule ?? '').trim();
+
+        if (appConf?.output?.fileNameSpase === 'custom' && fullPaths.length > 0 && rule)
+            return Media.getCustomMediaFileName(fullPaths[0], rule, targetExt);
+
+        const baseNames: string[] = fullPaths.map((p): string => {
+            const ext = path.extname(p);
+
+            return path.basename(p, ext);
+        });
+        const combined = baseNames.join('-');
+
+        return combined || `concat_${Date.now()}`;
+    }
+
+    /**
      * @method getOutputMediaFileName
-     * @param {string} fullPath - 原始路径
-     * @return {string}
+     * @param {string} fullPath - Original media file path
+     * @return {string} - Output base name, may include extension when custom rule uses {ext}
      * @author ayuanlmo
-     * @description 获取输出媒体文件名称（根据用户配置规则）。
+     * @description Get output media file name from user config rule.
      * **/
     public static getOutputMediaFileName = (fullPath: string): string => {
         const appConf: IDefaultSettingConfig | null = getLocalConfigAsMain();
@@ -226,6 +249,29 @@ class Media {
 
         return path.basename(fullPath, extName).replace(extName, '');
     };
+
+    /**
+     * Build full output path, avoiding duplicate extension when base name already contains one.
+     * @param outputDir - Output directory
+     * @param outputBaseName - Base name from getOutputMediaFileName (may already include ext)
+     * @param outputExt - Target extension (without leading dot)
+     * @return Full resolved output path
+     */
+    public static buildOutputPath(outputDir: string, outputBaseName: string, outputExt: string): string {
+        const baseExt = path.extname(outputBaseName).toLowerCase().replace(/^\./, '');
+
+        if (baseExt && baseExt === outputExt.toLowerCase()) {
+            return path.resolve(outputDir, outputBaseName);
+        }
+
+        if (baseExt) {
+            const baseWithoutExt: string = path.basename(outputBaseName, path.extname(outputBaseName));
+
+            return path.resolve(outputDir, `${baseWithoutExt}.${outputExt}`);
+        }
+
+        return path.resolve(outputDir, `${outputBaseName}.${outputExt}`);
+    }
 }
 
 export default Media;

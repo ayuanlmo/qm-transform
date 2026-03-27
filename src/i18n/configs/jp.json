@@ -55,7 +55,8 @@
     "label": "その他の設定",
     "tmpFile": "一時ファイル",
     "preventLowPowerMode": "低電力モードを防止",
-    "preventLowPowerModeDesc": "{{os}}がスリープや一時停止状態に入らないようにします。このセッションのみ有効です。"
+    "preventLowPowerModeDesc": "{{os}}がスリープや一時停止状態に入らないようにします。このセッションのみ有効です。",
+    "logLevel": "ログレベル","logLevelDesc": "メインプロセスのログ出力レベルを制御します。変更は即座に反映されます。"
   },
   "playerSetting": {
     "label": "プレイヤー設定",
@@ -202,6 +203,14 @@
     "max": "最大化",
     "hide": "最小化",
     "closeMessage": "本当に閉じますか？"
+  },
+  "videoConcat": {
+    "onlyOneVideo": "マージには少なくとも2つのビデオが必要です",
+    "startMerge": "マージ開始",
+    "pauseMerge": "一時停止",
+    "resumeMerge": "再開",
+    "mergeSuccess": "動画のマージが完了しました",
+    "mergeFailed": "マージに失敗しました"
   },
   "errMessage": {
     "label": "エラーメッセージ",

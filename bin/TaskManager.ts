@@ -7,8 +7,8 @@ interface ITaskProcess {
     pid: number;
     process?: ChildProcess;
     isPaused: boolean;
-    // 暂停时保存的信息
-    pausedAt?: number; // 暂停时的进度百分比
+    /** Progress percentage when paused */
+    pausedAt?: number;
     inputPath?: string;
     outputPath?: string;
     mediaInfo?: IMediaInfo;
@@ -25,12 +25,12 @@ class TaskManager {
     private tasks: Map<string, ITaskProcess> = new Map();
 
     /**
-     * 注册任务（在创建 ffmpeg 命令时调用）
+     * Register task (called when ffmpeg command is created)
      */
     public registerTask(taskId: string, mediaInfo: IMediaInfo, inputPath: string, outputPath: string, ctx: IpcMainEvent, ffmpegCommand?: any): void {
         const existingTask = this.tasks.get(taskId);
 
-        // 如果任务已存在且不是暂停状态，则警告（但允许继续，因为可能是重新启动）
+        // Warn if task exists and not paused (allow continue for resume scenario)
         if (existingTask && !existingTask.isPaused)
             Logger.warn(`Task ${taskId} already registered and not paused, but continuing anyway (likely resume)`);
 
@@ -43,12 +43,12 @@ class TaskManager {
             mediaInfo,
             ctx,
             ffmpegCommand,
-            pausedAt: undefined // 不再保留进度，因为不使用 -ss 参数
+            pausedAt: undefined
         });
     }
 
     /**
-     * 附加进程 PID（在 ffmpeg 启动后调用）
+     * Attach process PID (called after ffmpeg starts)
      */
     public attachPid(taskId: string, pid: number, process?: ChildProcess): void {
         const task = this.tasks.get(taskId);
@@ -64,7 +64,7 @@ class TaskManager {
     }
 
     /**
-     * 更新任务进度（用于暂停时保存进度）
+     * Update task progress (saved when pausing)
      */
     public updateProgress(taskId: string, progress: number): void {
         const task = this.tasks.get(taskId);
@@ -75,7 +75,7 @@ class TaskManager {
     }
 
     /**
-     * 暂停任务：停止进程，保存进度
+     * Pause task: suspend process, save progress
      */
     public async pauseTask(taskId: string): Promise<boolean> {
         const task = this.tasks.get(taskId);
@@ -98,21 +98,34 @@ class TaskManager {
         try {
             const platform = os.platform();
 
-            // 先设置暂停标志
             task.isPaused = true;
 
             if (platform === 'win32') {
-                // Windows: 使用 PowerShell 暂停进程
-                // 注意：Suspend-Process 可能需要管理员权限，但通常不需要
+                // Windows: use ntsuspend (NtSuspendProcess) - more reliable than PowerShell Suspend-Process
+                // PowerShell's Suspend-Process can fail silently with processes that have files open (e.g. ffmpeg)
+                try {
+                    const ntsuspend = await import('ntsuspend');
+
+                    if (ntsuspend && typeof ntsuspend.suspend === 'function') {
+                        const ok = ntsuspend.suspend(task.pid);
+
+                        if (ok) {
+                            Logger.info(`Task ${taskId} paused (PID: ${task.pid}, progress: ${task.pausedAt ?? 0}%)`);
+                            return true;
+                        }
+                        Logger.error(`ntsuspend.suspend returned false for task ${taskId} PID ${task.pid}`);
+                    }
+                } catch (ntErr) {
+                    Logger.warn(`ntsuspend not available, falling back to PowerShell:`, (ntErr as Error).message);
+                }
+                // Fallback: PowerShell Suspend-Process (may not work reliably with ffmpeg)
                 const {exec} = await import('node:child_process');
 
                 return new Promise<boolean>((resolve) => {
-                    // 使用 -NoProfile 和 -NonInteractive 避免 PowerShell 启动延迟
                     exec(`powershell -NoProfile -NonInteractive -Command "Suspend-Process -Id ${task.pid} -ErrorAction Stop"`, (error, stdout, stderr) => {
                         if (error) {
                             Logger.error(`Failed to suspend process on Windows for task ${taskId}:`, error.message);
                             Logger.error(`PowerShell stderr: ${stderr}`);
-                            // 如果暂停失败，恢复暂停标志，不杀死进程
                             task.isPaused = false;
                             resolve(false);
                         } else {
@@ -122,20 +135,19 @@ class TaskManager {
                     });
                 });
             }
-            // macOS/Linux: 使用 SIGSTOP 暂停进程（必须保持进程，只是暂停执行）
+            // macOS/Linux: use SIGSTOP to suspend process
             try {
                 task.process.kill('SIGSTOP');
                 Logger.info(`Task ${taskId} paused (PID: ${task.pid}, progress: ${task.pausedAt ?? 0}%)`);
                 return true;
             } catch (killError) {
-                // 如果发送信号失败，恢复暂停标志
                 task.isPaused = false;
                 Logger.error(`Failed to send SIGSTOP to task ${taskId}:`, killError);
                 return false;
             }
 
         } catch (error) {
-            // 如果暂停失败，恢复暂停标志
+            // Restore pause flag on failure
             task.isPaused = false;
             Logger.error(`Failed to pause task ${taskId}:`, error);
             return false;
@@ -143,7 +155,7 @@ class TaskManager {
     }
 
     /**
-     * 恢复任务：恢复暂停的进程
+     * Resume task: resume suspended process
      */
     public async resumeTask(taskId: string): Promise<boolean> {
         const task = this.tasks.get(taskId);
@@ -160,7 +172,7 @@ class TaskManager {
 
         if (!task.process) {
             Logger.warn(`Task ${taskId} has no process to resume`);
-            // 如果进程不存在，可能需要重新启动
+            // Restart if process no longer exists
             if (task.mediaInfo && task.inputPath && task.outputPath && task.ctx) {
                 Logger.info(`Task ${taskId} process not found, restarting from beginning`);
                 const TransformVideo = (await import('./TransformVideo')).default;
@@ -182,8 +194,26 @@ class TaskManager {
             const platform = os.platform();
 
             if (platform === 'win32') {
-                // Windows: 使用 PowerShell 恢复进程
+                // Windows: use ntsuspend (NtResumeProcess) - more reliable than PowerShell Resume-Process
+                try {
+                    const ntsuspend = await import('ntsuspend');
+
+                    if (ntsuspend && typeof ntsuspend.resume === 'function') {
+                        const ok = ntsuspend.resume(task.pid);
+
+                        if (ok) {
+                            task.isPaused = false;
+                            Logger.info(`Task ${taskId} resumed (PID: ${task.pid})`);
+                            return true;
+                        }
+                        Logger.error(`ntsuspend.resume returned false for task ${taskId} PID ${task.pid}`);
+                    }
+                } catch (ntErr) {
+                    Logger.warn(`ntsuspend not available for resume, falling back to PowerShell:`, (ntErr as Error).message);
+                }
+                // Fallback: PowerShell Resume-Process (may not work reliably)
                 const {exec} = await import('node:child_process');
+
                 return new Promise<boolean>((resolve) => {
                     exec(`powershell -NoProfile -NonInteractive -Command "Resume-Process -Id ${task.pid} -ErrorAction Stop"`, (error, stdout, stderr) => {
                         if (error) {
@@ -197,18 +227,18 @@ class TaskManager {
                         }
                     });
                 });
-            } else {
-                // macOS/Linux: 使用 SIGCONT 恢复进程
-                try {
-                    task.process.kill('SIGCONT');
-                    task.isPaused = false;
-                    Logger.info(`Task ${taskId} resumed (PID: ${task.pid})`);
-                    return true;
-                } catch (killError) {
-                    Logger.error(`Failed to send SIGCONT to task ${taskId}:`, killError);
-                    return false;
-                }
             }
+            // macOS/Linux: use SIGCONT to resume process
+            try {
+                task.process.kill('SIGCONT');
+                task.isPaused = false;
+                Logger.info(`Task ${taskId} resumed (PID: ${task.pid})`);
+                return true;
+            } catch (killError) {
+                Logger.error(`Failed to send SIGCONT to task ${taskId}:`, killError);
+                return false;
+            }
+
         } catch (error) {
             Logger.error(`Failed to resume task ${taskId}:`, error);
             return false;
@@ -216,7 +246,7 @@ class TaskManager {
     }
 
     /**
-     * 检查任务是否暂停
+     * Check if task is paused
      */
     public isPaused(taskId: string): boolean {
         const task = this.tasks.get(taskId);
@@ -225,14 +255,14 @@ class TaskManager {
     }
 
     /**
-     * 获取任务的暂停信息
+     * Get task info
      */
     public getTaskInfo(taskId: string): ITaskProcess | undefined {
         return this.tasks.get(taskId);
     }
 
     /**
-     * 清理任务（在任务结束或出错时调用）
+     * Cleanup task (called when task ends or errors)
      */
     public cleanup(taskId: string): void {
         this.tasks.delete(taskId);

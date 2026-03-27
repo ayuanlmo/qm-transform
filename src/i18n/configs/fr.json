@@ -55,7 +55,8 @@
     "label": "Autres paramètres",
     "tmpFile": "Fichiers temporaires",
     "preventLowPowerMode": "Empêcher le mode économie d'énergie",
-    "preventLowPowerModeDesc": "Empêche {{os}} de passer en veille ou en état suspendu, uniquement pour cette session."
+    "preventLowPowerModeDesc": "Empêche {{os}} de passer en veille ou en état suspendu, uniquement pour cette session.",
+    "logLevel": "Niveau de journal","logLevelDesc": "Contrôle le niveau de sortie des journaux du processus principal. Les modifications prennent effet immédiatement."
   },
   "playerSetting": {
     "label": "Paramètres du lecteur",
@@ -202,6 +203,14 @@
     "max": "Maximiser",
     "hide": "Minimiser",
     "closeMessage": "Voulez-vous vraiment fermer ?"
+  },
+  "videoConcat": {
+    "onlyOneVideo": "Au moins 2 vidéos requises pour fusionner",
+    "startMerge": "Démarrer la fusion",
+    "pauseMerge": "Pause",
+    "resumeMerge": "Reprendre",
+    "mergeSuccess": "Vidéos fusionnées avec succès",
+    "mergeFailed": "Échec de la fusion"
   },
   "errMessage": {
     "label": "Message d'erreur",

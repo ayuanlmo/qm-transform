@@ -8,6 +8,9 @@ import SysIpc from "./SysIpc";
 import TaskIpc from "./TaskIpc";
 import AppUpdate from "../bin/AppUpdate";
 import packageJSON from "../package.json";
+import Logger from "../lib/Logger";
+import {getLocalConfigAsMain} from "../bin/Conf";
+import {LogLevel} from "electron-log";
 
 /**
  * @class MainIpcHandles
@@ -39,12 +42,21 @@ class MainIpcHandles {
         this.window = window;
         this.appUpdate = appUpdate;
         this.pmc = new PowerManagementIpc();
+        this.applyLogLevelFromConfig();
         this.initHandles();
         new WindowStatusIpc(window);
         new AppDirectoryDialogIpc(window);
         new ExternalUrlIpc();
         new SysIpc();
         new TaskIpc();
+    }
+
+    private applyLogLevelFromConfig(): void {
+        const conf = getLocalConfigAsMain();
+        const level: LogLevel = (conf?.other?.logLevel ?? 'info') as LogLevel;
+
+        Logger.transports.file.level = level;
+        Logger.transports.console.level = level;
     }
 
     private initHandles(): void {
@@ -54,6 +66,10 @@ class MainIpcHandles {
         });
         ipcMain.on('main:on:check-for-updates', (): void => {
             this.appUpdate?.checkForUpdates();
+        });
+        ipcMain.on('window:on:set-log-level', (_event: IpcMainEvent, level: LogLevel): void => {
+            Logger.transports.file.level = level;
+            Logger.transports.console.level = level;
         });
     }
 

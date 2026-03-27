@@ -55,7 +55,9 @@
     "label": "其他設定",
     "tmpFile": "臨時檔案",
     "preventLowPowerMode": "阻止低耗電模式",
-    "preventLowPowerModeDesc": "阻止 {{os}} 進入待機、暫停等狀態，只在本次使用期間生效"
+    "preventLowPowerModeDesc": "阻止 {{os}} 進入待機、暫停等狀態，只在本次使用期間生效",
+    "logLevel": "日誌級別",
+    "logLevelDesc": "控制主進程日誌輸出級別，修改後立即生效"
   },
   "playerSetting": {
     "label": "播放器設定",
@@ -202,6 +204,14 @@
     "max": "最大化",
     "hide": "最小化",
     "closeMessage": "你確定要關閉嗎？"
+  },
+  "videoConcat": {
+    "onlyOneVideo": "至少需要 2 個影片才能合併",
+    "startMerge": "開始合併",
+    "pauseMerge": "暫停",
+    "resumeMerge": "繼續",
+    "mergeSuccess": "影片合併成功",
+    "mergeFailed": "合併失敗"
   },
   "errMessage": {
     "label": "錯誤訊息",

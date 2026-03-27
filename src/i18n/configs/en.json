@@ -56,7 +56,9 @@
     "label": "Other Settings",
     "tmpFile": "Temporary Files",
     "preventLowPowerMode": "Prevent Low Power Mode",
-    "preventLowPowerModeDesc": "Prevents Windows from entering standby or suspended states, effective only for this session"
+    "preventLowPowerModeDesc": "Prevents Windows from entering standby or suspended states, effective only for this session",
+    "logLevel": "Log Level",
+    "logLevelDesc": "Controls the main process log output level. Changes take effect immediately."
   },
   "playerSetting": {
     "label": "Player Settings",
@@ -208,6 +210,14 @@
     "max": "Maximize",
     "hide": "Minimize",
     "closeMessage": "Are you sure you want to close?"
+  },
+  "videoConcat": {
+    "onlyOneVideo": "At least 2 videos required to merge",
+    "startMerge": "Start Merge",
+    "pauseMerge": "Pause",
+    "resumeMerge": "Resume",
+    "mergeSuccess": "Video merged successfully",
+    "mergeFailed": "Merge failed"
   },
   "errMessage": {
     "label": "Error Message",
