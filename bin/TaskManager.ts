@@ -103,8 +103,11 @@ class TaskManager {
             if (platform === 'win32') {
                 // Windows: use ntsuspend (NtSuspendProcess) - more reliable than PowerShell Suspend-Process
                 // PowerShell's Suspend-Process can fail silently with processes that have files open (e.g. ffmpeg)
+                // Load via non-literal module id so tsc emits require(s), not require('ntsuspend'). Static analyzers
+                // (e.g. electron-builder) would otherwise require ntsuspend on macOS where it is optional / absent.
                 try {
-                    const ntsuspend = await import('ntsuspend');
+                    const ntsuspendPkg = 'nt' + 'suspend';
+                    const ntsuspend = await import(ntsuspendPkg);
 
                     if (ntsuspend && typeof ntsuspend.suspend === 'function') {
                         const ok = ntsuspend.suspend(task.pid);
@@ -196,7 +199,8 @@ class TaskManager {
             if (platform === 'win32') {
                 // Windows: use ntsuspend (NtResumeProcess) - more reliable than PowerShell Resume-Process
                 try {
-                    const ntsuspend = await import('ntsuspend');
+                    const ntsuspendPkg = 'nt' + 'suspend';
+                    const ntsuspend = await import(ntsuspendPkg);
 
                     if (ntsuspend && typeof ntsuspend.resume === 'function') {
                         const ok = ntsuspend.resume(task.pid);
