@@ -6,6 +6,7 @@ import {basename} from "path";
 import Media from "../bin/Media";
 import Player from "./MediaPlayerIpc";
 import {platform} from "node:os";
+import {pathToFileURL} from "node:url";
 
 interface IGetMediaInfo {
     id: string;
@@ -24,7 +25,7 @@ export class MediaIpcMainHandles {
         ipcMain.on('main:on:player', (event, data: string): void => {
             Player(data, event);
         });
-        ipcMain.on('window:on:test-media-name', (event,{path, rule}) => {
+        ipcMain.on('window:on:test-media-name', (event, {path, rule}) => {
             event.reply('window:on:test-media-name', Media.getCustomMediaFileName(path, rule));
         });
     }
@@ -53,7 +54,7 @@ export class MediaIpcMainHandles {
                 const cover: string | undefined = isVideo ? await Ffmpeg.getVideoMediaFirstFrame(mediaFile.path, ctx) : isAudio ? await Ffmpeg.getAudioVisualizationDiagram(mediaFile.path, ctx) : '';
 
                 medias.push({
-                    cover: platform() === 'darwin' ? `file://${cover}` : cover,
+                    cover: cover ? pathToFileURL(cover).href : '',
                     id: mediaFile.id,
                     baseName: basename(mediaFile.path),
                     fullPath: mediaFile.path,
