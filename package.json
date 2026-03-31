@@ -11,7 +11,8 @@
   "packageManager": "pnpm@10.4.1",
   "os": [
     "darwin",
-    "win32"
+    "win32",
+    "linux"
   ],
   "cpu": [
     "x64",
@@ -68,6 +69,24 @@
           "target": "dmg",
           "arch": [
             "arm64"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "icon": "public/icon.png",
+      "category": "Utility",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
           ]
         }
       ]
