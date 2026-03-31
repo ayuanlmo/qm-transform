@@ -128,6 +128,13 @@ const licenseData = [
         copyright: 'Copyright (c) 2014-2025 Sebastian Hildebrandt',
         license: 'MIT License',
         licenseUrl: '/sebhildebrandt/systeminformation/blob/master/LICENSE'
+    },
+    {
+        name: 'ntsuspend',
+        url: '/federicocarboni/node-ntsuspend',
+        copyright: 'Copyright (c) 2020 Federico Carboni',
+        license: 'MIT License',
+        licenseUrl: '/federicocarboni/node-ntsuspend/blob/master/LICENSE'
     }
 ];
 
