@@ -111,6 +111,7 @@
       "batchRunning": "処理中: {{current}} / {{total}}",
       "showInExplorer": "エクスプローラーで表示",
       "showInFinder": "Finderで表示",
+      "showInFileManager": "ファイルマネージャーで表示",
       "addTitle": "タイトルを追加",
       "addCredits": "クレジットを追加",
       "videoFps": "動画フレームレート",

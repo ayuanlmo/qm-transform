@@ -25,9 +25,9 @@ import {Dispatch} from "@reduxjs/toolkit";
 import {setCurrentSettingConfig} from "../../store/AppStore";
 import {sendIpcMessage} from "../../bin/IPC";
 import {useMainEventListener} from "../../bin/Hooks";
+import {getShowInSystemFileManagerI18nKey} from "../../utils";
 import {pathParse} from "../../utils/Global";
 import YExtendTemplate from "../YExtendTemplate";
-import AppConfig from "../../conf/AppConfig";
 
 export const gpuCodes = new Map<TGPUVendors, string>([
     ['AMD', 'amf'],
@@ -41,8 +41,7 @@ const selectOutputEventName = 'window:on:select-output-path';
 const getGPUNameEventName = 'window:on:get-gpu-name';
 const fileRules = ['name', 'ext', 'time', 'random'];
 const getCustomMediaFileNameEventName = 'window:on:test-media-name';
-const isWin32 = AppConfig.platform === 'win32';
-const openInSystemLabel: string = isWin32 ? 'mediaFile.options.showInExplorer' : 'mediaFile.options.showInFinder';
+const openInSystemLabel: string = getShowInSystemFileManagerI18nKey();
 
 const OutputSetting: React.FC = (): React.JSX.Element => {
     const {t} = useTranslation();

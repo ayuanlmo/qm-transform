@@ -113,6 +113,7 @@
       "batchRunning": "Running: {{current}} / {{total}}",
       "showInExplorer": "Show in Explorer",
       "showInFinder": "Show in Finder",
+      "showInFileManager": "Show in File Manager",
       "addTitle": "Add Title",
       "addCredits": "Add Credits",
       "videoFps": "Video FPS",

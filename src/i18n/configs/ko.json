@@ -111,6 +111,7 @@
       "batchRunning": "진행 중: {{current}} / {{total}}",
       "showInExplorer": "탐색기에서 표시",
       "showInFinder": "파인더에서 표시",
+      "showInFileManager": "파일 관리자에서 표시",
       "addTitle": "타이틀 추가",
       "addCredits": "크레딧 추가",
       "videoFps": "비디오 프레임 속도(FPS)",

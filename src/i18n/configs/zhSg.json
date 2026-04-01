@@ -113,6 +113,7 @@
       "batchRunning": "进行中：{{current}}/{{total}}",
       "showInExplorer": "在档案总管显示",
       "showInFinder": "在Finder显示",
+      "showInFileManager": "在文件管理器中显示",
       "addTitle": "添加片头",
       "addCredits": "添加片尾",
       "videoFps": "视频帧率",

@@ -111,6 +111,7 @@
       "batchRunning": "Käynnissä: {{current}} / {{total}}",
       "showInExplorer": "Näytä Resurssienhallinnassa",
       "showInFinder": "Näytä Finderissa",
+      "showInFileManager": "Näytä tiedostonhallinnassa",
       "addTitle": "Lisää intro",
       "addCredits": "Lisää lopputekstit",
       "videoFps": "Videon FPS",

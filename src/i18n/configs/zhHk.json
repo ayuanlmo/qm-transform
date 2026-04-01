@@ -112,6 +112,7 @@
       "batchRunning": "處理中：{{current}}/{{total}}",
       "showInExplorer": "在資源管理員顯示",
       "showInFinder": "在 Finder 顯示",
+      "showInFileManager": "在檔案管理員顯示",
       "addTitle": "新增片頭",
       "addCredits": "新增片尾",
       "videoFps": "影片幀率",

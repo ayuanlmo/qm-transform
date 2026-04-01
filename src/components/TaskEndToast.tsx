@@ -3,12 +3,8 @@ import Toast, {ToastProgressBar} from "./FluentTemplates/Toast";
 import {Link, Toaster, useId, useToastController} from "@fluentui/react-components";
 import * as React from "react";
 import {useTranslation} from "react-i18next";
-import {getUUID} from "../utils";
+import {getShowInSystemFileManagerI18nKey, getUUID} from "../utils";
 import {sendIpcMessage} from "../bin/IPC";
-import Global from "../utils/Global";
-import type OS from "os";
-
-const os = Global.requireNodeModule<typeof OS>('os');
 
 export interface ITaskEndMessage {
     id: string;
@@ -26,8 +22,7 @@ const TaskEndToast = () => {
         const {baseName, path} = data;
         const tid: string = getUUID();
 
-        const isWin32: boolean = os.platform() === 'win32';
-        const openInSystemLabel: string = isWin32 ? t('mediaFile.options.showInExplorer') : t('mediaFile.options.showInFinder');
+        const openInSystemLabel: string = t(getShowInSystemFileManagerI18nKey());
 
         dispatchToast(
             <Toast

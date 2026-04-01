@@ -111,6 +111,7 @@
       "batchRunning": "Läuft: {{current}} / {{total}}",
       "showInExplorer": "Im Explorer anzeigen",
       "showInFinder": "Im Finder anzeigen",
+      "showInFileManager": "Im Dateimanager anzeigen",
       "addTitle": "Intro hinzufügen",
       "addCredits": "Abspann hinzufügen",
       "videoFps": "Video-FPS",

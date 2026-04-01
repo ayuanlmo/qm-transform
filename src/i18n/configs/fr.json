@@ -111,6 +111,7 @@
       "batchRunning": "En cours : {{current}} / {{total}}",
       "showInExplorer": "Afficher dans l'Explorateur",
       "showInFinder": "Afficher dans le Finder",
+      "showInFileManager": "Afficher dans le gestionnaire de fichiers",
       "addTitle": "Ajouter un générique de début",
       "addCredits": "Ajouter un générique de fin",
       "videoFps": "FPS vidéo",

@@ -95,6 +95,7 @@
       "batchRunning": "Выполняется: {{current}} / {{total}}",
       "showInExplorer": "Показать в проводнике",
       "showInFinder": "Показать в Finder",
+      "showInFileManager": "Показать в файловом менеджере",
       "addTitle": "Добавить титры",
       "addCredits": "Добавить финальные титры",
       "videoFps": "Видео FPS",
