@@ -48,7 +48,8 @@ class MainApp {
                 minWidth: minWinWidth,
                 minHeight: minWinHeight,
                 frame: true,
-                titleBarStyle: 'hidden',
+                titleBarStyle: platform() === 'linux' ? 'default' : 'hidden',
+                autoHideMenuBar: platform() === 'linux',
                 webPreferences: {
                     nodeIntegration: true,
                     webSecurity: false,
