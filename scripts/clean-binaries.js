@@ -4,7 +4,7 @@ const {join} = require('path');
 const {platform, arch} = process;
 
 const packages = ['ffprobe-static'];
-const nodeModulesPath = join(__dirname, 'node_modules');
+const nodeModulesPath = join(__dirname, '..', 'node_modules');
 
 const removeDir = (dir) => {
     try {
@@ -33,7 +33,7 @@ void (() => {
                     const dirs = readdirSync(binPath);
 
                     dirs.forEach((dir) => {
-                        const resultPlatform = path.join(binPath, dir);
+                        const resultPlatform = join(binPath, dir);
                         const stat = statSync(resultPlatform);
 
                         if (stat.isDirectory()) {
