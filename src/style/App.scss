@@ -566,6 +566,22 @@
     margin: 1.25rem 0;
   }
 
+  .app-about-runtime {
+    text-align: left;
+    max-width: 28rem;
+    margin: 0 auto 1.25rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    border-radius: 4px;
+    background: var(--colorNeutralBackground3);
+    color: var(--colorNeutralForeground2);
+
+    p {
+      margin: 0.2rem 0;
+    }
+  }
+
   .app-about-update {
     display: flex;
     justify-content: center;

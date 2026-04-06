@@ -9,7 +9,7 @@ import {
     useState
 } from "react";
 import Dialog from "../FluentTemplates/Dialog";
-import {Button, Divider, Link, Tag} from "@fluentui/react-components";
+import {Button, Divider, Link, Tag, Text} from "@fluentui/react-components";
 import {useTranslation} from "react-i18next";
 import {useMainEventListener} from "../../bin/Hooks";
 import AppLicenseNotices, {IAppLicenseNoticesProps} from "./AppLicenseNotices";
@@ -18,6 +18,10 @@ import AppConfig from "../../conf/AppConfig";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {sendIpcMessage} from "../../bin/IPC";
+import Global from "../../utils/Global";
+import type OS from "node:os";
+
+const os = Global.requireNodeModule<typeof OS>("os");
 
 export interface IAboutRef {
     open: () => void;
@@ -65,6 +69,26 @@ const About: ForwardRefExoticComponent<RefAttributes<IAboutRef>> = forwardRef((_
                             {AppConfig.arch.toUpperCase()}
                         </Tag>
                     </p>
+                    <div className="app-about-runtime">
+                        <Text as="p" size={200} block>
+                            OS: {os.type()} / {os.release()}
+                        </Text>
+                        <Text as="p" size={200} block>
+                            Node.js: {process.versions.node}
+                        </Text>
+                        <Text as="p" size={200} block>
+                            Electron: {process.versions.electron ?? '—'}
+                        </Text>
+                        <Text as="p" size={200} block>
+                            Chromium: {process.versions.chrome ?? '—'}
+                        </Text>
+                        <Text as="p" size={200} block>
+                            V8: {process.versions.v8 ?? '—'}
+                        </Text>
+                        <Text as="p" size={200} block>
+                            User: {os.userInfo().username}
+                        </Text>
+                    </div>
                     <div className="app-about-update">
                         <Button onClick={(): void => {
                             sendIpcMessage('main:on:check-for-updates');
