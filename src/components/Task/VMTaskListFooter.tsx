@@ -159,6 +159,15 @@ const VMTaskListFooter: React.FC = (): React.JSX.Element => {
 
     return (
         <div className="task-list-footer vc-task-list-footer">
+            {isRunning &&
+                <div className="vc-concat-progress-bar">
+                    <ProgressBar
+                        max={100}
+                        thickness="large"
+                        value={Math.min(100, Math.max(0, vcConcatProgress))}
+                    />
+                </div>
+            }
             <div className="task-list-footer-content app_flex_box">
                 <div className="app_flex_box">
                     <div className="task-list-footer-item">
@@ -245,15 +254,6 @@ const VMTaskListFooter: React.FC = (): React.JSX.Element => {
                     }
                 </div>
             </div>
-            {isRunning &&
-                <div className="vc-concat-progress-bar">
-                    <ProgressBar
-                        max={100}
-                        thickness="large"
-                        value={Math.min(100, Math.max(0, vcConcatProgress))}
-                    />
-                </div>
-            }
         </div>
     );
 };

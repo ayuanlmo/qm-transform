@@ -175,8 +175,7 @@
           }
 
           .task-item-media-info-progress-bar {
-            //bottom: 0;
-            top: -10px;
+            bottom: 0;
             width: 100%;
           }
         }
@@ -247,11 +246,6 @@
       display: flex;
       flex-direction: column;
       align-items: stretch;
-
-      .vc-concat-progress-bar {
-        position: relative;
-        top: -.25rem;
-      }
     }
 
     .task-list-footer-content {
