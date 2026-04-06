@@ -27,7 +27,10 @@ import {sendIpcMessage} from "../../bin/IPC";
 import {useMainEventListener} from "../../bin/Hooks";
 import {getShowInSystemFileManagerI18nKey} from "../../utils";
 import {pathParse} from "../../utils/Global";
+import AppConfig from "../../conf/AppConfig";
 import YExtendTemplate from "../YExtendTemplate";
+
+const isLinux: boolean = AppConfig.platform === 'linux';
 
 export const gpuCodes = new Map<TGPUVendors, string>([
     ['AMD', 'amf'],
@@ -73,6 +76,16 @@ const OutputSetting: React.FC = (): React.JSX.Element => {
 
     useMainEventListener(getGPUNameEventName, (data: TGPUVendors): void => {
         setDetectedGpu(data);
+
+        if (isLinux) {
+            if (currentSettingConfig.output.codecType === 'GPU')
+                setConfig({
+                    codecType: 'CPU',
+                    codecMethod: ''
+                });
+            return;
+        }
+
         const code = gpuCodes.get(data);
 
         if (data === 'unknown') {
@@ -122,6 +135,15 @@ const OutputSetting: React.FC = (): React.JSX.Element => {
     useEffect(() => {
         sendIpcMessage(getGPUNameEventName);
     }, []);
+
+    useEffect(() => {
+        if (!isLinux) return;
+        if (currentSettingConfig.output.codecType === 'GPU')
+            setConfig({
+                codecType: 'CPU',
+                codecMethod: ''
+            });
+    }, [currentSettingConfig.output.codecType]);
 
     useEffect(() => {
         sendIpcMessage(getCustomMediaFileNameEventName, {
@@ -261,7 +283,7 @@ const OutputSetting: React.FC = (): React.JSX.Element => {
                         </Label>
                         <div>
                             <Select
-                                value={currentSettingConfig.output.codecType}
+                                value={isLinux ? 'CPU' : currentSettingConfig.output.codecType}
                                 onChange={(ev, {value}): void => {
                                     const nextConfig: Record<string, string> = {
                                         codecType: value
@@ -274,9 +296,12 @@ const OutputSetting: React.FC = (): React.JSX.Element => {
                                         ...nextConfig
                                     });
                                 }}
+                                disabled={isLinux}
                             >
                                 <option value={'CPU'}>CPU ({t('outputSetting.softwareDecoding')})</option>
-                                <option value={'GPU'}>GPU ({t('outputSetting.hardwareDecoding')})</option>
+                                {!isLinux &&
+                                    <option value={'GPU'}>GPU ({t('outputSetting.hardwareDecoding')})</option>
+                                }
                             </Select>
                         </div>
                         <div className={'system-setting-item-content-divider'}>
@@ -288,7 +313,7 @@ const OutputSetting: React.FC = (): React.JSX.Element => {
                             </Divider>
                         </div>
                     </div>
-                    <YExtendTemplate show={currentSettingConfig.output.codecType === 'GPU' && detectedGpu !== 'unknown'}>
+                    <YExtendTemplate show={!isLinux && currentSettingConfig.output.codecType === 'GPU' && detectedGpu !== 'unknown'}>
                         <div
                             className={`system-setting-item animated ${currentSettingConfig.output.codecType === 'GPU' ? 'zoomIn' : 'zoomOut'}`}>
                             <Label>

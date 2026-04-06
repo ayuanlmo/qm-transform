@@ -101,7 +101,8 @@ class ConcatVideo {
 
         let hardwareEncoderSuffix: string | null = null;
         const codec = (options.codec || 'h264').toLowerCase();
-        const gpuAccelerationFromConfig: boolean = appConf?.output?.codecType === 'GPU';
+        const gpuAccelerationFromConfig: boolean =
+            appConf?.output?.codecType === 'GPU' && os.platform() !== 'linux';
 
         if (gpuAccelerationFromConfig && (codec === 'h264' || codec === 'hevc')) {
             const methodRaw = (appConf?.output?.codecMethod || '').toLowerCase();

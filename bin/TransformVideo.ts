@@ -321,7 +321,8 @@ class TransformVideo {
         appConf: IDefaultSettingConfig
     ): VideoEncodingMeta {
         // 从配置中获取 GPU 加速设置，确保不被 media.videoParams 覆盖
-        const gpuAccelerationFromConfig: boolean = appConf?.output?.codecType === 'GPU';
+        const gpuAccelerationFromConfig: boolean =
+            appConf?.output?.codecType === 'GPU' && os.platform() !== 'linux';
         const hardwareEncoderFromConfig: string | undefined = appConf?.output?.codecMethod;
 
         // 合并参数：优先使用配置中的 GPU 设置，然后使用 media.videoParams 的其他参数
