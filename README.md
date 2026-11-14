@@ -231,6 +231,44 @@ Requirements and gotchas for the MSIX channel:
 - Don't run `pnpm start` while packaging, and exclude `dist/` and `out/` from your IDE's indexer — both hold
   open handles on the packaged `app.asar`
 
+### Release artifacts
+
+Publishing a Release runs `.github/workflows/release.yml`: Windows (NSIS), macOS (arm64 dmg) and Linux
+(AppImage + deb) build in parallel, and CI attaches every file to that Release verbatim. The MSIX is not part of
+it — that channel is packaged locally and handed to Partner Center.
+
+The version comes from the Release itself: its name when the name is a plain `x.y.z`, otherwise its tag (a
+leading `v` is ignored). CI writes that version into `package.json` before building, so the installer names, the
+running app version and the update metadata always agree:
+
+- `QM-Transform.Setup.<version>.exe`
+- `QM-Transform-<version>-arm64.dmg`
+
+A pre-release is rejected before anything is built: `electron-updater` reads `/releases/latest`, which never
+lists pre-releases, so there would be nothing to deliver. The repo's `version` no longer has to match the tag —
+the Release decides.
+
+Publishing first and building second leaves the Release without binaries for a few minutes. That gap is safe:
+with no `latest.yml` in the assets the app reports "no updates" instead of offering a partial build. Shipping
+installers without their `latest*.yml` is exactly what broke in-app updates here earlier, which is why CI, not a
+person, uploads them.
+
+The dmg is built on a macOS runner and is never notarized — notarization costs an Apple Developer subscription,
+which this project does not have — so at best it carries an ad-hoc signature. After downloading, open it via
+right-click → Open the first time.
+
+### Testing the update flow locally
+
+```bash
+pnpm run serve:updates        # serve dist/ as if it were the release
+pnpm run start:update-test    # dev app, update source = http://127.0.0.1:8099
+```
+
+`serve:updates` refuses to start when `dist/` has no `latest.yml`, and warns when that file names an installer
+that is not in the directory. For an update to be offered, the served version must be newer than the local one;
+`QM_UPDATE_FAKE_VERSION=9.9.9 pnpm run serve:updates` rewrites the version line only, so the installer checksum
+keeps validating.
+
 ### Installing a test build on Windows
 
 ```bash
@@ -238,14 +276,40 @@ pnpm run make:msix
 pnpm run sign:msix
 ```
 
-`sign:msix` reads the publisher out of the package manifest, creates a matching development certificate if
-you don't have one (`dist/msix/devcert.pfx`), signs the package, and prints the `Add-AppxPackage` command
-plus the one-time command to put `devcert.cer` into `TrustedPeople`. It needs `signtool` from the Windows
-SDK (`QM_SIGNTOOL` overrides where it is looked for).
+`sign:msix` reads the package identity out of the manifest, refuses to sign a package whose `Name`/`Publisher`
+differ from `forge.config.js` (an artifact built before the identity was fixed would otherwise get signed and
+uploaded anyway), creates a matching development certificate if you don't have one (`dist/msix/devcert.pfx`),
+signs the package, and prints the `Add-AppxPackage` command plus the one-time command to put `devcert.cer` into
+`TrustedPeople`. It needs `signtool` from the Windows SDK (`QM_SIGNTOOL` overrides where it is looked for).
 
-A package for Store submission stays **unsigned** — Partner Center signs it. Set the identity from your
-Store listing before building it:
+A package for Store submission stays **unsigned** — Partner Center signs it. The identity in `forge.config.js`
+is already the one reserved in the Store dashboard:
+
+| Manifest field | Value |
+| --- | --- |
+| `Package/Identity/Name` | `ayuanlmo.QM-Transform` |
+| `Package/Identity/Publisher` | `CN=56A54446-5F53-4BB5-A40B-063D78E4B992` |
+| `Package/Properties/PublisherDisplayName` | `ayuanlmo` |
+
+`Package Family Name` (`ayuanlmo.QM-Transform_k7w7p975xr2dt`) is not configured anywhere — Windows derives it
+from the name plus a hash of the publisher. Override the two identity fields only when the reserved values change:
 
 ```bash
 QM_MSIX_IDENTITY=<product identity> QM_MSIX_PUBLISHER=<publisher CN> pnpm run make:msix
 ```
+
+### Electron locales in the package
+
+Chromium ships ~55 `locales/*.pak` files (42 MB) holding its own UI strings — context menus, role-based menu
+items, and similar. They are unrelated to the app's own i18n, so both packaging channels keep only the languages
+the app actually offers, listed once in `package.json` (`build.win.electronLanguages`), which `forge.config.js`
+reads for the MSIX channel:
+
+```bash
+pnpm run make:msix   # [forge] locales: removed 46, kept 9
+```
+
+`en-US` is always kept: it is the fallback Chromium uses when a pak is missing. Users on a system language that
+was dropped see English native menus — the app's own interface still follows its language setting. The Store
+listing is unaffected either way: the manifest declares a single `<Resource Language="en-US" />`, and the
+languages Partner Center asks about come from the listing settings, not from this directory.

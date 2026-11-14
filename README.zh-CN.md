@@ -226,6 +226,38 @@ MSIX 通道的要求和已知的坑：
 - 打包需要跟 `dist/` 同卷的暂存目录，可用 `QM_PACKAGER_TMPDIR` 指定
 - 打包时别开着 `pnpm start`，并把 `dist/`、`out/` 从 IDE 索引里排除——它们会占着打好的 `app.asar` 不放
 
+### 发布产物
+
+Publish 一个 Release 会触发 `.github/workflows/release.yml`：Windows（NSIS）、macOS（arm64 dmg）、Linux（AppImage + deb）
+并行构建，产物原样回填到这一个 Release，不改名。MSIX 不在这条链上——它走本机打包，再由人工提交 Partner Center。
+
+版本号取自这个 Release 本身：Release 名称是 `x.y.z` 就用它，否则退回 tag（两者都忽略开头的 `v`）。CI 在构建前把它
+写进 `package.json`，所以安装包文件名、应用内版本号和更新元数据始终一致：
+
+- `QM-Transform.Setup.<版本号>.exe`
+- `QM-Transform-<版本号>-arm64.dmg`
+
+勾了 Pre-release 的 Release 在构建之前就会被拒：electron-updater 读 `/releases/latest`，那里从不列预发布版本，
+构建出来也没有人会收到。仓库里的 `version` 不再需要等于 tag——版本号由这个 Release 决定。
+
+先 Publish、后构建，意味着 Release 有几分钟看不到安装包。这个空窗是安全的：资产里没有 `latest.yml` 时，应用报
+「暂无更新」，不会把人导向半份构建。反过来，只传安装包不传 `latest*.yml` 正是本项目更新链坏掉的原因，所以这件事
+交给 CI 而不是人。
+
+dmg 在 macOS runner 上构建，从未做过公证——公证要 Apple Developer 年费，本项目承担不起——所以最好也只有
+ad-hoc 签名。下载后第一次需要用右键 → 打开绕过 Gatekeeper。
+
+### 本机验证更新流程
+
+```bash
+pnpm run serve:updates        # 把 dist/ 当成 Release 目录来提供
+pnpm run start:update-test    # 开发环境启动，更新源指向 http://127.0.0.1:8099
+```
+
+`dist/` 里没有 `latest.yml` 时 `serve:updates` 直接拒绝启动；`latest.yml` 指着一个目录里不存在的安装包也会告警。
+要让它报出新版本，被检查的版本号必须比本机的高，用
+`QM_UPDATE_FAKE_VERSION=9.9.9 pnpm run serve:updates` 只改版本号那一行，安装包的 sha512 校验照旧成立。
+
 ### 本机安装测试包
 
 ```bash
@@ -233,12 +265,36 @@ pnpm run make:msix
 pnpm run sign:msix
 ```
 
-`sign:msix` 会从包里读出清单的发布者，本机没有对应证书就现签一张（产出 `dist/msix/devcert.pfx`），签名后
-打印出 `Add-AppxPackage` 命令，以及把 `devcert.cer` 导入 `TrustedPeople` 的那条一次性命令。
+`sign:msix` 会从包里读出清单的包身份，**和 `forge.config.js` 对不上就拒绝签名**（否则改身份之前构建出来的
+旧包照样会被签好传上去），本机没有对应证书就现签一张（产出 `dist/msix/devcert.pfx`），签名后打印出
+`Add-AppxPackage` 命令，以及把 `devcert.cer` 导入 `TrustedPeople` 的那条一次性命令。
 它需要 Windows SDK 里的 `signtool`，路径可以用 `QM_SIGNTOOL` 覆盖。
 
-提交商店的包 **不签名**，由 Partner Center 代签。出这种包之前要把标识换成商店后台给的值：
+提交商店的包 **不签名**，由 Partner Center 代签。`forge.config.js` 里的包身份已经是商店后台保留的那一组：
+
+| 清单字段 | 值 |
+| --- | --- |
+| `Package/Identity/Name` | `ayuanlmo.QM-Transform` |
+| `Package/Identity/Publisher` | `CN=56A54446-5F53-4BB5-A40B-063D78E4B992` |
+| `Package/Properties/PublisherDisplayName` | `ayuanlmo` |
+
+`Package Family Name`（`ayuanlmo.QM-Transform_k7w7p975xr2dt`）不在任何配置里：它由包名加发布者 DN 的哈希
+算出来。只有保留值变了才需要覆盖：
 
 ```bash
 QM_MSIX_IDENTITY=<产品标识> QM_MSIX_PUBLISHER=<发布者 CN> pnpm run make:msix
 ```
+
+### 包里的 Chromium 语言包
+
+Electron 自带 55 个 `locales/*.pak`（42MB），装的是 Chromium 自己的界面文案——右键菜单、`role` 菜单项那一类，
+和应用自己的 i18n 无关。两条打包通道都只保留应用真正提供的语言，清单写在 `package.json`
+的 `build.win.electronLanguages` 一处，`forge.config.js` 读同一份去裁 MSIX：
+
+```bash
+pnpm run make:msix   # [forge] locales: removed 46, kept en-US, de, fi, fr, ja, ko, ru, zh-CN, zh-TW
+```
+
+`en-US` 永远保留：pak 缺失时 Chromium 回落的就是它。系统语言落在被裁掉的那批里，原生菜单会显示英文，
+应用自己的界面仍跟随应用的语言设置。商店那边与此无关：清单只声明了 `<Resource Language="en-US" />`，
+Partner Center 要填哪些语言由商店列表设置决定，不会因为多带 46 个 pak 就多要一种。
