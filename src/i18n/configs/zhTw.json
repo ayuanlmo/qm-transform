@@ -84,6 +84,9 @@
     "downloaded": "更新已下載完成，是否立即重新啟動應用程式以完成更新？",
     "restartNow": "立即重啟",
     "restartLater": "稍後重啟",
+    "downloadNow": "立即下載",
+    "later": "稍後",
+    "tasksRunning": "有任務正在轉換，請等待完成後再重啟以套用更新。",
     "error": {
       "network": "網路連線失敗，請檢查您的網路設定。",
       "server": "更新伺服器錯誤，請稍後重試。",

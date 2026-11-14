@@ -83,6 +83,9 @@
     "downloaded": "La mise à jour a été téléchargée. Voulez-vous redémarrer l'application maintenant pour l'appliquer ?",
     "restartNow": "Redémarrer maintenant",
     "restartLater": "Redémarrer plus tard",
+    "downloadNow": "Télécharger maintenant",
+    "later": "Plus tard",
+    "tasksRunning": "Une conversion est encore en cours. Attendez sa fin avant de redémarrer pour appliquer la mise à jour.",
     "error": {
       "network": "Échec de la connexion réseau. Veuillez vérifier vos paramètres réseau.",
       "server": "Erreur du serveur de mise à jour. Veuillez réessayer plus tard.",

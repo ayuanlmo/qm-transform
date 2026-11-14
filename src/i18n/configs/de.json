@@ -83,6 +83,9 @@
     "downloaded": "Das Update wurde heruntergeladen. Möchten Sie die Anwendung jetzt neu starten, um es anzuwenden?",
     "restartNow": "Jetzt neu starten",
     "restartLater": "Später neu starten",
+    "downloadNow": "Jetzt herunterladen",
+    "later": "Später",
+    "tasksRunning": "Es läuft noch eine Konvertierung. Warten Sie, bis sie beendet ist, bevor Sie für das Update neu starten.",
     "error": {
       "network": "Netzwerkverbindung fehlgeschlagen. Bitte überprüfen Sie Ihre Netzwerkeinstellungen.",
       "server": "Update-Serverfehler. Bitte versuchen Sie es später erneut.",

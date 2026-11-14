@@ -85,6 +85,9 @@
     "downloaded": "Update downloaded successfully. Do you want to restart the application now to apply the update?",
     "restartNow": "Restart Now",
     "restartLater": "Restart Later",
+    "downloadNow": "Download Now",
+    "later": "Later",
+    "tasksRunning": "A conversion is still running. Wait for it to finish before restarting to apply the update.",
     "error": {
       "network": "Network connection failed. Please check your network settings.",
       "server": "Update server error. Please try again later.",

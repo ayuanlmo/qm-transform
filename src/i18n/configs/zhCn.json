@@ -85,6 +85,9 @@
     "downloaded": "更新下载完成，是否立即重启应用程序完成更新？",
     "restartNow": "立即重启",
     "restartLater": "稍后重启",
+    "downloadNow": "立即下载",
+    "later": "稍后",
+    "tasksRunning": "有任务正在转换，请等待完成后再重启以应用更新。",
     "error": {
       "network": "网络连接失败，请检查您的网络设置。",
       "server": "更新服务器错误，请稍后重试。",

@@ -83,6 +83,9 @@
     "downloaded": "Päivitys on ladattu. Haluatko käynnistää sovelluksen uudelleen nyt, jotta päivitys otetaan käyttöön?",
     "restartNow": "Käynnistä uudelleen nyt",
     "restartLater": "Käynnistä uudelleen myöhemmin",
+    "downloadNow": "Lataa nyt",
+    "later": "Myöhemmin",
+    "tasksRunning": "Muunnos on vielä käynnissä. Odota sen päättymistä ennen päivityksen uudelleenkäynnistystä.",
     "error": {
       "network": "Verkkoyhteys epäonnistui. Tarkista verkkoyhteytesi.",
       "server": "Päivityspalvelimen virhe. Yritä myöhemmin uudelleen.",
