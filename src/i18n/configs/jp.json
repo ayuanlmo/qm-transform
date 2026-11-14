@@ -69,6 +69,7 @@
     "label": "情報",
     "viewOnGithub": "GitHubでこのプロジェクトを見る",
     "checkForUpdate": "更新を確認する",
+    "updateManagedByStore": "更新は Microsoft Store が管理します。",
     "designer": "デザイナー",
     "licenseAndOpenSourceNotices": "ライセンスおよびオープンソースに関する通知",
     "appOpenSourceNotice": "<appName>{{name}}</appName> は Apache 2.0 ライセンスに基づいて公開されているオープンソースプロジェクトです。<github>Github</github> でソースコードを閲覧し、このプロジェクトに貢献することが可能です。"
@@ -219,6 +220,15 @@
     "media-first-frame-error": "メディアファイル [{{mediaFile}}] の最初のフレーム画像を取得中にエラーが発生しました。詳細: {{message}}",
     "media-audio-av-error": "オーディオファイル [{{mediaFile}}] の波形を取得中にエラーが発生しました。詳細: {{message}}",
     "output-directory-not-exist": "出力ディレクトリ [{{path}}] が存在しません。再度選択してください。",
-    "conversionFailedMessage": "[{{name}}] 変換に失敗しました。詳細: {{message}}。"
+    "conversionFailedMessage": "[{{name}}] 変換に失敗しました。詳細: {{message}}。",
+    "media-file-not-found": "メディアファイル[{{mediaFile}}]が存在しないか、削除されました。",
+    "media-file-empty": "メディアファイル[{{mediaFile}}]は空であり、データが含まれていません。",
+    "media-file-unreadable": "メディアファイル[{{mediaFile}}]を読み取れません。他のプログラムが使用中か、権限が不足しています。",
+    "media-binary-missing": "アプリ内蔵の FFmpeg コンポーネントが見つかりません。アプリを再インストールしてください。",
+    "media-probe-timeout": "メディアファイル[{{mediaFile}}]の読み取りがタイムアウトしました。ファイルが破損している可能性があります。",
+    "media-probe-invalid": "メディアファイル[{{mediaFile}}]が破損しているか、対応していないメディア形式です（{{message}}）。",
+    "task-create-failed": "変換タスクの起動に失敗しました（{{message}}）。",
+    "task-pause-unsupported": "このタスクは一時停止できません（リモックス、再生時間不明、または結合できない出力形式）。変換は継続します。",
+    "task-segment-merge-failed": "一時停止した区間を出力ファイルに結合できませんでした（{{message}}）。再開時にこの区間を再エンコードします。"
   }
 }

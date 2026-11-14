@@ -71,6 +71,7 @@
     "label": "关于",
     "viewOnGithub": "在Github查看此项目",
     "checkForUpdate": "检查更新",
+    "updateManagedByStore": "更新由 Microsoft Store 管理。",
     "designer": "设计师",
     "licenseAndOpenSourceNotices": "许可证和开源声明",
     "appOpenSourceNotice": "<appName>{{name}}</appName> 是一个基于 Apache 2.0 许可证发布的开源项目。您可以在 <github>Github</github> 查看源代码并为此项目做出贡献。"
@@ -226,6 +227,15 @@
     "media-first-frame-error": "获取媒体文件[{{mediaFile}}]的第一帧图片时出现错误，详细信息为：{{message}}",
     "media-audio-av-error": "获取音频文件[{{mediaFile}}]波形图时出现错误，详细信息为：{{message}}",
     "output-directory-not-exist": "输出目录:[{{path}}]不存在，请重新选择。",
-    "conversionFailedMessage": "[{{name}}] 失败，详细信息：{{message}}。"
+    "conversionFailedMessage": "[{{name}}] 失败，详细信息：{{message}}。",
+    "media-file-not-found": "媒体文件[{{mediaFile}}]不存在或已被移除。",
+    "media-file-empty": "媒体文件[{{mediaFile}}]为空文件，不包含任何数据。",
+    "media-file-unreadable": "媒体文件[{{mediaFile}}]无法读取，可能正被其他程序占用或权限不足。",
+    "media-binary-missing": "应用内置的 FFmpeg 组件缺失，请重新安装应用。",
+    "media-probe-timeout": "读取媒体文件[{{mediaFile}}]超时，文件可能已损坏。",
+    "media-probe-invalid": "媒体文件[{{mediaFile}}]已损坏或不是受支持的媒体格式（{{message}}）。",
+    "task-create-failed": "转换任务启动失败（{{message}}）。",
+    "task-pause-unsupported": "该任务无法暂停（重封装、时长未知或输出格式不支持续转拼接），转换会继续进行。",
+    "task-segment-merge-failed": "暂停的分段未能合并进输出文件（{{message}}），恢复时会将这一段重新编码。"
   }
 }

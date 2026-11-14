@@ -69,6 +69,7 @@
     "label": "À propos",
     "viewOnGithub": "Voir ce projet sur GitHub",
     "checkForUpdate": "Rechercher des mises à jour",
+    "updateManagedByStore": "Les mises à jour sont gérées par le Microsoft Store.",
     "designer": "Designer",
     "licenseAndOpenSourceNotices": "Licence et mentions open source",
     "appOpenSourceNotice": "<appName>{{name}}</appName> est un projet open source publié sous licence Apache 2.0. Vous pouvez consulter le code source et contribuer à ce projet sur <github>Github</github>."
@@ -219,7 +220,16 @@
     "media-first-frame-error": "Une erreur s'est produite lors de la récupération de la première image du fichier [{{mediaFile}}], détails : {{message}}",
     "media-audio-av-error": "Une erreur s'est produite lors de la récupération de la forme d'onde du fichier audio [{{mediaFile}}], détails : {{message}}",
     "output-directory-not-exist": "Le dossier de sortie [{{path}}] n'existe pas. Veuillez en choisir un autre.",
-    "conversionFailedMessage": "La conversion de [{{name}}] a échoué, détails : {{message}}."
+    "conversionFailedMessage": "La conversion de [{{name}}] a échoué, détails : {{message}}.",
+    "media-file-not-found": "Le fichier média [{{mediaFile}}] n'existe pas ou a été supprimé.",
+    "media-file-empty": "Le fichier média [{{mediaFile}}] est vide et ne contient aucune donnée.",
+    "media-file-unreadable": "Impossible de lire le fichier média [{{mediaFile}}]. Il est peut-être utilisé par un autre programme ou les autorisations sont insuffisantes.",
+    "media-binary-missing": "Le composant FFmpeg intégré est manquant. Réinstallez l'application.",
+    "media-probe-timeout": "La lecture du fichier média [{{mediaFile}}] a expiré. Le fichier est peut-être endommagé.",
+    "media-probe-invalid": "Le fichier média [{{mediaFile}}] est endommagé ou utilise un format média non pris en charge ({{message}}).",
+    "task-create-failed": "Échec du démarrage de la tâche de conversion ({{message}}).",
+    "task-pause-unsupported": "Cette tâche ne peut pas être suspendue (remux, durée inconnue ou format de sortie non fusionnable). La conversion continue.",
+    "task-segment-merge-failed": "Le segment suspendu n’a pas pu être fusionné dans le fichier de sortie ({{message}}). Il sera réencodé à la reprise."
   }
 }
 

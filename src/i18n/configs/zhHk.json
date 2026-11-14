@@ -70,6 +70,7 @@
     "label": "關於",
     "viewOnGithub": "在 GitHub 檢視此專案",
     "checkForUpdate": "檢查更新",
+    "updateManagedByStore": "更新由 Microsoft Store 管理。",
     "designer": "設計師",
     "licenseAndOpenSourceNotices": "許可證與開源聲明",
     "appOpenSourceNotice": "<appName>{{name}}</appName> 是根據 Apache 2.0 許可證發佈的開源專案。你可以在 <github>Github</github> 檢視原始碼並為此專案作出貢獻。"
@@ -220,7 +221,16 @@
     "media-first-frame-error": "取得媒體檔案 [{{mediaFile}}] 第一幀圖片時發生錯誤，詳細內容為：{{message}}",
     "media-audio-av-error": "取得音訊檔案 [{{mediaFile}}] 波形圖時發生錯誤，詳細內容為：{{message}}",
     "output-directory-not-exist": "輸出目錄 [{{path}}] 不存在，請重新選擇。",
-    "conversionFailedMessage": "[{{name}}] 轉換失敗，詳細內容：{{message}}。"
+    "conversionFailedMessage": "[{{name}}] 轉換失敗，詳細內容：{{message}}。",
+    "media-file-not-found": "媒體檔案[{{mediaFile}}]不存在或已被移除。",
+    "media-file-empty": "媒體檔案[{{mediaFile}}]為空檔案，不包含任何資料。",
+    "media-file-unreadable": "媒體檔案[{{mediaFile}}]無法讀取，可能正被其他程式佔用或權限不足。",
+    "media-binary-missing": "應用內建的 FFmpeg 元件缺失，請重新安裝應用。",
+    "media-probe-timeout": "讀取媒體檔案[{{mediaFile}}]逾時，檔案可能已損壞。",
+    "media-probe-invalid": "媒體檔案[{{mediaFile}}]已損壞或非支援的媒體格式（{{message}}）。",
+    "task-create-failed": "轉換任務啟動失敗（{{message}}）。",
+    "task-pause-unsupported": "該任務無法暫停（重新封裝、時長未知或輸出格式不支援續轉拼接），轉換會繼續進行。",
+    "task-segment-merge-failed": "暫停的分段未能合併至輸出檔案（{{message}}），恢復時會重新編碼這一段。"
   }
 }
 

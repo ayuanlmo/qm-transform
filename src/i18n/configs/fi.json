@@ -69,6 +69,7 @@
     "label": "Tietoja",
     "viewOnGithub": "Näytä tämä projekti GitHubissa",
     "checkForUpdate": "Tarkista päivitykset",
+    "updateManagedByStore": "Päivityksistä vastaa Microsoft Store.",
     "designer": "Suunnittelija",
     "licenseAndOpenSourceNotices": "Lisenssi ja avoimen lähdekoodin ilmoitukset",
     "appOpenSourceNotice": "<appName>{{name}}</appName> on avoimen lähdekoodin projekti, joka on julkaistu Apache 2.0 -lisenssillä. Voit tarkastella lähdekoodia ja osallistua projektiin <github>Githubissa</github>."
@@ -219,7 +220,16 @@
     "media-first-frame-error": "Virhe ilmeni haettaessa mediatiedoston [{{mediaFile}}] ensimmäistä kuvaa. Lisätiedot: {{message}}",
     "media-audio-av-error": "Virhe ilmeni haettaessa äänitiedoston [{{mediaFile}}] aaltomuotoa. Lisätiedot: {{message}}",
     "output-directory-not-exist": "Tulostuskansio [{{path}}] ei ole olemassa. Valitse jokin toinen.",
-    "conversionFailedMessage": "[{{name}}] -muunnos epäonnistui. Lisätiedot: {{message}}."
+    "conversionFailedMessage": "[{{name}}] -muunnos epäonnistui. Lisätiedot: {{message}}.",
+    "media-file-not-found": "Mediatiedostoa [{{mediaFile}}] ei ole tai se on poistettu.",
+    "media-file-empty": "Mediatiedosto [{{mediaFile}}] on tyhjä eikä sisällä dataa.",
+    "media-file-unreadable": "Mediatiedostoa [{{mediaFile}}] ei voi lukea. Se on ehkä toisen ohjelman käytössä tai oikeudet eivät riitä.",
+    "media-binary-missing": "Sovelluksen FFmpeg-komponentti puuttuu. Asenna sovellus uudelleen.",
+    "media-probe-timeout": "Mediatiedoston [{{mediaFile}}] luku aikakatkaistiin. Tiedosto saattaa vioittua.",
+    "media-probe-invalid": "Mediatiedosto [{{mediaFile}}] on vioittunut tai käyttämättömää mediamuotoa ({{message}}).",
+    "task-create-failed": "Muunnostehtävän käynnistäminen epäonnistui ({{message}}).",
+    "task-pause-unsupported": "Tehtävää ei voi pysäyttää väliaikaisesti (remux, tuntematon kesto tai ei-yhdistettävä tulostemuoto). Muunnos jatkuu.",
+    "task-segment-merge-failed": "Pysäytettyä osiota ei voitu yhdistää tulostiedostoon ({{message}}). Jatkuessa tämä osio koodataan uudelleen."
   }
 }
 
