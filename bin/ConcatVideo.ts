@@ -1,11 +1,11 @@
 import ffmpeg, {FfmpegCommand} from 'fluent-ffmpeg';
 import path from 'path';
-import * as os from 'node:os';
 import {IpcMainEvent} from 'electron';
 import {mkdirSync} from 'node:fs';
 import {getLocalConfigAsMain} from './Conf';
 import Media from './Media';
 import taskManager from './TaskManager';
+import {discardEmptyOutput, isEmptyOutput, resolveConcatEncoder} from './TransformVideo';
 import Logger from '../lib/Logger';
 
 export interface IConcatOptions {
@@ -29,12 +29,14 @@ const getOutputExt = (optFormat: string): string => {
 };
 
 class ConcatVideo {
-    public static concat(payload: IConcatPayload, ctx: IpcMainEvent): void {
+    public static async concat(payload: IConcatPayload, ctx: IpcMainEvent): Promise<void> {
         const {concatTaskId, items, options} = payload;
 
         if (!items || items.length < 2) {
             ctx.reply('main:on:task-end', {
                 id: concatTaskId,
+                baseName: '',
+                path: null,
                 error: true,
                 errorMessage: 'At least 2 videos required for concat'
             });
@@ -97,32 +99,10 @@ class ConcatVideo {
             `${concatInputs.join('')}concat=n=${n}:v=1:a=1[outv][outa]`
         ].join(';');
 
-        taskManager.registerTask(concatTaskId, items[0], items.map((i): string => i.fullPath).join('|'), outputPath, ctx, undefined);
+        taskManager.registerTask(concatTaskId, items[0], items.map((i): string => i.fullPath).join('|'), outputPath, ctx, {totalSeconds: 0});
 
-        let hardwareEncoderSuffix: string | null = null;
-        const codec = (options.codec || 'h264').toLowerCase();
-        const gpuAccelerationFromConfig: boolean =
-            appConf?.output?.codecType === 'GPU' && os.platform() !== 'linux';
-
-        if (gpuAccelerationFromConfig && (codec === 'h264' || codec === 'hevc')) {
-            const methodRaw = (appConf?.output?.codecMethod || '').toLowerCase();
-            const platform = os.platform();
-
-            if (platform === 'darwin') {
-                hardwareEncoderSuffix = 'videotoolbox';
-            } else if (['amd', 'amf'].includes(methodRaw)) {
-                hardwareEncoderSuffix = 'amf';
-            } else if (['intel', 'qsv'].includes(methodRaw)) {
-                hardwareEncoderSuffix = 'qsv';
-            } else if (['nvidia', 'nvenc'].includes(methodRaw)) {
-                hardwareEncoderSuffix = 'nvenc';
-            }
-        }
-
-        const useHardware = !!hardwareEncoderSuffix;
-        const encoderName = useHardware
-            ? `${codec === 'hevc' ? 'hevc' : 'h264'}_${hardwareEncoderSuffix}`
-            : codec === 'hevc' ? 'libx265' : 'libx264';
+        const encoderName = await resolveConcatEncoder(
+            (options.codec || 'h264').toLowerCase(), appConf, outputPath, ctx);
 
         ffmpegCommand
             .outputOptions(['-filter_complex', filterComplex])
@@ -131,15 +111,16 @@ class ConcatVideo {
             .outputOptions(['-c:a', 'aac', '-b:a', '192k'])
             .output(outputPath);
 
-        if (useHardware && hardwareEncoderSuffix === 'videotoolbox') {
+        if (encoderName.endsWith('_videotoolbox'))
             ffmpegCommand.outputOptions(['-q:v', '30']);
-        } else if (useHardware && hardwareEncoderSuffix === 'nvenc') {
+        else if (encoderName.endsWith('_nvenc'))
             ffmpegCommand.outputOptions(['-preset', 'p4', '-rc', 'vbr', '-cq', '23', '-b:v', '0']);
-        } else if (useHardware && (hardwareEncoderSuffix === 'qsv' || hardwareEncoderSuffix === 'amf')) {
-            ffmpegCommand.outputOptions(['-crf', '23']);
-        } else {
+        else if (encoderName.endsWith('_qsv'))
+            ffmpegCommand.outputOptions(['-preset', 'medium', '-crf', '23']);
+        else if (encoderName.endsWith('_amf'))
+            ffmpegCommand.outputOptions(['-quality', 'balanced', '-rc', 'cqp', '-qp_i', '23', '-qp_p', '23']);
+        else
             ffmpegCommand.outputOptions(['-preset', 'faster', '-crf', '23']);
-        }
 
         ffmpegCommand
             .on('start', (): void => {
@@ -153,12 +134,27 @@ class ConcatVideo {
                 if (taskManager.isPaused(concatTaskId)) return;
                 const percent = Math.round(progress.percent || 0);
 
-                taskManager.updateProgress(concatTaskId, percent);
                 ctx.reply('main:on:video-concat-progress', {id: concatTaskId, progress: percent});
             })
             .on('end', (): void => {
                 if (taskManager.isPaused(concatTaskId)) return;
                 taskManager.cleanup(concatTaskId);
+
+                if (isEmptyOutput(outputPath)) {
+                    Logger.error(`Concat task ${concatTaskId} finished without writing ${outputPath}`);
+                    discardEmptyOutput(outputPath);
+                    ctx.reply('main:on:video-concat-progress', {id: concatTaskId, progress: 0, error: true});
+                    ctx.reply('main:on:task-end', {
+                        id: concatTaskId,
+                        progress: 100,
+                        path: null,
+                        baseName: outputBaseName,
+                        error: true,
+                        errorMessage: 'ffmpeg wrote nothing to the output file.'
+                    });
+                    return;
+                }
+
                 ctx.reply('main:on:video-concat-progress', {id: concatTaskId, progress: 100});
                 ctx.reply('main:on:task-end', {
                     id: concatTaskId,
@@ -170,6 +166,7 @@ class ConcatVideo {
             .on('error', (err): void => {
                 if (taskManager.isPaused(concatTaskId)) return;
                 taskManager.cleanup(concatTaskId);
+                discardEmptyOutput(outputPath);
                 ctx.reply('main:on:video-concat-progress', {
                     id: concatTaskId,
                     progress: 0,
@@ -178,6 +175,8 @@ class ConcatVideo {
                 });
                 ctx.reply('main:on:task-end', {
                     id: concatTaskId,
+                    baseName: outputBaseName,
+                    path: null,
                     error: true,
                     errorMessage: err.message
                 });

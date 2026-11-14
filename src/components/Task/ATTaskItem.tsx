@@ -72,13 +72,15 @@ const ATTaskItem: React.FC<ATTaskItemProps> = (props: ATTaskItemProps): React.JS
         dispatch(removeCurrentATTaskItem(data.id));
     });
 
-    useMainEventListener<{ id: string }>('main:on:task-paused', (event): void => {
-        if (event.id !== data.id) return;
+    // 主进程可能拒绝暂停/恢复（例如续转分段合并失败），只有成功才改状态，
+    // 否则条目会停在"已暂停"而后台其实还在转
+    useMainEventListener<{ id: string; success: boolean }>('main:on:task-paused', (event): void => {
+        if (event.id !== data.id || !event.success) return;
         handleTaskUpdate({status: 'paused'});
     });
 
-    useMainEventListener<{ id: string }>('main:on:task-resumed', (event): void => {
-        if (event.id !== data.id) return;
+    useMainEventListener<{ id: string; success: boolean }>('main:on:task-resumed', (event): void => {
+        if (event.id !== data.id || !event.success) return;
         handleTaskUpdate({status: 'processing'});
     });
 

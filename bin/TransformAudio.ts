@@ -5,10 +5,12 @@ import {mkdirSync} from "node:fs";
 import Media from "./Media";
 import {getLocalConfigAsMain} from "./Conf";
 import taskManager from "./TaskManager";
+import {IResumeSegment, toSeconds} from "./TaskSegments";
+import {AUDIO_CODEC_ALIAS} from "./TransformVideo";
 import Logger from "../lib/Logger";
 
 class TransformAudio {
-    public static transformAudioMedia(media: IMediaInfo, ctx: IpcMainEvent): void {
+    public static transformAudioMedia(media: IMediaInfo, ctx: IpcMainEvent, resume?: IResumeSegment): void {
         const appConf: IDefaultSettingConfig | null = getLocalConfigAsMain();
         const extName: string = path.extname(media.fullPath);
         const outputBaseName: string = Media.getOutputMediaFileName(media.fullPath);
@@ -47,10 +49,26 @@ class TransformAudio {
                 outputExt = 'opus';
         }
 
-        const outputPath: string = Media.buildOutputPath(outputDir, outputBaseName, outputExt);
+        let outputPath: string = Media.buildOutputPath(outputDir, outputBaseName, outputExt);
 
-        // 注册任务到 TaskManager
-        taskManager.registerTask(media.id, media, media.fullPath, outputPath, ctx, undefined);
+        // 续转时沿用注册时的产物路径（自定义命名规则里的 {random} 每次都会推出新名字），
+        // 本段写到分段文件上，收尾时由 TaskManager 并回产物
+        if (resume) {
+            outputPath = resume.outputPath;
+            outputExt = path.extname(outputPath).replace('.', '').toLowerCase();
+        }
+
+        const partPath: string = resume ? resume.partPath : outputPath;
+        const totalSeconds: number = toSeconds(media.mediaInfo?.format?.duration);
+
+        // 注册任务到 TaskManager（resume 时任务记录已存在，重建会把检查点清零）
+        if (!resume) {
+            taskManager.registerTask(media.id, media, media.fullPath, outputPath, ctx, {
+                totalSeconds,
+                restart: (startSeconds: number, nextPart: string): void =>
+                    TransformAudio.transformAudioMedia(media, ctx, {startSeconds, partPath: nextPart, outputPath})
+            });
+        }
 
         // 初始化Ffmpeg
         const ffmpegCommand: FfmpegCommand = ffmpeg(media.fullPath)
@@ -61,12 +79,30 @@ class TransformAudio {
                 if (ffmpegProc && ffmpegProc.pid)
                     taskManager.attachPid(media.id, ffmpegProc.pid, ffmpegProc);
             })
-            .on('end', (): void => {
+            .on('end', async (): Promise<void> => {
                 // 检查任务是否处于暂停状态，如果是暂停导致的结束，不发送完成事件
                 if (taskManager.isPaused(media.id)) {
                     Logger.info(`Task ${media.id} ended due to pause, not marking as complete`);
                     return;
                 }
+
+                // 续转过就得先把最后一段并回产物，否则"完成"指向的只是尾巴那一截
+                try {
+                    await taskManager.finalize(media.id);
+                } catch (e) {
+                    Logger.error(`Task ${media.id} failed to stitch resumed segments: ${(e as Error).message}`);
+                    taskManager.cleanup(media.id);
+                    ctx.reply('main:on:task-end', {
+                        id: media.id,
+                        progress: 100,
+                        path: null,
+                        baseName: media.baseName,
+                        error: true,
+                        errorMessage: 'The resumed segments could not be merged into the output file.'
+                    });
+                    return;
+                }
+
                 // 清理任务
                 taskManager.cleanup(media.id);
                 // 补发一次 100% 进度，避免 Windows 下进度未满时前端卡住
@@ -89,10 +125,8 @@ class TransformAudio {
                     return;
                 }
 
-                const progressPercent: number = Math.round(progress.percent || 0);
+                const progressPercent: number = taskManager.progressOf(media.id, progress.timemark, Math.round(progress.percent || 0));
 
-                // 更新 TaskManager 中的进度
-                taskManager.updateProgress(media.id, progressPercent);
                 ctx.reply('main:on:media-transform-progress', {
                     id: media.id,
                     progress: progressPercent,
@@ -125,8 +159,12 @@ class TransformAudio {
                 });
             });
 
-        // 设置输出路径
-        ffmpegCommand.output(outputPath);
+        // 续转分段从已完成的秒数接着往后转。-ss 必须落在 -i 之前才是输入端精确 seek
+        if (resume && resume.startSeconds > 0)
+            ffmpegCommand.inputOption(['-ss', resume.startSeconds.toFixed(3)]);
+
+        // 设置输出路径（续转时指向本分段，收尾后由 TaskManager 并回 outputPath）
+        ffmpegCommand.output(partPath);
 
         // 配置音频编码参数
         this.configureAudioEncoding(ffmpegCommand, media);
@@ -156,54 +194,39 @@ class TransformAudio {
         let channels: number | undefined = media.audioParams?.channels;
 
         // 按容器限制可用的音频编码器，并设置合理默认值
+        // 注意：前端传的是"格式名"（mp3 / opus / vorbis），ffmpeg 的编码器名是 libmp3lame / libopus / libvorbis，
+        // 直接把格式名塞给 audioCodec 会得到 "Audio codec mp3 is not available"，所以这里一律归一成编码器名。
         switch (container) {
             case 'mp3':
-                // MP3 使用 libmp3lame
-                if (!codec || codec !== 'mp3') {
-                    codec = 'libmp3lame';
-                }
+                codec = 'libmp3lame';
                 if (!bitrate)
                     bitrate = '192k';
                 break;
             case 'm4a':
             case 'aac':
-                // M4A/AAC 使用 aac
-                if (!codec || !['aac', 'libfdk_aac'].includes(codec)) {
+                if (!['aac', 'libfdk_aac'].includes(codec ?? '')) {
                     codec = 'aac';
                 }
                 if (!bitrate)
                     bitrate = '192k';
                 break;
             case 'ogg':
-                // OGG 使用 libvorbis 或 libopus
-                if (!codec || !['vorbis', 'libvorbis', 'opus', 'libopus'].includes(codec)) {
-                    codec = 'libvorbis';
-                }
+                codec = ['opus', 'libopus'].includes(codec ?? '') ? 'libopus' : 'libvorbis';
                 if (!bitrate)
                     bitrate = '160k';
                 break;
             case 'flac':
-                // FLAC 是无损格式，不需要 bitrate
-                if (!codec || codec !== 'flac') {
-                    codec = 'flac';
-                }
+                codec = 'flac';
                 break;
             case 'opus':
-                // Opus 编码
-                if (!codec || codec !== 'opus') {
-                    codec = 'libopus';
-                }
+                codec = 'libopus';
                 if (!bitrate)
                     bitrate = '128k';
                 break;
             case 'wav':
-                // WAV 通常使用 PCM，不需要 codec 设置
-                if (!codec) {
-                    codec = 'pcm_s16le';
-                }
+                codec = 'pcm_s16le';
                 break;
             default:
-                // 其它容器保持 AAC 默认
                 if (!codec)
                     codec = 'aac';
                 if (!bitrate)
@@ -215,7 +238,7 @@ class TransformAudio {
 
         // 实际写入 FFmpeg 参数
         if (codec)
-            ffmpegCommand.audioCodec(codec);
+            ffmpegCommand.audioCodec(AUDIO_CODEC_ALIAS[codec] ?? codec);
         if (bitrate)
             ffmpegCommand.audioBitrate(bitrate);
         if (sampleRate)

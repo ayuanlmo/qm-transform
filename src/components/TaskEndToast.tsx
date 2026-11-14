@@ -9,8 +9,10 @@ import {sendIpcMessage} from "../bin/IPC";
 export interface ITaskEndMessage {
     id: string;
     progress: number;
-    path: string;
+    path: string | null;
     baseName: string;
+    error?: boolean;
+    errorMessage?: string;
 }
 
 const TaskEndToast = () => {
@@ -19,22 +21,26 @@ const TaskEndToast = () => {
     const {dispatchToast, dismissToast} = useToastController(id);
 
     const mkToast = (data: ITaskEndMessage): void => {
-        const {baseName, path} = data;
+        const {baseName, path, error, errorMessage} = data;
         const tid: string = getUUID();
 
         const openInSystemLabel: string = t(getShowInSystemFileManagerI18nKey());
 
         dispatchToast(
             <Toast
-                title={t('mediaFile.options.conversionSuccessMessage', {name: baseName})}
+                title={error
+                    ? t('errMessage.conversionFailedMessage', {name: baseName, message: errorMessage ?? ''})
+                    : t('mediaFile.options.conversionSuccessMessage', {name: baseName})}
                 footer={
-                    <Link
-                        onClick={(): void => {
-                            sendIpcMessage('window:on:open-directory', path);
-                        }}
-                    >
-                        {openInSystemLabel}
-                    </Link>
+                    error || !path ? undefined : 
+                        <Link
+                            onClick={(): void => {
+                                sendIpcMessage('window:on:open-directory', path);
+                            }}
+                        >
+                            {openInSystemLabel}
+                        </Link>
+                    
                 }
                 surface={
                     <>
@@ -43,7 +49,7 @@ const TaskEndToast = () => {
                             overflowY: 'auto',
                             marginBottom: '.5rem'
                         }}>
-                            {baseName}
+                            {error ? errorMessage ?? baseName : baseName}
                         </div>
                         <ToastProgressBar
                             intervalDelay={500}
@@ -56,7 +62,7 @@ const TaskEndToast = () => {
             />, {
                 toastId: tid,
                 timeout: -1,
-                intent: "success"
+                intent: error ? "error" : "success"
             });
     };
 

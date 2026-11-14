@@ -1,11 +1,13 @@
 import ffmpeg, {FfmpegCommand} from 'fluent-ffmpeg';
 import path from 'path';
 import {IpcMainEvent} from "electron";
-import {mkdirSync} from "node:fs";
+import {mkdirSync, existsSync, statSync, unlinkSync} from "node:fs";
 import * as os from "node:os";
 import Media from "./Media";
+import Ffmpeg from "./Ffmpeg";
 import {getLocalConfigAsMain} from "./Conf";
 import taskManager from "./TaskManager";
+import {IResumeSegment, toSeconds} from "./TaskSegments";
 import Logger from "../lib/Logger";
 
 // 根据清晰度等级映射到具体的编码参数
@@ -72,6 +74,13 @@ type VideoEncodingMeta = {
 /**
  * 将音频码率规范到合理范围（主要避免探测值过高导致编码器拒绝）
  */
+// 前端下拉框给的是格式名，ffmpeg 的编码器另有其名，直接透传会得到 "Audio codec mp3 is not available"
+export const AUDIO_CODEC_ALIAS: Record<string, string> = {
+    mp3: 'libmp3lame',
+    opus: 'libopus',
+    vorbis: 'libvorbis'
+};
+
 const normalizeAudioBitrate = (codec?: string, bitrate?: string): string | undefined => {
     if (!bitrate) return bitrate;
 
@@ -98,8 +107,161 @@ const normalizeAudioBitrate = (codec?: string, bitrate?: string): string | undef
     return `${valueInKbps}${unit === 'm' ? 'k' : 'k'}`;
 };
 
+/** h264_amf/hevc_amf 的 -quality 是 0..2 的枚举（speed/balanced/quality），不能当 CRF 传。 */
+const qualityToAmfMap: Record<string, string> = {
+    'very_low': 'speed',
+    'low': 'speed',
+    'medium': 'balanced',
+    'high': 'quality',
+    'very_high': 'quality'
+};
+
+/**
+ * @method inferHardwareEncoderSuffix
+ * @param codecMethod {string} 配置中的 codecMethod
+ * @param platform {NodeJS.Platform}
+ * @returns {string | null}
+ * @description 由配置推断硬件编码器后缀。推断与可用性探测分离，
+ * 保证 configureVideoEncoding 和预检看到的是同一个后缀。
+ * **/
+const inferHardwareEncoderSuffix = (codecMethod: string, platform: NodeJS.Platform): string | null => {
+    if (platform === 'darwin') return 'videotoolbox';
+
+    const methodRaw: string = (codecMethod || '').toLowerCase();
+
+    if (['amd', 'amf'].includes(methodRaw)) return 'amf';
+    if (['intel', 'qsv'].includes(methodRaw)) return 'qsv';
+    if (['nvidia', 'nvenc'].includes(methodRaw)) return 'nvenc';
+
+    return null;
+};
+
+/**
+ * @method resolveVideoBitrate
+ * @param raw {string | undefined}
+ * @returns {{value: string | null, fromSource: boolean}}
+ * @description ffprobe 的 bit_rate 是 bps 且不带单位，而 fluent-ffmpeg 的 videoBitrate 会在纯数字后补 'k'，
+ * 于是 48Mbps 的源会被写成 `-b:v 48000000k`（48Gbps）。这里统一换算成 kbps，并标记来源以便硬件编码忽略。
+ * **/
+const resolveVideoBitrate = (raw?: string): { value: string | null; fromSource: boolean } => {
+    const text: string = (raw || '').trim();
+
+    if (!text) return {value: null, fromSource: false};
+
+    // 用户在界面选的值形如 2000k，原样使用
+    if (!/^\d+$/.test(text)) return {value: text, fromSource: false};
+
+    const bps: number = Number(text);
+
+    if (!Number.isFinite(bps) || bps <= 0) return {value: null, fromSource: true};
+
+    return {value: `${Math.max(1, Math.round(bps / 1000))}k`, fromSource: true};
+};
+
+/**
+ * @method isEmptyOutput
+ * @param outputPath {string}
+ * @returns {boolean}
+ * @description ffmpeg 以 0 退出但一个字节都没写出（编码器初始化失败、所有流被禁用）时的产物判定。
+ * **/
+export const isEmptyOutput = (outputPath: string): boolean => {
+    try {
+        return !existsSync(outputPath) || statSync(outputPath).size === 0;
+    } catch {
+        return true;
+    }
+};
+
+/**
+ * @method hasResolutionChange
+ * @param videoParams {VideoEncodingParams}
+ * @returns {boolean}
+ * @description 目标分辨率与源分辨率是否不同（即是否需要在输出上加 scale 滤镜）。
+ * **/
+const hasResolutionChange = (videoParams: VideoEncodingParams): boolean => {
+    const targetWidth: number = videoParams.width || 0;
+    const targetHeight: number = videoParams.height || 0;
+    const originalWidth: number = videoParams.originWidth || 0;
+    const originalHeight: number = videoParams.originHeight || 0;
+
+    return targetWidth > 0 && targetHeight > 0 &&
+        (targetWidth !== originalWidth || targetHeight !== originalHeight);
+};
+
+/** 失败残留的空文件会被前端当成可打开的输出，这里只删除长度为 0 的产物。 */
+export const discardEmptyOutput = (outputPath: string): void => {
+    try {
+        if (existsSync(outputPath) && statSync(outputPath).size === 0)
+            unlinkSync(outputPath);
+    } catch (e) {
+        Logger.warn(`[TransformVideo] cannot remove incomplete output ${outputPath}: ${(e as Error).message}`);
+    }
+};
+
+/**
+ * @method resolveHardwareEncoder
+ * @param codec {string} 'h264' | 'hevc' | 其它
+ * @param codecType {string | undefined}
+ * @param codecMethod {string | undefined}
+ * @param platform {NodeJS.Platform}
+ * @returns {{encoder: string, suffix: string} | null}
+ * @description 硬件编码选择的唯一入口：转换与串联共用，避免两处对 codecMethod 的解读走偏。
+ * **/
+const resolveHardwareEncoder = (
+    codec: string,
+    codecType: string | undefined,
+    codecMethod: string | undefined,
+    platform: NodeJS.Platform
+): { encoder: string; suffix: string } | null => {
+    if (codecType !== 'GPU' || platform === 'linux') return null;
+    if (codec !== 'h264' && codec !== 'hevc') return null;
+
+    const suffix: string | null = inferHardwareEncoderSuffix(codecMethod || '', platform);
+
+    if (!suffix) return null;
+
+    return {encoder: `${codec === 'hevc' ? 'hevc' : 'h264'}_${suffix}`, suffix};
+};
+
+/**
+ * @method resolveConcatEncoder
+ * @param codec {string}
+ * @param appConf {IDefaultSettingConfig | null}
+ * @param outputPath {string} 预检失败时用于清理半成品
+ * @param ctx {IpcMainEvent}
+ * @returns {Promise<string>} 实际可用的视频编码器名
+ * @description 串联的 filter_complex 必然走软件滤镜，硬件解码在这里无法参与，因此只校验编码器本身能否打开。
+ * **/
+export const resolveConcatEncoder = async (
+    codec: string,
+    appConf: IDefaultSettingConfig | null,
+    outputPath: string,
+    ctx: IpcMainEvent
+): Promise<string> => {
+    const fallback: string = codec === 'hevc' ? 'libx265' : 'libx264';
+    const hardware: { encoder: string; suffix: string } | null =
+        resolveHardwareEncoder(codec, appConf?.output?.codecType, appConf?.output?.codecMethod, os.platform());
+
+    if (!hardware) return fallback;
+    if (await Ffmpeg.isEncoderAvailable(hardware.encoder)) return hardware.encoder;
+
+    Logger.warn(`[ConcatVideo] ${hardware.encoder} is not usable on this machine, falling back to ${fallback}`);
+
+    // 预检失败时 ffmpeg 还没起跑，但输出文件已经建好，是个打不开的 0 字节空壳
+    if (isEmptyOutput(outputPath)) {
+        discardEmptyOutput(outputPath);
+        ctx.reply('main:on:error', {
+            type: 'media-binary-missing',
+            message: `${hardware.encoder} is unavailable on this machine.`,
+            mediaFile: outputPath
+        });
+    }
+
+    return fallback;
+};
+
 class TransformVideo {
-    public static transformVideoMedia(media: IMediaInfo, ctx: IpcMainEvent): void {
+    public static async transformVideoMedia(media: IMediaInfo, ctx: IpcMainEvent, resume?: IResumeSegment): Promise<void> {
         const appConf: IDefaultSettingConfig | null = getLocalConfigAsMain();
         const extName: string = path.extname(media.fullPath);
         const outputBaseName: string = Media.getOutputMediaFileName(media.fullPath);
@@ -158,8 +320,39 @@ class TransformVideo {
             outputPath = path.join(m3u8Dir, `${m3u8BaseName}.m3u8`);
         }
 
-        // 注册任务到 TaskManager
-        taskManager.registerTask(media.id, media, media.fullPath, outputPath, ctx, undefined);
+        // 续转时必须沿用注册时的产物路径：自定义命名规则里的 {random} 每次推断都会得到一个新文件名，
+        // 那样已拼好的前段就成了孤儿。本段则写到分段文件上，收尾时由 TaskManager 并回产物。
+        if (resume) {
+            outputPath = resume.outputPath;
+            outputExt = path.extname(outputPath).replace('.', '').toLowerCase();
+        }
+
+        const partPath: string = resume ? resume.partPath : outputPath;
+        const totalSeconds: number = toSeconds(media.mediaInfo?.format?.duration);
+
+        // 在“保持原画质 + 无额外参数 + 容器不变时，尝试直接流拷贝，可极大提升编码之速度
+        const sourceExt: string = extName.replace('.', '').toLowerCase();
+        const sameContainer: boolean = outputExt === sourceExt;
+
+        const hasVideoParams: boolean = !!media.videoParams && Object.keys(media.videoParams).length > 0;
+        const hasAudioParams: boolean = !!media.audioParams && Object.keys(media.audioParams).length > 0;
+        const keepOriginalQuality: boolean = !media.quality || media.quality === ('original' as MediaQuality);
+
+        const canCopyVideo: boolean = sameContainer && keepOriginalQuality && !hasVideoParams && !media.libs;
+        const canCopyAudio: boolean = !media.noAudio && !hasAudioParams;
+        const useStreamCopy: boolean = canCopyVideo && (canCopyAudio || media.noAudio === true);
+
+        // 续转注册（resume 时任务记录已在 TaskManager 里，重建会把检查点清零）
+        if (!resume) {
+            taskManager.registerTask(media.id, media, media.fullPath, outputPath, ctx, {
+                totalSeconds,
+                // 流拷贝下的 -ss 只能落到最近的关键帧，接缝会重复几帧画面，这类任务不提供续转钩子
+                restart: useStreamCopy
+                    ? undefined
+                    : (startSeconds: number, nextPart: string): Promise<void> =>
+                        TransformVideo.transformVideoMedia(media, ctx, {startSeconds, partPath: nextPart, outputPath})
+            });
+        }
 
         let videoEncodingMeta: VideoEncodingMeta = {
             useHardwareAcceleration: false,
@@ -211,16 +404,47 @@ class TransformVideo {
                     }
                 }
             })
-            .on('end', (): void => {
+            .on('end', async (): Promise<void> => {
                 // 检查任务是否处于暂停状态，如果是暂停导致的结束，不发送完成事件
                 if (taskManager.isPaused(media.id)) {
                     Logger.info(`Task ${media.id} ended due to pause, not marking as complete`);
                     return;
                 }
 
+                // 续转过就得先把最后一段并回产物，否则"完成"指向的只是尾巴那一截
+                try {
+                    await taskManager.finalize(media.id);
+                } catch (e) {
+                    Logger.error(`Task ${media.id} failed to stitch resumed segments: ${(e as Error).message}`);
+                    taskManager.cleanup(media.id);
+                    ctx.reply('main:on:task-end', {
+                        id: media.id,
+                        progress: 100,
+                        path: null,
+                        baseName: media.baseName,
+                        error: true,
+                        errorMessage: 'The resumed segments could not be merged into the output file.'
+                    });
+                    return;
+                }
 
                 // 清理任务
                 taskManager.cleanup(media.id);
+
+                // ffmpeg 有可能以 0 退出却没有写出任何数据，这会被前端显示成"转换成功"然后打不开文件
+                if (isEmptyOutput(outputPath)) {
+                    Logger.error(`Task ${media.id} ffmpeg exited without writing ${outputPath}`);
+                    ctx.reply('main:on:task-end', {
+                        id: media.id,
+                        progress: 100,
+                        path: null,
+                        baseName: media.baseName,
+                        error: true,
+                        errorMessage: 'ffmpeg wrote nothing to the output file.'
+                    });
+                    return;
+                }
+
                 // 补发一次 100% 进度，避免 Windows 下进度未满时前端卡住
                 ctx.reply('main:on:media-transform-progress', {
                     id: media.id,
@@ -240,10 +464,9 @@ class TransformVideo {
                     return;
                 }
 
-                const progressPercent = Math.round(progress.percent || 0);
+                // 续转分段里 fluent-ffmpeg 的 percent 从本段起点算起，要折回全局进度
+                const progressPercent: number = taskManager.progressOf(media.id, progress.timemark, Math.round(progress.percent || 0));
 
-                // 更新 TaskManager 中的进度
-                taskManager.updateProgress(media.id, progressPercent);
                 ctx.reply('main:on:media-transform-progress', {
                     id: media.id,
                     progress: progressPercent,
@@ -257,6 +480,8 @@ class TransformVideo {
                 }
                 // 清理任务
                 taskManager.cleanup(media.id);
+                // 硬件编码器在打开阶段失败时，ffmpeg 已经创建了输出文件但没有任何内容
+                discardEmptyOutput(partPath);
                 console.error('Ffmpeg error:', err);
                 ctx.reply('main:on:media-transform-progress', {
                     id: media.id,
@@ -275,21 +500,14 @@ class TransformVideo {
                 });
             });
 
-        // 设置输出路径
-        ffmpegCommand.output(outputPath);
+        // 续转分段从已完成的秒数接着往后转。-ss 必须落在 -i 之前才是输入端精确 seek
+        if (resume && resume.startSeconds > 0)
+            ffmpegCommand.inputOption(['-ss', resume.startSeconds.toFixed(3)]);
 
-        // 在“保持原画质 + 无额外参数 + 容器不变时，尝试直接流拷贝，可极大提升编码之速度
-        const sourceExt: string = extName.replace('.', '').toLowerCase();
-        const sameContainer: boolean = outputExt === sourceExt;
+        // 设置输出路径（续转时指向本分段，收尾后由 TaskManager 并回 outputPath）
+        ffmpegCommand.output(partPath);
 
-        const hasVideoParams: boolean = !!media.videoParams && Object.keys(media.videoParams).length > 0;
-        const hasAudioParams: boolean = !!media.audioParams && Object.keys(media.audioParams).length > 0;
-        const keepOriginalQuality: boolean = !media.quality || media.quality === ('original' as MediaQuality);
-
-        const canCopyVideo: boolean = sameContainer && keepOriginalQuality && !hasVideoParams && !media.libs;
-        const canCopyAudio: boolean = !media.noAudio && !hasAudioParams;
-
-        if (canCopyVideo && (canCopyAudio || media.noAudio)) {
+        if (useStreamCopy) {
             // 单纯的容器内重封装：视频/音频按需 copy 或禁用音频，速度快
             ffmpegCommand.videoCodec('copy');
             if (media.noAudio)
@@ -299,7 +517,7 @@ class TransformVideo {
         } else {
             // 需要重新编码时，按原有逻辑配置视频/音频编码参数
             if (appConf)
-                videoEncodingMeta = this.configureVideoEncoding(ffmpegCommand, media, appConf);
+                videoEncodingMeta = await this.configureVideoEncoding(ffmpegCommand, media, appConf);
             this.configureAudioEncoding(ffmpegCommand, media);
         }
 
@@ -315,11 +533,11 @@ class TransformVideo {
      * @param appConf {IDefaultSettingConfig}
      * @description 配置视频编码参数
      * **/
-    private static configureVideoEncoding(
+    private static async configureVideoEncoding(
         ffmpegCommand: FfmpegCommand,
         media: IMediaInfo,
         appConf: IDefaultSettingConfig
-    ): VideoEncodingMeta {
+    ): Promise<VideoEncodingMeta> {
         // 从配置中获取 GPU 加速设置，确保不被 media.videoParams 覆盖
         const gpuAccelerationFromConfig: boolean =
             appConf?.output?.codecType === 'GPU' && os.platform() !== 'linux';
@@ -360,44 +578,34 @@ class TransformVideo {
         if (!supportedCodecs.includes(selectedCodec))
             selectedCodec = supportedCodecs[0] || 'h264';
 
-        // 根据配置文件中的 codecType / codecMethod 以及当前平台，推断 GPU 编码器后缀
-        let hardwareEncoderSuffix: string | null = null;
+        // GPU 编码器推断 + 可用性预检。编码器出现在构建里不代表本机驱动可用：
+        // 没有 AMD 显卡时 h264_amf 依然可执行，但 avcodec_open2 会失败，进程秒退并留下一个空文件。
+        const candidateEncoder: { encoder: string; suffix: string } | null =
+            resolveHardwareEncoder(selectedCodec, appConf?.output?.codecType, appConf?.output?.codecMethod, os.platform());
+        const hardwareEncoder: { encoder: string; suffix: string } | null =
+            candidateEncoder && await Ffmpeg.isEncoderAvailable(candidateEncoder.encoder) ? candidateEncoder : null;
 
-        // 目前仅对 H.264 / H.265 尝试 GPU 加速，VP9 等保持 CPU 编码
-        if (videoParams.gpuAcceleration && (selectedCodec === 'h264' || selectedCodec === 'hevc')) {
-            const methodRaw: string = (appConf.output.codecMethod || '').toLowerCase();
-            const platform: NodeJS.Platform = os.platform();
+        if (candidateEncoder && !hardwareEncoder)
+            Logger.warn(`Task ${media.id} ${candidateEncoder.encoder} is not usable on this machine, falling back to the software encoder`);
 
-            if (platform === 'darwin') {
-                // Apple 芯片 / macOS 下统一使用 videotoolbox
-                hardwareEncoderSuffix = 'videotoolbox';
-            } else {
-                if (['amd', 'amf'].includes(methodRaw))
-                    hardwareEncoderSuffix = 'amf';
-                else if (['intel', 'qsv'].includes(methodRaw))
-                    hardwareEncoderSuffix = 'qsv';
-                else if (['nvidia', 'nvenc'].includes(methodRaw))
-                    hardwareEncoderSuffix = 'nvenc';
-            }
-        }
-
-        const useHardwareAcceleration: boolean = !!hardwareEncoderSuffix;
+        const useHardwareAcceleration: boolean = !!hardwareEncoder;
+        const hardwareEncoderSuffix: string | null = hardwareEncoder?.suffix ?? null;
         const resultMeta: VideoEncodingMeta = {
             useHardwareAcceleration,
             hardwareEncoderSuffix,
             selectedCodec
         };
 
-        // 如果配置开启 GPU 加速并且推断出了可用的硬件编码器，优先使用硬件编码
-        if (useHardwareAcceleration) {
-            const baseCodec = selectedCodec === 'hevc' ? 'hevc' : 'h264';
-            const encoderName = `${baseCodec}_${hardwareEncoderSuffix}`;
+        // 需要缩放时放弃硬件解码：滤镜链的输入格式与硬件 surface 的对接在各 API 上不一致
+        // （qsv 要 hwdownload，d3d11va 加了 hwdownload 反而报 "Impossible to convert between the formats"），
+        // 而硬件解码 + 软件滤镜组合失败后 ffmpeg 会立刻退出并留下 0 字节文件。软件解码不影响硬件编码的收益。
+        const needsScale: boolean = hasResolutionChange(videoParams);
 
-            ffmpegCommand.videoCodec(encoderName); // 例如 h264_nvenc / hevc_videotoolbox
+        if (hardwareEncoder) {
+            ffmpegCommand.videoCodec(hardwareEncoder.encoder); // 例如 h264_nvenc / hevc_videotoolbox
 
             // 配置硬件编码器参数
-            if (hardwareEncoderSuffix)
-                this.configureHardwareEncoder(ffmpegCommand, media, hardwareEncoderSuffix);
+            this.configureHardwareEncoder(ffmpegCommand, media, hardwareEncoder.suffix, !needsScale);
         } else {
             // CPU 编码：优先使用前端传入的 libs，其次使用 selectedCodec
             if (media.libs && media.libs.trim().length > 0) {
@@ -413,17 +621,19 @@ class TransformVideo {
                     ffmpegCommand.videoCodec('libx264');
             }
         }
-        // 应用清晰度设置
-        // VideoToolbox 使用 q:v，不应用 CRF 和 bitrate
-        // NVENC/QSV/AMF 使用 CRF/quality，已在上面设置，这里只应用像素格式
+        // 硬件编码的质量已由 configureHardwareEncoder 按编码器自己的语法设置好，
+        // 这里不再叠加 CRF/码率/像素格式：nvenc 用 -cq、qsv 用 -crf、amf 用 -qp_i/-qp_p、videotoolbox 用 -q:v，
+        // 且各家硬件编码器只接受 nv12/p010 等固定像素格式，透传源文件的 yuv444p/10bit 会被拒绝。
+        const isVideoToolbox: boolean = useHardwareAcceleration && hardwareEncoderSuffix === 'videotoolbox';
+
         this.applyQualitySettings(
             ffmpegCommand,
             media,
             videoParams,
-            useHardwareAcceleration && hardwareEncoderSuffix === 'videotoolbox',
-            hardwareEncoderSuffix === 'nvenc',
-            hardwareEncoderSuffix === 'nvenc',
-            useHardwareAcceleration && hardwareEncoderSuffix === 'nvenc'
+            isVideoToolbox,
+            useHardwareAcceleration,
+            useHardwareAcceleration,
+            useHardwareAcceleration
         );
 
         // 应用分辨率设置
@@ -431,42 +641,37 @@ class TransformVideo {
 
         // 应用其他视频参数
         // VideoToolbox 不支持 bitrate 和 preset 参数，使用 q:v 控制质量
-        if (useHardwareAcceleration && hardwareEncoderSuffix === 'videotoolbox') {
+        if (isVideoToolbox) {
             // VideoToolbox 只使用 q:v，不使用 bitrate 和 preset
             if (videoParams.fps)
                 ffmpegCommand.fps(videoParams.fps);
         } else {
-            // NVENC 走 CQ/VBR，不再设置显式 bitrate，避免探测到的超高码率导致失败
-            const shouldApplyBitrate: boolean = !(useHardwareAcceleration && hardwareEncoderSuffix === 'nvenc');
+            // 探测到的源码率只用于 CPU 编码；硬件编码有自己的 rate control，
+            // 且 nvenc 分支显式使用 `-b:v 0` + CQ，再叠加源码率会互相冲突
+            const bitrateInfo: { value: string | null; fromSource: boolean } = resolveVideoBitrate(videoParams.bitrate);
+            const shouldApplyBitrate: boolean = !useHardwareAcceleration || !bitrateInfo.fromSource;
 
-            if (shouldApplyBitrate && videoParams.bitrate)
-                ffmpegCommand.videoBitrate(videoParams.bitrate);
+            if (shouldApplyBitrate && bitrateInfo.value)
+                ffmpegCommand.videoBitrate(bitrateInfo.value);
             if (videoParams.fps)
                 ffmpegCommand.fps(videoParams.fps);
-            // 对 CPU 编码路径设置一个偏向速度的默认 preset（未指定时使用 faster）
-            const effectivePreset: string | undefined = useHardwareAcceleration
-                ? videoParams.preset
-                : videoParams.preset || 'faster';
-
-            if (effectivePreset)
-                ffmpegCommand.addOutputOptions(`-preset ${effectivePreset}`);
+            // preset 名单来自 x264（ultrafast..veryslow）：NVENC 只认 p1..p7，AMF 根本没有该选项，
+            // 传给硬件编码器会让 ffmpeg 在打开编码器时报错并留下空文件，因此只用于 CPU 编码。
+            if (!useHardwareAcceleration)
+                ffmpegCommand.addOutputOptions(`-preset ${videoParams.preset || 'faster'}`);
         }
-        // VideoToolbox 不支持 tune、profile、level 参数，跳过这些
-        if (!(useHardwareAcceleration && hardwareEncoderSuffix === 'videotoolbox')) {
+        // tune/profile/level 同样是 x264 语义（如 profile=main10），硬件编码器会直接拒绝；
+        // 硬件路径交给编码器自己协商 profile 与 level。
+        if (!useHardwareAcceleration) {
             if (videoParams.tune)
                 ffmpegCommand.addOutputOptions(`-tune ${videoParams.tune}`);
             if (videoParams.profile)
                 ffmpegCommand.addOutputOptions(`-profile:v ${videoParams.profile}`);
-            // NVENC 自动选择 level，源文件携带的 level（如 5.1 / 51）可能不被硬件接受
-            const shouldApplyLevel: boolean = !!videoParams.level && !(useHardwareAcceleration && hardwareEncoderSuffix === 'nvenc');
-
-            if (shouldApplyLevel)
+            if (videoParams.level)
                 ffmpegCommand.addOutputOptions(`-level ${videoParams.level}`);
         }
-        // 像素格式对所有编码器都适用，但 VideoToolbox 会自动选择兼容格式
-        if (videoParams.pixFmt &&
-            !(useHardwareAcceleration && hardwareEncoderSuffix === 'videotoolbox') &&
-            !(useHardwareAcceleration && hardwareEncoderSuffix === 'nvenc'))
+        // 像素格式仅对 CPU 编码透传，硬件编码使用编码器默认的 nv12/p010
+        if (videoParams.pixFmt && !useHardwareAcceleration)
             ffmpegCommand.addOutputOptions(`-pix_fmt ${videoParams.pixFmt}`);
 
         return resultMeta;
@@ -474,11 +679,13 @@ class TransformVideo {
 
     /**
      * 配置硬件编码器参数
+     * @param allowHardwareDecoding {boolean} 是否允许附加硬件解码（需要缩放滤镜时必须关掉）
      */
     private static configureHardwareEncoder(
         ffmpegCommand: FfmpegCommand,
         media: IMediaInfo,
-        hardwareEncoderSuffix: string
+        hardwareEncoderSuffix: string,
+        allowHardwareDecoding: boolean
     ): void {
         const quality = (media.quality || 'medium') as MediaQuality;
 
@@ -487,7 +694,8 @@ class TransformVideo {
             const qValue: string = quality === 'original' ? '15' : qualityToQValueMap[quality] || '30';
 
             // VideoToolbox 硬件编码器配置
-            ffmpegCommand.addInputOptions(['-hwaccel', 'videotoolbox']);
+            this.setupHardwareDecoding(ffmpegCommand, media, 'videotoolbox', allowHardwareDecoding);
+
             ffmpegCommand.addOutputOptions(['-q:v', qValue]);
             // 转换颜色空间：VideoToolbox 不支持 smpte170m，转换为 bt709
             ffmpegCommand.addOutputOptions(['-colorspace', 'bt709']);
@@ -495,10 +703,7 @@ class TransformVideo {
             ffmpegCommand.addOutputOptions(['-color_trc', 'bt709']);
         } else if (hardwareEncoderSuffix === 'nvenc') {
             // NVIDIA NVENC 硬件编码器配置
-            this.setupHardwareDecoding(ffmpegCommand, media, 'cuda', {
-                h265: 'hevc_cuvid',
-                h264: 'h264_cuvid'
-            }, true);
+            this.setupHardwareDecoding(ffmpegCommand, media, 'cuda', allowHardwareDecoding);
 
             const crfValue: string = quality === 'original' ? '18' : qualityToCrfMap[quality] || '23';
 
@@ -508,10 +713,7 @@ class TransformVideo {
             ffmpegCommand.addOutputOptions(['-b:v', '0']);
         } else if (hardwareEncoderSuffix === 'qsv') {
             // Intel QSV 硬件编码器配置
-            this.setupHardwareDecoding(ffmpegCommand, media, 'qsv', {
-                h265: 'hevc_qsv',
-                h264: 'h264_qsv'
-            });
+            this.setupHardwareDecoding(ffmpegCommand, media, 'qsv', allowHardwareDecoding);
 
             const crfValue: string = quality === 'original' ? '18' : qualityToCrfMap[quality] || '23';
 
@@ -519,45 +721,43 @@ class TransformVideo {
             ffmpegCommand.addOutputOptions(['-crf', crfValue]);
         } else if (hardwareEncoderSuffix === 'amf') {
             // AMD AMF 硬件编码器配置
-            if (media.isH265 || media.isH264) {
-                try {
-                    ffmpegCommand.addInputOptions(['-hwaccel', 'd3d11va']);
-                } catch (error) {
-                    // 忽略错误，回退到软件解码
-                }
-            }
+            this.setupHardwareDecoding(ffmpegCommand, media, 'd3d11va', allowHardwareDecoding);
 
-            const qualityValue: string = quality === 'original' ? '18' : qualityToCrfMap[quality] || '23';
+            // AMF 没有 -quality_preset，且 -quality 是 speed/balanced/quality 三档枚举，
+            // 把 CRF 数字（如 23）直接塞进去会得到 "Value 23.000000 for parameter 'quality' out of range [0 - 2]"，
+            // ffmpeg 在解析参数阶段就退出，输出文件根本没被创建。质量数值只能走 -qp_i/-qp_p。
+            const qualityMode: string = qualityToAmfMap[quality] || 'balanced';
+            const qpValue: string = quality === 'original' ? '18' : qualityToCrfMap[quality] || '23';
 
-            ffmpegCommand.addOutputOptions(['-quality', qualityValue]);
-            ffmpegCommand.addOutputOptions(['-quality_preset', 'balanced']);
+            ffmpegCommand.addOutputOptions(['-quality', qualityMode]);
+            ffmpegCommand.addOutputOptions(['-rc', 'cqp']);
+            ffmpegCommand.addOutputOptions(['-qp_i', qpValue]);
+            ffmpegCommand.addOutputOptions(['-qp_p', qpValue]);
         }
     }
 
     /**
-     * 设置硬件解码
-     */
+     * @method setupHardwareDecoding
+     * @param ffmpegCommand {FfmpegCommand}
+     * @param media {IMediaInfo}
+     * @param hwaccel {string}
+     * @param allowed {boolean}
+     * @description 只传 -hwaccel，让 ffmpeg 自己挑选解码器并把帧交回系统内存。
+     * 之前额外指定的 `-c:v h264_qsv` 解码器会把帧留在硬件 surface 上，
+     * 随后任何滤镜（包括 ffmpeg 为对齐像素格式自动插入的 scale）都会报
+     * "Impossible to convert between the formats supported by the filter ..."，
+     * 转换在几百毫秒内退出并留下 0 字节文件；`-hwaccel_output_format cuda` 同理。
+     * **/
     private static setupHardwareDecoding(
         ffmpegCommand: FfmpegCommand,
         media: IMediaInfo,
         hwaccel: string,
-        decoders: { h265: string; h264: string }
-        , allowDecoderFallback: boolean = false
+        allowed: boolean
     ): void {
-        if (media.isH265 || media.isH264) {
-            const inputOptions: string[] = ['-hwaccel', hwaccel];
+        if (!allowed) return;
+        if (!(media.isH265 || media.isH264)) return;
 
-            // 在允许回退时，不强制指定具体解码器，避免 cuvid 缺失导致失败
-            if (!allowDecoderFallback) {
-                if (media.isH265)
-                    inputOptions.push('-c:v', decoders.h265);
-                else if (media.isH264)
-                    inputOptions.push('-c:v', decoders.h264);
-            } else if (hwaccel === 'cuda')
-                inputOptions.push('-hwaccel_output_format', 'cuda');
-
-            ffmpegCommand.addInputOptions(inputOptions);
-        }
+        ffmpegCommand.addInputOptions(['-hwaccel', hwaccel]);
     }
 
     /**
@@ -605,20 +805,11 @@ class TransformVideo {
         media: IMediaInfo,
         videoParams: VideoEncodingParams
     ): void {
-        // 获取原始视频分辨率
-        const originalWidth: number = videoParams.originWidth || 0;
-        const originalHeight: number = videoParams.originHeight || 0;
+        if (!hasResolutionChange(videoParams)) return;
 
-        // 目标分辨率
-        const targetWidth: number = videoParams.width || 0;
-        const targetHeight: number = videoParams.height || 0;
-
-        // 如果目标分辨率有效且与原始分辨率不同，应用缩放
-        if (targetWidth > 0 && targetHeight > 0 &&
-            (targetWidth !== originalWidth || targetHeight !== originalHeight)) {
-            // 使用 lanczos 算法进行高质量缩放
-            ffmpegCommand.addOutputOptions(`-vf scale=${targetWidth}:${targetHeight}:flags=lanczos`);
-        }
+        // 使用 lanczos 算法进行高质量缩放
+        ffmpegCommand.addOutputOptions(
+            `-vf scale=${videoParams.width}:${videoParams.height}:flags=lanczos`);
     }
 
     /**
@@ -679,7 +870,7 @@ class TransformVideo {
 
         // 实际写入 Ffmpeg 参数
         if (codec)
-            ffmpegCommand.audioCodec(codec);
+            ffmpegCommand.audioCodec(AUDIO_CODEC_ALIAS[codec] ?? codec);
         if (bitrate)
             ffmpegCommand.audioBitrate(bitrate);
         if (sampleRate)
