@@ -5,9 +5,9 @@ import {platform} from "node:os";
 import AppConf from "./AppConf";
 
 const Player = (mediaPath: string, ctx: IpcMainEvent): void => {
-    const {player: {playerPath, playerType}} = AppConf;
+    const {playerPath, playerType} = AppConf?.player ?? {};
 
-    if (!existsSync(playerPath))
+    if (!playerPath || !existsSync(playerPath))
         return ctx.reply('main:on:player-not-exists', '');
 
     if (!existsSync(mediaPath))
