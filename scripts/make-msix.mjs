@@ -4,12 +4,8 @@ import {rmSync} from 'node:fs';
 import {join, resolve} from 'node:path';
 import {platform} from "node:os";
 
-/**
- * 走 Forge 的 Node API 而不是 `electron-forge make` 命令行：
- * CLI 的启动自检用 `pnpm config get node-linker` 判断 pnpm 布局，而 pnpm 10 的
- * `config get` 只读全局配置，看不到本项目的 .npmrc，于是明明已经是 hoisted 布局仍被判为不合格。
- * 安装布局由 .npmrc 保证，这里只做真正的工作。
- */
+// 不走 `electron-forge make`：CLI 的自检用 `pnpm config get node-linker`，而 pnpm 10 只读全局配置，
+// 看不见本项目 .npmrc 里的 hoisted，布局正确也会被判不合格。
 
 void (async () => {
     if (platform() !== 'win32')
@@ -27,11 +23,21 @@ void (async () => {
         process.exit(1);
     }
 
-// maker 把成品从临时目录挪到 out 时用的是"目标必须不存在"的语义（rename，已存在直接失败），
-// 而同名文件正是上一轮的产物：版本号不变时文件名一模一样，所以这里点名删掉它。
-    const previousArtifact = join(OUT_DIR, 'make', 'msix', 'x64', `${appName}-win32-x64-${require('../package.json').version}.msix`);
+    // maker 落盘用 rename，目标已存在就失败；版本号不变时上一轮的产物名一模一样
+    const artifactBaseName = `${appName}-win32-x64-${require('../package.json').version}`;
+    const previousArtifact = join(OUT_DIR, 'make', 'msix', 'x64', `${artifactBaseName}.msix`);
 
-    rmSync(previousArtifact, {force: true});
+    try {
+        rmSync(previousArtifact, {force: true});
+    } catch (e) {
+        if (e.code !== 'EPERM' && e.code !== 'EBUSY') throw e;
+
+        // 编辑器握着旧包的句柄且没开 FILE_SHARE_DELETE，这种文件删不掉也改名；换个文件名继续出产物
+        process.env.QM_MSIX_OUTPUT_BASE_NAME = `${artifactBaseName}-${Date.now()}`;
+        console.error(`[make:msix] ${previousArtifact} 被其他进程独占，删不掉`);
+        console.error(`[make:msix] 本轮改写到 ${process.env.QM_MSIX_OUTPUT_BASE_NAME}.msix`);
+        console.error('[make:msix] 要清掉旧包：先关掉编辑器（或把 dist 标为 excluded），再手动删');
+    }
 
     const results = await api.make({
         dir: process.cwd(),
@@ -44,6 +50,6 @@ void (async () => {
         for (const artifact of result.artifacts)
             console.log(`[make:msix] ${artifact}`);
 
-// make 跑完后仍留有未释放的句柄，node 不会自己退出，产物已经落盘，直接收工
+// Forge 留下的句柄会让 node 不退出，产物此时已经落盘
     process.exit(0);
 })();

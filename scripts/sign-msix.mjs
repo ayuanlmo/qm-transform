@@ -1,13 +1,12 @@
 import {spawnSync} from 'node:child_process';
-import {existsSync, readdirSync, statSync} from 'node:fs';
+import {createRequire} from 'node:module';
+import {existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync} from 'node:fs';
 import path from 'node:path';
 
-/**
- * 本机自签：出 devcert.pfx / devcert.cer，把 dist/msix 里那枚 .msix 签成能直接 Add-AppxPackage 的包。
- * 签名仅用于本地测试，避免0x80073CF9 导致无法安装
- *
- * Publisher不写死，而是从包里的 AppxManifest.xml 读出来反推证书。
- */
+const require = createRequire(import.meta.url);
+
+// 本机自签，让 .msix 能直接 Add-AppxPackage；商店提交用的包不签名。
+// 证书身份不写死，从包里的 AppxManifest.xml 读出来反推。
 
 const OUT_DIR = path.resolve('dist', 'msix');
 const MANIFEST = path.join(OUT_DIR, 'AppxManifest.xml');
@@ -25,9 +24,8 @@ const findMsix = () => {
         ? readdirSync(dir).filter((f) => f.endsWith('.msix')).map((f) => path.join(dir, f))
         : [];
 
-    // 未构建？？
     if (candidates.length === 0) {
-        console.log(':[sign:msix] 找不到构建目标，请先构建后再试。');
+        console.error('[sign:msix] 找不到 .msix，请先 pnpm run make:msix');
         process.exit(1);
     }
     return candidates.sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs)[0];
@@ -61,14 +59,13 @@ const findSignTool = () => {
     return path.join(binRoot, versions[versions.length - 1], 'x64', 'signtool.exe');
 };
 
-/**
- * PowerShell 一律走 -File，脚本内容是写死的字符串，参数只通过环境变量传，
- * 这样不经 shell 拼接，也不会有引号被吃掉的问题。
- */
+// 走 -File 且参数只经环境变量传，不经 shell 拼接。
+// 落盘必须带 BOM：PS 5.1 读无 BOM 的 .ps1 按本机 ANSI 代码页解码，正文里任何非 ASCII
+// （含中文注释）都会串位到语法上，报出来的是不相干的 Null 引用错——所以 PS 正文只写 ASCII。
 const runPowerShell = (name, body, env) => {
     const scriptPath = path.join(OUT_DIR, `.${name}.ps1`);
 
-    writeFileSync(scriptPath, body, 'utf8');
+    writeFileSync(scriptPath, `\uFEFF${body}`, 'utf8');
     const proc = spawnSync('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', scriptPath], {
         encoding: 'utf8',
         env: {...process.env, ...env}
@@ -97,28 +94,47 @@ $reader.Close()
 $zip.Dispose()
 Set-Content -Path $env:QM_MANIFEST -Value $xml -Encoding UTF8
 [xml]$doc = $xml
+Write-Output ("NAME=" + $doc.Package.Identity.Name)
 Write-Output ("PUBLISHER=" + $doc.Package.Identity.Publisher)
 `, {QM_MSIX: msix, QM_MANIFEST: MANIFEST});
 
+const identity = /^NAME=(.+)$/m.exec(readManifest)?.[1]?.trim();
 const publisher = /^PUBLISHER=(.+)$/m.exec(readManifest)?.[1]?.trim();
 
-if (!publisher) {
-    console.error('[sign:msix] 从包里读不到 <Identity Publisher>');
+if (!identity || !publisher) {
+    console.error('[sign:msix] 从包里读不到 <Identity Name/Publisher>');
     process.exit(1);
 }
+
+// 身份和 forge.config.js 对不上说明手里是旧身份构建的包：本机自签照样验通，Partner Center 按 Name/Publisher 拒收
+const manifestVars = require('../forge.config.js').makers
+    .find((maker) => maker.name === '@electron-forge/maker-msix')?.config?.manifestVariables ?? {};
+const expectPublisher = (manifestVars.publisher ?? '').replace(/^CN=/, '');
+
+if (identity !== manifestVars.packageIdentity || publisher.replace(/^CN=/, '') !== expectPublisher) {
+    console.error('[sign:msix] 包身份和 forge.config.js 对不上：');
+    console.error(`  包里     Name=${identity}  Publisher=${publisher}`);
+    console.error(`  配置里   Name=${manifestVars.packageIdentity}  Publisher=${manifestVars.publisher}`);
+    console.error('[sign:msix] 用当前配置重新 pnpm run make:msix，别拿旧包签名。');
+    process.exit(1);
+}
+
 console.log(`[sign:msix] 包：${msix}`);
 console.log(`[sign:msix] 清单已导出：${MANIFEST}`);
+console.log(`[sign:msix] 包名：${identity}`);
 console.log(`[sign:msix] 发布者：${publisher}`);
 
+// Appx 要的是 Code Signing EKU，本机 -Type 只认 CodeSigningCert（教程常见的 DocumentSigningCert 会被枚举拒掉）。
+// New-SelfSignedCertificate 的返回对象不可靠，建完一律回 CurrentUser\My 按主题重取。
 const certReport = runPowerShell('cert', `
 $ErrorActionPreference = 'Stop'
 $secure = ConvertTo-SecureString -String $env:QM_PASSWORD -Force -AsPlainText
-$cert = Get-ChildItem Cert:\\CurrentUser\\My |
-    Where-Object { $_.Subject -eq $env:QM_PUBLISHER } |
-    Sort-Object NotAfter -Descending |
-    Select-Object -First 1
+$findCert = { Get-ChildItem Cert:\\CurrentUser\\My | Where-Object { $_.Subject -eq $env:QM_PUBLISHER } | Sort-Object NotAfter -Descending | Select-Object -First 1 }
+$cert = & $findCert
 if ($null -eq $cert) {
-    $cert = New-SelfSignedCertificate -Subject $env:QM_PUBLISHER -FriendlyName 'QM-Transform local MSIX test cert' -Type DocumentSigningCert -KeyUsage DigitalSignature -KeyExportPolicy Exportable -HashAlgorithm SHA256 -NotAfter (Get-Date).AddYears(3) -CertStoreLocation Cert:\\CurrentUser\\My
+    $null = New-SelfSignedCertificate -Subject $env:QM_PUBLISHER -FriendlyName 'QM-Transform local MSIX test cert' -Type CodeSigningCert -KeyUsage DigitalSignature -KeySpec Signature -KeyExportPolicy Exportable -HashAlgorithm SHA256 -NotAfter (Get-Date).AddYears(3) -CertStoreLocation 'Cert:\\CurrentUser\\My'
+    $cert = & $findCert
+    if ($null -eq $cert) { throw "certificate with subject $env:QM_PUBLISHER is not in CurrentUser\\My after creation" }
     Write-Output ("CREATED=" + $cert.Thumbprint)
 } else {
     Write-Output ("REUSED=" + $cert.Thumbprint)
@@ -161,5 +177,5 @@ if (/^TRUSTED=0$/m.test(report)) {
     console.log(`  Import-Certificate -FilePath '${CER}' -CertStoreLocation Cert:\\LocalMachine\\TrustedPeople`);
 }
 console.log('');
-console.log(`[sign:msix] 安装：Add-AppxPackage -Path '${msix}'；卸载：Get-AppxPackage -Name '*QMTransform*' | Remove-AppxPackage`);
+console.log(`[sign:msix] 安装：Add-AppxPackage -Path '${msix}'；卸载：Get-AppxPackage -Name '${identity}' | Remove-AppxPackage`);
 console.log(`[sign:msix] 本机签名完成。`);

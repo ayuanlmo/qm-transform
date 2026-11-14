@@ -13,11 +13,17 @@ const WIN_KIT_BIN = 'C:\\Program Files (x86)\\Windows Kits\\10\\bin';
 
 const APP_NAME = 'QM-Transform';
 
-// 商店身份：这两项必须与 Partner Center 里保留的包名、发布者完全一致，
-// 名字不对会被直接拒收，所以留成可覆盖的环境变量而不是写死在代码里。
-const MSIX_IDENTITY = process.env.QM_MSIX_IDENTITY ?? 'ayuanlmo.QMTransform';
-const MSIX_PUBLISHER = process.env.QM_MSIX_PUBLISHER ?? 'ayuanlmo';
-const MSIX_PUBLISHER_DISPLAY_NAME = process.env.QM_MSIX_PUBLISHER_DISPLAY_NAME ?? MSIX_PUBLISHER;
+// 商店身份：三项必须与 Partner Center「包标识符」里保留的值逐字一致，名字对不上会被直接拒收。
+//   Package/Identity/Name             ayuanlmo.QM-Transform
+//   Package/Identity/Publisher        CN=56A54446-5F53-4BB5-A40B-063D78E4B992
+//   Package/Properties/PublisherDisplayName  ayuanlmo
+// Name 里那个点后面没有空格：Appx 的 Name 属性不允许出现空格，官网页面上的空格是展示用的。
+// Publisher 是 GUID 形式的证书主题（商店代签用的就是这张证书），写成 CN= 全形式；
+// maker 会把多余的 CN= 前缀去掉再补回模板，所以带不带前缀都能出对的清单，这里按官网原样写。
+// PFN ayuanlmo.QM-Transform_k7w7p975xr2dt 不用配置：它是 Name + 发布者哈希（取自 Publisher DN）算出来的。
+const MSIX_IDENTITY = process.env.QM_MSIX_IDENTITY ?? 'ayuanlmo.QM-Transform';
+const MSIX_PUBLISHER = process.env.QM_MSIX_PUBLISHER ?? 'CN=56A54446-5F53-4BB5-A40B-063D78E4B992';
+const MSIX_PUBLISHER_DISPLAY_NAME = process.env.QM_MSIX_PUBLISHER_DISPLAY_NAME ?? 'ayuanlmo';
 
 const versionParts = (version) => version.split('.').map((part) => Number.parseInt(part, 10) || 0);
 
@@ -60,7 +66,39 @@ const IGNORED_NODE_MODULES_ENTRIES = new Set(['.pnpm', '.cache', '.bin', '.packa
 // 杀软还握着上一轮的文件就当场 EBUSY。同卷就是一次 rename，不复制也不删。
 const PACKAGER_STAGING_DIR = process.env.QM_PACKAGER_TMPDIR ?? path.resolve(__dirname, '..', 'qm-msix-staging');
 
+/**
+ * Chromium 自带的界面字符串（locales/*.pak）和应用自己的 i18n 是两回事：它只覆盖右键菜单、
+ * 编辑菜单里 role 项这类系统级文案，55 个 pak 一共 42MB，而 src/i18n 只出 9 种语言。
+ * 清单放在 package.json 的 build.win.electronLanguages（electron-builder 那条通道读同一份），
+ * en-US 在这里无条件保留：pak 缺失时 Chromium 回落的就是它，把它删了就没有兜底。
+ * 商店清单与此无关——AppxManifest 只声明 <Resource Language="en-US" />，Store 一览要填的
+ * 语言由后台的列表设置决定，不会因为多塞了 46 个 pak 就多要求一种语言。
+ */
+const SUPPORTED_CHROMIUM_LOCALES = new Set(
+    ['en-US', ...(require('./package.json').build.win.electronLanguages ?? [])]
+);
+
 module.exports = {
+    hooks: {
+        // packager 的 ignore 只过滤应用自己的文件，Electron 解压出来的 locales 不在它管辖范围内，
+        // 所以剔除放在打包收尾：此时 outputPaths 就是最终产物目录，改完 maker 直接拿它封装。
+        postPackage: async (_config, {outputPaths}) => {
+            for (const appDir of [outputPaths].flat()) {
+                const localesDir = path.resolve(appDir, 'locales');
+
+                if (!fs.existsSync(localesDir)) continue;
+
+                const removed = fs.readdirSync(localesDir)
+                    .filter((file) => file.endsWith('.pak'))
+                    .filter((file) => !SUPPORTED_CHROMIUM_LOCALES.has(file.slice(0, -'.pak'.length)));
+
+                for (const file of removed)
+                    fs.rmSync(path.join(localesDir, file), {force: true});
+
+                console.log(`[forge] locales: removed ${removed.length}, kept ${[...SUPPORTED_CHROMIUM_LOCALES].sort().join(', ')}`);
+            }
+        }
+    },
     packagerConfig: {
         name: APP_NAME,
         tmpdir: PACKAGER_STAGING_DIR,
@@ -103,6 +141,10 @@ module.exports = {
                 // 磁贴/Logo 的输入资源，跟 public/ 里的图标同级：由人准备、构建只读取，
                 // 不是构建产物，所以要进版本库（名字和尺寸是 MSIX 清单里写死的那一套）。
                 packageAssets: path.resolve('resources/msix/assets'),
+                // 默认文件名就是 maker 自己的 <包目录名>-<版本>。留一个环境变量口子是因为上一轮的
+                // 产物可能被编辑器独占而删不掉，maker 的 move 遇到同名目标直接失败——那种情况下
+                // scripts/make-msix.mjs 换成带时间戳的名字，保证这一轮仍然出得来（见该脚本）。
+                outputFileName: () => process.env.QM_MSIX_OUTPUT_BASE_NAME ?? `${APP_NAME}-win32-x64-${require('./package.json').version}`,
                 manifestVariables: {
                     packageIdentity: MSIX_IDENTITY,
                     publisher: MSIX_PUBLISHER,

@@ -1,6 +1,6 @@
 {
   "name": "qm-transform",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "QM-Transform 现代化、开源的媒体格式转换工具",
   "main": "build/main.js",
   "private": false,
@@ -64,6 +64,17 @@
     },
     "win": {
       "icon": "public/favicon.ico",
+      "electronLanguages": [
+        "en-US",
+        "de",
+        "fi",
+        "fr",
+        "ja",
+        "ko",
+        "ru",
+        "zh-CN",
+        "zh-TW"
+      ],
       "target": [
         {
           "target": "nsis",
@@ -88,6 +99,17 @@
     "linux": {
       "icon": "public/icon.png",
       "category": "Utility",
+      "electronLanguages": [
+        "en-US",
+        "de",
+        "fi",
+        "fr",
+        "ja",
+        "ko",
+        "ru",
+        "zh-CN",
+        "zh-TW"
+      ],
       "target": [
         {
           "target": "AppImage",
