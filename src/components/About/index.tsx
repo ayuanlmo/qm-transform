@@ -4,6 +4,7 @@ import {
     forwardRef,
     ForwardRefExoticComponent,
     RefAttributes,
+    useEffect,
     useImperativeHandle,
     useRef,
     useState
@@ -30,9 +31,19 @@ export interface IAboutRef {
 const About: ForwardRefExoticComponent<RefAttributes<IAboutRef>> = forwardRef((_props: {}, ref: ForwardedRef<IAboutRef>): React.JSX.Element => {
     const {t} = useTranslation();
     const [visible, setVisible] = useState(false);
+    const [managedByStore, setManagedByStore] = useState(false);
     const appLicenseNoticesRef = useRef<IAppLicenseNoticesProps>(null);
     const {appName} = AppConfig;
     const appVersion: string = useSelector((state: RootState): string => state.app.appVersion);
+
+    // MSIX 通道没有自更新：主进程不实例化 AppUpdate，这里把"检查更新"换成商店管理的说明
+    useMainEventListener<{managedByStore: boolean}>('main:on:update-mode', (data): void => {
+        setManagedByStore(data.managedByStore);
+    });
+
+    useEffect((): void => {
+        sendIpcMessage('main:on:get-update-mode');
+    }, []);
 
     const open = () => {
         setVisible(!visible);
@@ -90,9 +101,12 @@ const About: ForwardRefExoticComponent<RefAttributes<IAboutRef>> = forwardRef((_
                         </Text>
                     </div>
                     <div className="app-about-update">
-                        <Button onClick={(): void => {
-                            sendIpcMessage('main:on:check-for-updates');
-                        }}>{t('about.checkForUpdate')}</Button>
+                        {managedByStore
+                            ? <Text as="p" size={200} block>{t('about.updateManagedByStore')}</Text>
+                            : <Button onClick={(): void => {
+                                sendIpcMessage('main:on:check-for-updates');
+                            }}>{t('about.checkForUpdate')}</Button>
+                        }
                     </div>
                     <div className={'app-about-license'}>
                         <AppLicenseNotices ref={appLicenseNoticesRef}/>
