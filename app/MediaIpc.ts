@@ -5,7 +5,6 @@ import Logger from "../lib/Logger";
 import {basename} from "path";
 import Media from "../bin/Media";
 import Player from "./MediaPlayerIpc";
-import {platform} from "node:os";
 import {pathToFileURL} from "node:url";
 
 interface IGetMediaInfo {
@@ -21,7 +20,9 @@ interface IGetMediaInfo {
  * **/
 export class MediaIpcMainHandles {
     constructor() {
-        ipcMain.on('main:on:get-media-info', (event, files: IGetMediaInfo[]): Promise<void> => this.getMediaInfo(files, event));
+        ipcMain.on('main:on:get-media-info', (event, files: IGetMediaInfo[]): void => {
+            void this.getMediaInfo(Array.isArray(files) ? files : [], event).catch((e: unknown): void => Logger.error(e));
+        });
         ipcMain.on('main:on:player', (event, data: string): void => {
             Player(data, event);
         });
@@ -35,29 +36,32 @@ export class MediaIpcMainHandles {
      * @param {IGetMediaInfo[]} files
      * @param {IpcMainEvent} ctx
      * @author ayuanlmo
-     * @description 获取媒体文件信息
+     * @description Get media files info
      * **/
     public async getMediaInfo(files: IGetMediaInfo[], ctx: IpcMainEvent): Promise<void> {
         const medias = [];
 
         for (const mediaFile of files) {
-            ctx.reply('main:on:media-info:pending', {
-                id: mediaFile.id,
-                baseName: basename(mediaFile.path)
-            });
-            try {
-                const mediaInfo: FfprobeData | undefined = await Ffmpeg.getMediaInfo(mediaFile.path, ctx);
+            const {id, path: fullPath} = mediaFile ?? ({} as IGetMediaInfo);
+            const baseName: string = fullPath ? basename(fullPath) : '';
 
-                if (!mediaInfo) return;
+            ctx.reply('main:on:media-info:pending', {id, baseName});
+
+            try {
+                const mediaInfo: FfprobeData = await Ffmpeg.getMediaInfo(fullPath, ctx);
                 const isVideo: boolean = Media.targetIs(mediaInfo, 'video');
                 const isAudio: boolean = Media.targetIs(mediaInfo, 'audio');
-                const cover: string | undefined = isVideo ? await Ffmpeg.getVideoMediaFirstFrame(mediaFile.path, ctx) : isAudio ? await Ffmpeg.getAudioVisualizationDiagram(mediaFile.path, ctx) : '';
+                const cover: string = isVideo
+                    ? await Ffmpeg.getVideoMediaFirstFrame(fullPath, ctx).catch((): string => '')
+                    : isAudio
+                        ? await Ffmpeg.getAudioVisualizationDiagram(fullPath, ctx).catch((): string => '')
+                        : '';
 
                 medias.push({
                     cover: cover ? pathToFileURL(cover).href : '',
-                    id: mediaFile.id,
-                    baseName: basename(mediaFile.path),
-                    fullPath: mediaFile.path,
+                    id,
+                    baseName,
+                    fullPath,
                     isH264: Media.isH264(mediaInfo),
                     isH265: Media.isH265(mediaInfo),
                     format: Media.mediaFormat(mediaInfo),
@@ -68,13 +72,10 @@ export class MediaIpcMainHandles {
                     videoParams: Ffmpeg.getMediaVideoInfo(mediaInfo),
                     audioParams: Ffmpeg.getMediaAudioInfo(mediaInfo)
                 });
-
-                ctx.reply('main:on:media-info:complete', {
-                    id: mediaFile.id,
-                    baseName: basename(mediaFile.path)
-                });
             } catch (e) {
-                Logger.error(e);
+                Logger.error(`[MediaIpc] skipped ${fullPath}: ${(e as Error)?.message ?? e}`);
+            } finally {
+                ctx.reply('main:on:media-info:complete', {id, baseName});
             }
         }
 
