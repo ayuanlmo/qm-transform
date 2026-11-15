@@ -184,6 +184,7 @@ jobs:
       - name: 上传
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
           TAG: ${{ needs.prepare.outputs.tag }}
         run: |
           set -euo pipefail
