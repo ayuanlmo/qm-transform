@@ -58,6 +58,9 @@ jobs:
     name: Windows (NSIS exe + latest.yml)
     needs: prepare
     runs-on: windows-latest
+    env:
+      # CRA 在 CI 下把 warnings 当 errors，弃用告警会打挂构建
+      CI: 'false'
     defaults:
       run:
         shell: bash
@@ -97,6 +100,8 @@ jobs:
     env:
       # 没有开发者证书，别让构建去钥匙串里找签名身份
       CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      # CRA 在 CI 下把 warnings 当 errors，弃用告警会打挂构建
+      CI: 'false'
     steps:
       - uses: actions/checkout@v4
 
@@ -140,6 +145,9 @@ jobs:
     name: Linux (AppImage + deb)
     needs: prepare
     runs-on: ubuntu-latest
+    env:
+      # CRA 在 CI 下把 warnings 当 errors，弃用告警会打挂构建
+      CI: 'false'
     steps:
       - uses: actions/checkout@v4
 
