@@ -1,17 +1,22 @@
 name: Release
 
-# 新建 Release（非草稿、非预发布）后构建三平台产物并回填到该 Release。MSIX 除外
+# 构建三平台产物并回填到 Release。Release 发布触发；也可手动按 tag 重跑（回填到已有 Release）。MSIX 除外
 
 on:
   release:
     types:
       - published
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: '要构建并回填的 Release tag（例如 2.2.0）'
+        required: true
 
 permissions:
   contents: write
 
 concurrency:
-  group: release-${{ github.event.release.tag_name }}
+  group: release-${{ github.event.release.tag_name || inputs.tag }}
 
 env:
   NODE_VERSION: '24'
@@ -22,14 +27,14 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.verify.outputs.version }}
-      tag: ${{ github.event.release.tag_name }}
+      tag: ${{ steps.verify.outputs.tag }}
     steps:
       - name: 版本号取 Release 标题，退回 tag
         id: verify
         env:
           NAME: ${{ github.event.release.name }}
-          TAG: ${{ github.event.release.tag_name }}
-          PRERELEASE: ${{ github.event.release.prerelease }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+          PRERELEASE: ${{ github.event.release.prerelease || 'false' }}
         run: |
           set -euo pipefail
 
@@ -52,6 +57,7 @@ jobs:
           fi
 
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "发布 $VERSION"
 
   windows:
@@ -63,6 +69,8 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - uses: pnpm/action-setup@v4
 
@@ -99,6 +107,8 @@ jobs:
       CSC_IDENTITY_AUTO_DISCOVERY: 'false'
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - uses: pnpm/action-setup@v4
 
@@ -142,6 +152,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.tag }}
 
       - uses: pnpm/action-setup@v4
 
@@ -186,11 +198,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           TAG: ${{ needs.prepare.outputs.tag }}
+          VERSION: ${{ needs.prepare.outputs.version }}
         run: |
           set -euo pipefail
 
           # 少了 latest*.yml，应用就不知道有新版本
           ls assets/latest*.yml > /dev/null
 
+          # Release 不存在就新建（重建场景通常已存在，这句兜底）
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --title "$VERSION"
           gh release upload "$TAG" assets/* --clobber
           gh release view "$TAG"
