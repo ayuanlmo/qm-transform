@@ -71,6 +71,7 @@
     "label": "About",
     "viewOnGithub": "View this project on GitHub",
     "checkForUpdate": "Check for Updates",
+    "updateManagedByStore": "Updates are managed by the Microsoft Store.",
     "designer": "Designer",
     "licenseAndOpenSourceNotices": "License and Open Source Notices",
     "appOpenSourceNotice": "<appName>{{name}}</appName> is an open source project published under the Apache 2.0 License. You can view the source code and contribute to this project on <github>Github</github>"
@@ -84,6 +85,9 @@
     "downloaded": "Update downloaded successfully. Do you want to restart the application now to apply the update?",
     "restartNow": "Restart Now",
     "restartLater": "Restart Later",
+    "downloadNow": "Download Now",
+    "later": "Later",
+    "tasksRunning": "A conversion is still running. Wait for it to finish before restarting to apply the update.",
     "error": {
       "network": "Network connection failed. Please check your network settings.",
       "server": "Update server error. Please try again later.",
@@ -113,6 +117,7 @@
       "batchRunning": "Running: {{current}} / {{total}}",
       "showInExplorer": "Show in Explorer",
       "showInFinder": "Show in Finder",
+      "showInFileManager": "Show in File Manager",
       "addTitle": "Add Title",
       "addCredits": "Add Credits",
       "videoFps": "Video FPS",
@@ -225,6 +230,15 @@
     "media-first-frame-error": "An error occurred while retrieving the first frame image of media file [{{mediaFile}}], details: {{message}}",
     "media-audio-av-error": "An error occurred while retrieving waveform of audio file [{{mediaFile}}], details: {{message}}",
     "output-directory-not-exist": "Output directory [{{path}}] does not exist. Please select another.",
-    "conversionFailedMessage": "[{{name}}] conversion failed, details: {{message}}."
+    "conversionFailedMessage": "[{{name}}] conversion failed, details: {{message}}.",
+    "media-file-not-found": "Media file [{{mediaFile}}] does not exist or is no longer accessible.",
+    "media-file-empty": "Media file [{{mediaFile}}] is empty and contains no data.",
+    "media-file-unreadable": "Media file [{{mediaFile}}] cannot be read. It may be in use by another program or permissions are insufficient.",
+    "media-binary-missing": "The built-in FFmpeg component is missing. Please reinstall the application.",
+    "media-probe-timeout": "Reading media file [{{mediaFile}}] timed out. The file may be damaged.",
+    "media-probe-invalid": "Media file [{{mediaFile}}] is damaged or uses an unsupported media format ({{message}}).",
+    "task-create-failed": "Failed to start the conversion task ({{message}}).",
+    "task-pause-unsupported": "This task cannot be paused (a remux, an unknown duration, or an output format that cannot be stitched back). The conversion keeps running.",
+    "task-segment-merge-failed": "The paused part could not be merged into the output file ({{message}}). It will be re-encoded when the task resumes."
   }
 }

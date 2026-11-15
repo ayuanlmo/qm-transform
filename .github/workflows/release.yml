@@ -1,0 +1,195 @@
+name: Release
+
+# 新建 Release（非草稿、非预发布）后构建三平台产物并回填到该 Release。MSIX 除外
+
+on:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.event.release.tag_name }}
+
+env:
+  NODE_VERSION: '24'
+
+jobs:
+  prepare:
+    name: 校验版本号
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.verify.outputs.version }}
+      tag: ${{ github.event.release.tag_name }}
+    steps:
+      - name: 版本号取 Release 标题，退回 tag
+        id: verify
+        env:
+          NAME: ${{ github.event.release.name }}
+          TAG: ${{ github.event.release.tag_name }}
+          PRERELEASE: ${{ github.event.release.prerelease }}
+        run: |
+          set -euo pipefail
+
+          if [ "$PRERELEASE" != "false" ]; then
+            echo "::error title=预发布不构建::electron-updater 读 /releases/latest，里面不含预发布。"
+            exit 1
+          fi
+
+          is_version() { printf '%s' "$1" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; }
+
+          VERSION="${NAME#v}"
+
+          if ! is_version "$VERSION"; then
+            VERSION="${TAG#v}"
+          fi
+
+          if ! is_version "$VERSION"; then
+            echo "::error title=没有版本号::标题[$NAME] 和 tag[$TAG] 都不是 x.y.z。"
+            exit 1
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "发布 $VERSION"
+
+  windows:
+    name: Windows (NSIS exe + latest.yml)
+    needs: prepare
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 版本号来自 Release
+        run: pnpm pkg set version='${{ needs.prepare.outputs.version }}'
+
+      - name: 构建
+        run: pnpm build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-windows
+          path: |
+            dist/*.exe
+            dist/*.yml
+            dist/*.blockmap
+            !dist/builder-debug.yml
+          if-no-files-found: error
+
+  macos:
+    name: macOS (arm64 dmg + latest-mac.yml)
+    needs: prepare
+    runs-on: macos-latest
+    env:
+      # 没有开发者证书，别让构建去钥匙串里找签名身份
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      # prebuild 按 process.arch 删不匹配的 ffprobe，runner 是 x64 就会把它装进 arm64 包
+      - name: runner 必须是 arm64
+        run: |
+          ARCH="$(node -p "process.arch")"
+
+          if [ "$ARCH" != "arm64" ]; then
+            echo "::error title=runner 架构不对::需要 arm64，实际 $ARCH。"
+            exit 1
+          fi
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 版本号来自 Release
+        run: pnpm pkg set version='${{ needs.prepare.outputs.version }}'
+
+      - name: 构建
+        run: pnpm build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-macos
+          path: |
+            dist/*.dmg
+            dist/*.yml
+            dist/*.blockmap
+            !dist/builder-debug.yml
+          if-no-files-found: error
+
+  linux:
+    name: Linux (AppImage + deb)
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 版本号来自 Release
+        run: pnpm pkg set version='${{ needs.prepare.outputs.version }}'
+
+      - name: 构建
+        run: pnpm build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-linux
+          path: |
+            dist/*.AppImage
+            dist/*.deb
+            dist/*.yml
+            dist/*.blockmap
+            !dist/builder-debug.yml
+          if-no-files-found: error
+
+  upload:
+    name: 回填 Release
+    needs: [prepare, windows, macos, linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: dist-*
+          path: assets
+          merge-multiple: true
+
+      - name: 上传
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+        run: |
+          set -euo pipefail
+
+          # 少了 latest*.yml，应用就不知道有新版本
+          ls assets/latest*.yml > /dev/null
+
+          gh release upload "$TAG" assets/* --clobber
+          gh release view "$TAG"

@@ -104,3 +104,5 @@ export const formatFileSize = (bytes: number): string => {
 
     return `${(bytes / (k * k * k)).toFixed(1)}G`;
 };
+
+export {getShowInSystemFileManagerI18nKey} from './platformI18n';

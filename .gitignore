@@ -1,5 +1,6 @@
 .DS_Store
 .idea
+.run
 .vscode
 *.suo
 *.ntvs*
@@ -9,4 +10,5 @@
 
 node_modules
 /dist
+/out
 build

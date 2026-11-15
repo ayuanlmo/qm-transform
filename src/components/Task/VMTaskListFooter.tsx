@@ -122,27 +122,34 @@ const VMTaskListFooter: React.FC = (): React.JSX.Element => {
         });
     };
 
+    // 批量状态以主进程回执为准：合成任务无法断点续转，暂停会被拒绝，
+    // 抢先 dispatch 只会把界面冻在一个后台其实还在跑（或早已结束）的"已暂停"上
     const handlePause = (): void => {
-        if (vcBatch.running.length > 0) {
+        if (vcBatch.running.length > 0)
             sendIpcMessage('main:on:task-pause', vcBatch.running[0]);
-            dispatch(vcBatchPause());
-        }
     };
 
     const handleResume = (): void => {
-        if (vcBatch.running.length > 0) {
+        if (vcBatch.running.length > 0)
             sendIpcMessage('main:on:task-resume', vcBatch.running[0]);
-            dispatch(vcBatchResume());
-        }
     };
 
     const handleStop = (): void => {
-        if (vcBatch.running.length > 0) {
-            sendIpcMessage('main:on:task-pause', vcBatch.running[0]);
-        }
+        if (vcBatch.running.length > 0)
+            sendIpcMessage('main:on:task-cancel', vcBatch.running[0]);
+
         dispatch(vcBatchStop());
-        dispatch(vcBatchPause());
     };
+
+    useMainEventListener<{ id: string; success: boolean }>('main:on:task-paused', ({id, success}): void => {
+        if (success && id.startsWith('concat-'))
+            dispatch(vcBatchPause());
+    });
+
+    useMainEventListener<{ id: string; success: boolean }>('main:on:task-resumed', ({id, success}): void => {
+        if (success && id.startsWith('concat-'))
+            dispatch(vcBatchResume());
+    });
 
     useMainEventListener<{ id: string; progress: number }>('main:on:video-concat-progress', ({id, progress}): void => {
         if (id.startsWith('concat-')) {
@@ -159,6 +166,15 @@ const VMTaskListFooter: React.FC = (): React.JSX.Element => {
 
     return (
         <div className="task-list-footer vc-task-list-footer">
+            {isRunning &&
+                <div className="vc-concat-progress-bar">
+                    <ProgressBar
+                        max={100}
+                        thickness="large"
+                        value={Math.min(100, Math.max(0, vcConcatProgress))}
+                    />
+                </div>
+            }
             <div className="task-list-footer-content app_flex_box">
                 <div className="app_flex_box">
                     <div className="task-list-footer-item">
@@ -245,15 +261,6 @@ const VMTaskListFooter: React.FC = (): React.JSX.Element => {
                     }
                 </div>
             </div>
-            {isRunning &&
-                <div className="vc-concat-progress-bar">
-                    <ProgressBar
-                        max={100}
-                        thickness="large"
-                        value={Math.min(100, Math.max(0, vcConcatProgress))}
-                    />
-                </div>
-            }
         </div>
     );
 };

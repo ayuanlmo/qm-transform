@@ -1,13 +1,24 @@
 import {app, BrowserWindow, Display, globalShortcut, nativeTheme, screen, session, Size} from "electron";
 import {join} from "path";
+import {existsSync} from "fs";
 import Logger from "./lib/Logger";
 import {platform} from "os";
 import MainIpcHandles from "./app/MainIPC";
 // import AppMenu from "./lib/Menu";
 import AppUpdate from "./bin/AppUpdate";
+import {isStorePackaged} from "./bin/PackageEnv";
+import taskManager from "./bin/TaskManager";
 import Extensions from "./DevTools";
 
 const __DEV_MODEL: boolean = !app.isPackaged;
+
+// 开发期资源在 <项目根>/public，打包后 CRA 把 public 内容平铺进 build/，
+// 而 WindowsApps 等安装位的 CWD 不是安装目录，所以必须用绝对路径解析。
+const resolveIcon = (): string => {
+    const candidates: string[] = [join(__dirname, 'favicon.ico'), join(app.getAppPath(), 'public', 'favicon.ico')];
+
+    return candidates.find((p: string): boolean => existsSync(p)) ?? '';
+};
 
 class MainApp {
     private mainWindow: BrowserWindow | undefined;
@@ -18,6 +29,11 @@ class MainApp {
             app.exit();
 
         app.on('ready', this.appReady);
+
+        // 退出不等于 ffmpeg 结束。孤儿进程会继续占用输出文件，Windows 上还会让目录无法删除。
+        app.on('before-quit', (): void => {
+            taskManager.killAll();
+        });
     }
 
     private appReady(): void {
@@ -44,11 +60,12 @@ class MainApp {
             this.mainWindow = new BrowserWindow({
                 width: winWidth,
                 height: winHeight,
-                icon: 'public/favicon.ico',
+                icon: resolveIcon() || undefined,
                 minWidth: minWinWidth,
                 minHeight: minWinHeight,
                 frame: true,
-                titleBarStyle: 'hidden',
+                titleBarStyle: platform() === 'linux' ? 'default' : 'hidden',
+                autoHideMenuBar: platform() === 'linux',
                 webPreferences: {
                     nodeIntegration: true,
                     webSecurity: false,
@@ -56,7 +73,9 @@ class MainApp {
                 }
             });
 
-            this.appUpdate = new AppUpdate(this.mainWindow);
+            // MSIX 通道由商店负责更新，electron-updater 只在官网安装包上拉起：
+            // 商店容器里它下载的安装包无法自行执行，留下的只是一个必然失败的检查。
+            this.appUpdate = isStorePackaged() ? undefined : new AppUpdate(this.mainWindow);
             new MainIpcHandles(this.mainWindow, this.appUpdate);
 
             Logger.info('launching...');

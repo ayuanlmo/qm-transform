@@ -98,7 +98,6 @@
           .task-item-tag {
             position: relative;
             top: -2rem;
-            left: .81rem;
             justify-content: space-between;
             padding: 0 .81rem;
 
@@ -176,8 +175,7 @@
           }
 
           .task-item-media-info-progress-bar {
-            //bottom: 0;
-            top: -10px;
+            bottom: 0;
             width: 100%;
           }
         }
@@ -248,11 +246,6 @@
       display: flex;
       flex-direction: column;
       align-items: stretch;
-
-      .vc-concat-progress-bar {
-        position: relative;
-        top: -.25rem;
-      }
     }
 
     .task-list-footer-content {
@@ -571,6 +564,22 @@
   .app-about-version {
     font-size: 0.875rem;
     margin: 1.25rem 0;
+  }
+
+  .app-about-runtime {
+    text-align: left;
+    max-width: 28rem;
+    margin: 0 auto 1.25rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    border-radius: 4px;
+    background: var(--colorNeutralBackground3);
+    color: var(--colorNeutralForeground2);
+
+    p {
+      margin: 0.2rem 0;
+    }
   }
 
   .app-about-update {

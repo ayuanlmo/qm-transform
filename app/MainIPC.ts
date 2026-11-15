@@ -10,6 +10,7 @@ import AppUpdate from "../bin/AppUpdate";
 import packageJSON from "../package.json";
 import Logger from "../lib/Logger";
 import {getLocalConfigAsMain} from "../bin/Conf";
+import taskManager from "../bin/TaskManager";
 import {LogLevel} from "electron-log";
 
 /**
@@ -67,6 +68,9 @@ class MainIpcHandles {
         ipcMain.on('main:on:check-for-updates', (): void => {
             this.appUpdate?.checkForUpdates();
         });
+        ipcMain.on('main:on:get-update-mode', (event: IpcMainEvent): void => {
+            event.reply('main:on:update-mode', {managedByStore: !this.appUpdate});
+        });
         ipcMain.on('window:on:set-log-level', (_event: IpcMainEvent, level: LogLevel): void => {
             Logger.transports.file.level = level;
             Logger.transports.console.level = level;
@@ -74,6 +78,9 @@ class MainIpcHandles {
     }
 
     private async closeApp(instant: boolean = false, exit: boolean = false): Promise<void> {
+        if (exit)
+            taskManager.killAll(0);
+
         if (exit)
             app.exit();
         else if (instant)

@@ -3,7 +3,7 @@ import {Fragment, useEffect, useState} from "react";
 import {Button, Card, Divider, Label, Select, Switch} from "@fluentui/react-components";
 import {DeleteLines20Filled, DesktopOff20Filled, Whiteboard20Filled} from "@fluentui/react-icons";
 import {useTranslation} from "react-i18next";
-import {appTempFileInfo, deleteAppleTempFiles} from "../../utils";
+import {appTempFileInfo, deleteAppleTempFiles, getShowInSystemFileManagerI18nKey} from "../../utils";
 import YExtendTemplate from "../YExtendTemplate";
 import {useMainEventListener} from "../../bin/Hooks";
 import {sendIpcMessage} from "../../bin/IPC";
@@ -14,8 +14,7 @@ import {setCurrentSettingConfig} from "../../store/AppStore";
 import type {LogLevel} from "electron-log";
 
 const platform = process.platform;
-const isWin32 = platform === 'win32';
-const openInSystemLabel: string = isWin32 ? 'mediaFile.options.showInExplorer' : 'mediaFile.options.showInFinder';
+const openInSystemLabel: string = getShowInSystemFileManagerI18nKey();
 
 const OtherSetting: React.FC = (): React.JSX.Element => {
     const {t} = useTranslation();

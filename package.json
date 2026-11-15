@@ -1,6 +1,6 @@
 {
   "name": "qm-transform",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "QM-Transform 现代化、开源的媒体格式转换工具",
   "main": "build/main.js",
   "private": false,
@@ -11,7 +11,8 @@
   "packageManager": "pnpm@10.4.1",
   "os": [
     "darwin",
-    "win32"
+    "win32",
+    "linux"
   ],
   "cpu": [
     "x64",
@@ -24,7 +25,13 @@
     "start": "pnpm run c && concurrently \"pnpm run start-react-app\" \"pnpm run start-electron-app\"",
     "c": "tsc",
     "start-electron-app": "pnpm run c && cross-env NODE_ENV=development electron build/main.js",
-    "build": "cross-env NODE_ENV=production pnpm run start-react-app-build && pnpm run c && pnpm run prepare-electron && electron-builder",
+    "prebuild": "node scripts/clean-binaries.js",
+    "build": "pnpm run prebuild && cross-env NODE_ENV=production pnpm run start-react-app-build && pnpm run c && pnpm run prepare-electron && electron-builder",
+    "make:msix": "pnpm run prebuild && cross-env NODE_ENV=production pnpm run start-react-app-build && pnpm run c && node scripts/make-msix.mjs",
+    "sign:msix": "node scripts/sign-msix.mjs",
+    "make:msix-assets": "node scripts/make-msix-assets.mjs",
+    "serve:updates": "node scripts/serve-updates.mjs",
+    "start:update-test": "pnpm run c && concurrently \"pnpm run start-react-app\" \"cross-env QM_DEV_UPDATE_URL=http://127.0.0.1:8099 pnpm run start-electron-app\"",
     "prepare-electron": "node -e \"const fs=require('fs');fs.copyFileSync('build/main.js','build/electron.js');\"",
     "start-react-app": "cross-env BROWSER=none PORT=8088 LMO_APP_VERSION=$npm_package_version craco start",
     "start-react-app-build": "cross-env BROWSER=none PORT=8088 LMO_APP_VERSION=$npm_package_version craco build"
@@ -33,8 +40,13 @@
     "productName": "QM-Transform",
     "icon": "public/favicon.ico",
     "asar": true,
+    "asarUnpack": [
+      "**/*.node",
+      "node_modules/ffmpeg-static/**",
+      "node_modules/ffprobe-static/**"
+    ],
     "directories": {
-      "buildResources": "build",
+      "buildResources": "resources",
       "output": "dist"
     },
     "nsis": {
@@ -47,10 +59,22 @@
       "installerIcon": "public/favicon.ico",
       "uninstallerIcon": "public/favicon.ico",
       "installerHeaderIcon": "public/favicon.ico",
+      "artifactName": "QM-Transform.Setup.${version}.exe",
       "license": "LICENSE"
     },
     "win": {
-      "icon": "public/icon.ico",
+      "icon": "public/favicon.ico",
+      "electronLanguages": [
+        "en-US",
+        "de",
+        "fi",
+        "fr",
+        "ja",
+        "ko",
+        "ru",
+        "zh-CN",
+        "zh-TW"
+      ],
       "target": [
         {
           "target": "nsis",
@@ -62,11 +86,41 @@
     },
     "mac": {
       "icon": "public/icon.icns",
+      "artifactName": "QM-Transform-${version}-${arch}.dmg",
       "target": [
         {
           "target": "dmg",
           "arch": [
             "arm64"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "icon": "public/icon.png",
+      "category": "Utility",
+      "electronLanguages": [
+        "en-US",
+        "de",
+        "fi",
+        "fr",
+        "ja",
+        "ko",
+        "ru",
+        "zh-CN",
+        "zh-TW"
+      ],
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
           ]
         }
       ]
@@ -98,20 +152,20 @@
     "react-i18next": "^15.4.1",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.4.0",
-    "react-scripts": "^5.0.1",
     "systeminformation": "^5.27.1",
     "uuid": "^11.1.0"
   },
-  "optionalDependencies": {
-    "ntsuspend": "^1.0.2"
-  },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "ntsuspend"
+      "@parcel/watcher",
+      "electron",
+      "ffmpeg-static"
     ]
   },
   "devDependencies": {
     "@craco/craco": "^7.1.0",
+    "@electron-forge/cli": "^8.0.1",
+    "@electron-forge/maker-msix": "^8.0.1",
     "@eslint/js": "^9.22.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
@@ -142,6 +196,7 @@
     "eslint-plugin-react-hooks": "^4.3.0",
     "globals": "^16.0.0",
     "html-webpack-plugin": "^5.6.3",
+    "react-scripts": "^5.0.1",
     "sass": "^1.86.0",
     "sass-loader": "^16.0.5",
     "style-loader": "^4.0.0",

@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Card, ListItem, ProgressBar, Tag, Text, Tooltip} from "@fluentui/react-components";
+import {Card, ListItem, Tag, Text, Tooltip} from "@fluentui/react-components";
 import {useTranslation} from "react-i18next";
 import {useSortable} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
@@ -15,7 +15,7 @@ export interface IVideoConcatTaskItemProps {
 }
 
 const VMTaskItem: React.FC<IVideoConcatTaskItemProps> = (props: IVideoConcatTaskItemProps): React.JSX.Element => {
-    const {data, isProcessing, concatProgress = 0, onRemove} = props;
+    const {data, isProcessing, onRemove} = props;
     const {t} = useTranslation();
 
     const {
@@ -127,16 +127,6 @@ const VMTaskItem: React.FC<IVideoConcatTaskItemProps> = (props: IVideoConcatTask
                             >
                                 <DragHandleIcon className="app_cursor_pointer"/>
                             </div>
-                            {
-                                // isProcessing
-                                // &&
-                                <div className="task-item-media-info-progress-bar app_position_absolute">
-                                    <ProgressBar
-                                        max={100}
-                                        value={Math.min(100, Math.max(0, concatProgress + 50))}
-                                    />
-                                </div>
-                            }
                         </div>
                     </div>
                 </Card>

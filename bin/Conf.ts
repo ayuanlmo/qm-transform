@@ -1,11 +1,9 @@
 import path from "path";
 import {existsSync, readFileSync} from "node:fs";
 import Logger from "../lib/Logger";
-import os from "node:os";
+import {appConfigDir} from "../lib/Dir";
 
-const isWin32: boolean = os.platform() === 'win32';
-const appHomePath: string = path.resolve(isWin32 ? path.resolve(os.homedir(), 'AppData', 'Local', 'QM-Transform') : path.resolve(os.homedir(), '.QM-Transform'));
-const configFileDir: string = path.resolve(appHomePath, 'config', 'Conf.t.json');
+const configFileDir: string = path.resolve(appConfigDir, 'Conf.t.json');
 
 export const getLocalConfigAsMain = (): IDefaultSettingConfig | null => {
     if (existsSync(configFileDir)) {
