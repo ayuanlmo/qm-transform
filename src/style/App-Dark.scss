@@ -1,4 +1,4 @@
-@import "theme";
+@use "theme" as *;
 
 .dark-mode {
   .main-menu {

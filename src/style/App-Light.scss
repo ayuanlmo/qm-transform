@@ -1,4 +1,4 @@
-@import "theme";
+@use "theme" as *;
 
 .light-mode {
   .main-menu {
@@ -12,7 +12,7 @@
   }
 
   .main-menu-content-item-shared {
-    background: $__primary-sub-bg-color-light;
+    background: $primary-sub-bg-color-light;
   }
 
   .main-menu-content-item {
